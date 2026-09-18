@@ -1,0 +1,1 @@
+ALTER TABLE records ADD COLUMN products_json TEXT NOT NULL DEFAULT '[]';
