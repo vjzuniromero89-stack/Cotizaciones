@@ -1,0 +1,65 @@
+import React,{useEffect,useState}from'react';
+import{Search,FileText,CheckCircle2,X,Pencil,Trash2,Phone,Package,Route,CalendarDays,StickyNote,Printer}from'lucide-react';
+import'./detail.css';
+import'./product-detail.css';
+
+const money=n=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(n||0);
+const labels={pending:'Pendiente',returned:'Archivada',confirmed:'Confirmada',purchased:'Comprada',transit:'En tránsito',delivered:'Entregada',cancelled:'Cancelada'};
+const steps=['confirmed','purchased','transit','delivered'];
+async function api(path,options){const r=await fetch('/api'+path,{headers:{'content-type':'application/json'},...options});if(!r.ok)throw new Error((await r.json()).error||'No se pudo completar');return r.status===204?null:r.json()}
+
+function ClientQuote({data,onClose}){
+ const total=Number(data.total||0)*1.30,totalUnits=Number(data.totals?.totalUnits||0);
+ return <div className="clientQuoteOverlay"><section className="clientQuotePrint">
+  <div className="clientQuoteTools"><button onClick={onClose}><X/> Cerrar</button><button className="printQuote" onClick={()=>window.print()}><Printer/> Imprimir / guardar PDF</button></div>
+  <header className="clientQuoteHeader"><div className="quoteBrand"><span>RS</span><div><b>RutaSmart</b><small>Compras y logística internacional</small></div></div><div className="quoteTitle"><small>COTIZACIÓN PARA CLIENTE</small><strong>{data.number}</strong></div></header>
+  <div className="clientQuoteMeta"><div><small>PREPARADA PARA</small><strong>{data.customer_name}</strong>{data.phone&&<span>{data.phone}</span>}</div><div><small>FECHA</small><strong>{new Date(data.created_at).toLocaleDateString('es-NI',{year:'numeric',month:'long',day:'numeric'})}</strong><span>Entrega en Managua, Nicaragua</span></div></div>
+  <div className="clientProductTable"><div className="clientProductHead"><span>Descripción</span><span>Cantidad</span></div>{data.products?.length?<>{data.products.map((p,i)=><div className="clientProductRow" key={i}><span>{p.name||'Producto'}</span><b>{Number(p.qty||0).toLocaleString()}</b></div>)}</>:<div className="clientProductRow"><span>{data.description||'Productos cotizados'}</span><b>{totalUnits.toLocaleString()}</b></div>}</div>
+  <div className="clientQuoteSummary"><div><span>Total de unidades</span><b>{totalUnits.toLocaleString()}</b></div><div className="clientGrandTotal"><span>Total puesto en Managua<br/><small>Incluyendo envío</small></span><strong>{money(total)}</strong></div></div>
+  <div className="clientQuoteNotes"><b>Servicio incluido</b><p>Compra, gestión logística y envío de los productos hasta Managua, Nicaragua.</p></div>
+  <footer><span>Gracias por confiar en RutaSmart.</span><b>Cotización válida sujeta a confirmación de disponibilidad.</b></footer>
+ </section></div>
+}
+
+function ClientDetail({id,onClose}){
+ const[data,setData]=useState(null);
+ useEffect(()=>{api('/records/'+id).then(setData)},[id]);
+ if(!data)return <div className="overlay"><div className="detailSheet loadingDetail">Preparando cotización para el cliente…</div></div>;
+ return <ClientQuote data={data} onClose={onClose}/>;
+}
+
+function Detail({id,type,onClose,onChanged}){
+ const[data,setData]=useState(null),[edit,setEdit]=useState(false),[form,setForm]=useState(null),[busy,setBusy]=useState(false);
+ useEffect(()=>{api('/records/'+id).then(x=>{setData(x);setForm({...x})})},[id]);
+ if(!data)return <div className="overlay"><div className="detailSheet loadingDetail">Cargando expediente…</div></div>;
+ const totals=data.totals,shownRoute=edit?form.route:data.route,selectedShipping=shownRoute==='miami'?totals.viaMiami:totals.direct,routeTotal=shownRoute==='miami'?(totals.landedMiami??totals.viaMiami):(totals.landedDirect??totals.direct);
+ const f=(k,v)=>setForm(x=>({...x,[k]:v}));
+ async function save(){setBusy(true);try{await api('/records/'+id,{method:'PATCH',body:JSON.stringify({...form,total:routeTotal})});setData({...data,...form,total:routeTotal});setEdit(false);onChanged()}finally{setBusy(false)}}
+ async function remove(){const isOrder=data.record_type==='order',message=isOrder?'¿Quitar esta orden? Se conservará en Cotizaciones internas y Cotizaciones para clientes.':'¿Eliminar esta cotización permanentemente? Esta acción no se puede deshacer.';if(!confirm(message))return;setBusy(true);try{await api('/records/'+id+(isOrder?'/revert':''),{method:isOrder?'POST':'DELETE'});onChanged();onClose()}finally{setBusy(false)}}
+ return <div className="overlay" onMouseDown={e=>e.target===e.currentTarget&&onClose()}><section className="detailSheet">
+  <div className="detailTop"><div><span className={'badge '+data.status}>{labels[data.status]}</span><small>{data.record_type==='quote'?'EXPEDIENTE DE COTIZACIÓN':'EXPEDIENTE DE ORDEN'}</small><h2>{data.number}</h2></div><button className="iconBtn" onClick={onClose}><X/></button></div>
+  <div className="detailActions">{!edit&&<>{type==='quote'&&<button onClick={()=>setEdit(true)}><Pencil/> Editar</button>}<button className="danger" disabled={busy} onClick={remove}><Trash2/> {type==='order'?'Quitar de órdenes':'Eliminar'}</button></>}</div>
+  <div className="detailGrid"><div className="detailCard"><label>Cliente</label>{edit?<input value={form.customer_name} onChange={e=>f('customer_name',e.target.value)}/>:<b>{data.customer_name}</b>}<span><Phone/> {edit?<input value={form.phone} onChange={e=>f('phone',e.target.value)}/>:data.phone||'Sin teléfono'}</span></div><div className="detailCard"><label>Producto</label>{edit?<input value={form.description} onChange={e=>f('description',e.target.value)}/>:<b>{data.description||'Sin descripción'}</b>}<span><CalendarDays/> Creada {new Date(data.created_at).toLocaleString()}</span></div></div>
+  <div className="detailSection"><h3><Route/> Ruta y costos</h3>{edit?<select value={form.route} onChange={e=>f('route',e.target.value)}><option value="miami">Vía 1 · China–Miami–Managua</option><option value="direct">Vía 2 · China–Managua</option></select>:<p className="chosenRoute">{shownRoute==='miami'?'Vía 1 · China → Miami → Managua':'Vía 2 · China → Managua'}</p>}<div className="costBreakdown">{shownRoute==='miami'?<><div><span>China → Miami</span><b>{money(totals.cnCost)}</b></div><div><span>Miami → Managua</span><b>{money(totals.miCost)}</b></div></>:<div><span>China → Managua</span><b>{money(totals.direct)}</b></div>}<div className="selectedCost"><span>Total del envío seleccionado</span><strong>{money(selectedShipping)}</strong></div></div></div>
+  {shownRoute==='miami'&&totals.cnVolumeKg!=null&&<div className="detailSection"><h3>Peso seleccionado para cobro</h3><div className="costBreakdown"><div><span>China → Miami · {totals.cnVolumeKg>totals.actualKg?'Volumétrico':'Crudo'}</span><b>{totals.cnBillKg.toFixed(2)} kg</b></div><div><span>Miami → Managua · {totals.miVolumeLb>totals.actualLb?'Volumétrico':'Crudo'}</span><b>{totals.miBillLb.toFixed(2)} lb</b></div></div></div>}
+  {data.products?.length>0&&<div className="detailSection"><h3>Productos ({totals.totalUnits} unidades)</h3><div className="savedProducts">{data.products.map((p,i)=><div key={i}>{p.imageUrl?<img src={p.imageUrl} alt=""/>:<span className="noPhoto">Sin foto</span>}<p><b>{p.name||'Producto'}</b><small>{p.qty} × {money(p.price)}</small></p><strong>{money(Number(p.qty)*Number(p.price))}</strong></div>)}</div><div className="costBreakdown productCosts"><div><span>Subtotal productos</span><b>{money(totals.productSubtotal)}</b></div><div><span>Comisión ({totals.feePercent}%)</span><b>{money(totals.feeAmount)}</b></div><div><span>Productos + comisión</span><b>{money(totals.merchandiseTotal)}</b></div><div><span>Envío seleccionado</span><b>{money(selectedShipping)}</b></div><div className="selectedCost"><span>Total puesto en Nicaragua</span><strong>{money(edit?routeTotal:data.total)}</strong></div><div className="selectedCost unitCost"><span>Costo promedio por unidad</span><strong>{money(shownRoute==='miami'?totals.unitMiami:totals.unitDirect)}</strong></div></div></div>}
+  <div className="detailSection"><h3><Package/> Cajas ({data.total_boxes})</h3><div className="boxTable"><div className="boxRow head"><span>Cant.</span><span>Medidas</span><span>Peso crudo/caja</span></div>{data.boxes.map((b,i)=><div className="boxRow" key={i}><span>{b.qty}</span><span>{b.l} × {b.w} × {b.h} {b.unit}</span><span>{b.weight} {b.weightUnit}</span></div>)}</div></div>
+  <div className="detailSection"><h3><StickyNote/> Notas</h3>{edit?<textarea value={form.notes} onChange={e=>f('notes',e.target.value)}/>:<p>{data.notes||'Sin notas'}</p>}</div>
+  {edit&&<div className="editFooter"><button onClick={()=>{setEdit(false);setForm({...data})}}>Cancelar</button><button className="primary" disabled={!form.customer_name||busy} onClick={save}>{busy?'Guardando…':'Guardar cambios'}</button></div>}
+ </section></div>
+}
+
+export default function RecordsPage({type,refreshKey,onChange}){
+ const[rows,setRows]=useState([]),[query,setQuery]=useState(''),[loading,setLoading]=useState(true),[selected,setSelected]=useState(null);
+ const isClient=type==='client',recordType=isClient?'quote':type;
+ async function load(){setLoading(true);try{setRows(await api(`/records?type=${recordType}`))}finally{setLoading(false)}}
+ useEffect(()=>{load()},[type,refreshKey]);
+ const filtered=rows.filter(x=>(x.customer_name+' '+x.number+' '+(x.description||'')).toLowerCase().includes(query.toLowerCase()));
+ async function promote(e,id){e.stopPropagation();await api(`/records/${id}/promote`,{method:'POST'});load();onChange()}
+ async function status(e,id){e.stopPropagation();await api(`/records/${id}`,{method:'PATCH',body:JSON.stringify({status:e.target.value})});load()}
+ async function removeRow(e,id){e.stopPropagation();if(!window.confirm('¿Quitar esta orden? Se conservará en Cotizaciones internas y Cotizaciones para clientes.'))return;await api(`/records/${id}/revert`,{method:'POST'});load();onChange()}
+ return <div className="workspace"><div className="pageHead"><div><small>{isClient?'DOCUMENTOS PARA ENVIAR':type==='quote'?'VENTAS':'LOGÍSTICA'}</small><h1>{isClient?'Cotizaciones para clientes':type==='quote'?'Cotizaciones internas':'Órdenes en proceso'}</h1><p>{isClient?'Precios finales con ganancia y envío incluidos, listos para imprimir.':type==='quote'?'Edita, revisa o confirma cada propuesta.':'Abre una orden para ver, actualizar o eliminar su expediente.'}</p></div></div>
+ <div className="stats"><div><span>Total</span><b>{rows.length}</b></div><div><span>{type==='order'?'En proceso':'Pendientes'}</span><b>{rows.filter(x=>type==='order'?x.status!=='delivered':x.status==='pending').length}</b></div><div><span>{isClient?'Valor de venta':'Valor'}</span><b>{money(rows.reduce((s,x)=>s+x.total*(isClient?1.30:1),0))}</b></div></div>
+ <section className="panel records"><div className="search"><Search/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Buscar cliente o número…"/></div>{loading?<div className="empty">Cargando…</div>:filtered.length===0?<div className="empty"><FileText/><h3>No hay registros</h3><p>{type==='order'?'Las cotizaciones confirmadas aparecerán aquí.':'Guarda una cotización desde la calculadora.'}</p></div>:<div className="recordList">{filtered.map(x=><article className="record clickable" key={x.id} onClick={()=>setSelected(x.id)}><div className="recordMain"><span className={'badge '+x.status}>{labels[x.status]}</span><b>{x.number}</b><h3>{x.customer_name}</h3><p>{x.description||'Sin descripción'} · {x.total_boxes} cajas{isClient?' · Envío incluido':' · '+(x.route==='miami'?'Vía Miami':'Vía directa')}</p></div><div className="recordSide"><strong>{money(x.total*(isClient?1.30:1))}</strong><small>{new Date(x.created_at).toLocaleDateString()}</small>{type==='quote'?<button className="confirm" onClick={e=>promote(e,x.id)}><CheckCircle2/> Cliente confirmó</button>:type==='order'?<div className="orderRowActions"><select value={x.status} onClick={e=>e.stopPropagation()} onChange={e=>status(e,x.id)}>{steps.map(s=><option key={s} value={s}>{labels[s]}</option>)}</select><button className="orderDelete" onClick={e=>removeRow(e,x.id)}><Trash2/> Quitar</button></div>:<span className="readyToSend"><Printer/> Lista para imprimir</span>}</div></article>)}</div>}</section>
+ {selected&&(isClient?<ClientDetail id={selected} onClose={()=>setSelected(null)}/>:<Detail id={selected} type={type} onClose={()=>setSelected(null)} onChanged={()=>{load();onChange()}}/>)}</div>
+}
