@@ -56,20 +56,46 @@ async function updateRecord(env,id,values,extraFilter=''){
  return rows[0]||null;
 }
 
+async function createProductImagesBucket(env){
+ const response=await supabaseFetch(env,'/storage/v1/bucket',{
+  method:'POST',
+  headers:{'content-type':'application/json'},
+  body:JSON.stringify({
+   id:'product-images',
+   name:'product-images',
+   public:false,
+   file_size_limit:5*1024*1024,
+   allowed_mime_types:['image/jpeg','image/png','image/webp','image/gif']
+  })
+ });
+ if(!response.ok&&response.status!==409){
+  throw new Error((await response.text())||'No se pudo crear el contenedor de imágenes');
+ }
+}
+
+async function uploadProductImage(env,key,type,bytes){
+ const path=`/storage/v1/object/product-images/products/${key}`;
+ const options={method:'POST',headers:{'content-type':type,'x-upsert':'false'}};
+ let response=await supabaseFetch(env,path,{...options,body:bytes.slice(0)});
+ if(response.status===404){
+  await createProductImagesBucket(env);
+  response=await supabaseFetch(env,path,{...options,body:bytes.slice(0)});
+ }
+ return response;
+}
+
 async function handleApi(request,env,url){
  try{
   const upload=url.pathname.match(/^\/api\/uploads\/([^/]+)$/);
   if(upload&&request.method==='PUT'){
    const type=request.headers.get('content-type')||'application/octet-stream';
    if(!type.startsWith('image/'))return json({error:'Solo se permiten imágenes'},400);
-   const size=Number(request.headers.get('content-length')||0);
-   if(size>5*1024*1024)return json({error:'La imagen supera 5 MB'},413);
+   const declaredSize=Number(request.headers.get('content-length')||0);
+   if(declaredSize>5*1024*1024)return json({error:'La imagen supera 5 MB'},413);
+   const bytes=await request.arrayBuffer();
+   if(bytes.byteLength>5*1024*1024)return json({error:'La imagen supera 5 MB'},413);
    const key=encodeURIComponent(upload[1]);
-   const response=await supabaseFetch(env,`/storage/v1/object/product-images/products/${key}`,{
-    method:'POST',
-    headers:{'content-type':type,'x-upsert':'false'},
-    body:request.body
-   });
+   const response=await uploadProductImage(env,key,type,bytes);
    if(!response.ok)throw new Error((await response.text())||'Supabase Storage rechazó la imagen');
    return json({url:'/api/files/'+upload[1]},201);
   }
