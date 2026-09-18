@@ -6,7 +6,7 @@ import RecordsPage from'./RecordsPage.jsx';
 import WeightBreakdown from'./WeightBreakdown.jsx';
 import ProductSection,{blankProduct}from'./ProductSection.jsx';
 import ProfitPage from'./ProfitPage.jsx';
-import'./landed.css';
+import'./landed.css';import'./dark.css';
 const money=n=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(n||0);
 const blank=()=>({id:crypto.randomUUID(),name:'Caja',qty:1,l:12,w:12,h:12,unit:'in',weight:10,weightUnit:'kg'});
 const initialRates={cnRate:2,miRate:1.5,cbmRate:550,cnDivisor:5000,miDivisor:166,minCbm:true};
