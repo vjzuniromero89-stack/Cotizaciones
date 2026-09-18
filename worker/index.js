@@ -2,8 +2,8 @@ const json=(data,status=200)=>new Response(JSON.stringify(data),{status,headers:
 
 function supabaseConfig(env){
  const url=String(env.SUPABASE_URL||'').replace(/\/+$/,'');
- const key=String(env.SUPABASE_SERVICE_ROLE_KEY||'');
- if(!url||!key)throw new Error('Falta configurar SUPABASE_URL y SUPABASE_SERVICE_ROLE_KEY en Cloudflare');
+ const key=String(env.SUPABASE_SECRET_KEY||env.SUPABASE_SERVICE_ROLE_KEY||'');
+ if(!url||!key)throw new Error('Falta configurar SUPABASE_URL y SUPABASE_SECRET_KEY en Cloudflare');
  return{url,key};
 }
 
@@ -11,7 +11,9 @@ async function supabaseFetch(env,path,options={}){
  const{url,key}=supabaseConfig(env);
  const headers=new Headers(options.headers||{});
  headers.set('apikey',key);
- headers.set('authorization',`Bearer ${key}`);
+ // Las claves nuevas sb_secret_ no son JWT y deben viajar solo en apikey.
+ // La clave service_role antigua sí requiere Authorization: Bearer.
+ if(!key.startsWith('sb_secret_'))headers.set('authorization',`Bearer ${key}`);
  return fetch(url+path,{...options,headers});
 }
 
