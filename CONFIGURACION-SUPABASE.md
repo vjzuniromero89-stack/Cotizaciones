@@ -28,14 +28,15 @@ código del navegador, GitHub ni a variables que empiecen con `VITE_`.
 
 ## 3. Configurar y volver a desplegar
 
-En **Build configuration**, usa estos comandos:
+En **Build configuration**, puedes conservar estos comandos:
 
 - Build command: `npm run build`
-- Deploy command: `npm run deploy`
+- Deploy command: `npx wrangler deploy`
 
-Después de guardar, ejecuta un nuevo despliegue desde Cloudflare. El comando de
-despliegue transfiere ambas variables al Worker como secretos de ejecución sin
-mostrar sus valores en el código ni en el registro.
+Después de guardar, ejecuta un nuevo despliegue desde Cloudflare. Durante la
+compilación, la aplicación transfiere automáticamente ambas variables al Worker
+como secretos de ejecución sin mostrar sus valores en el código ni en el
+registro.
 
 Al seleccionar una foto, la aplicación mostrará `Subiendo…` y luego la vista
 previa del producto.
