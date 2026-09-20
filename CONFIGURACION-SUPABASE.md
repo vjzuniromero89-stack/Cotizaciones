@@ -26,6 +26,18 @@ En el proyecto de Cloudflare abre **Settings → Variables and Secrets** y agreg
 La clave secreta es únicamente para Cloudflare. No debe agregarse al
 código del navegador, GitHub ni a variables que empiecen con `VITE_`.
 
+## Primer administrador y usuarios
+
+Después de publicar esta versión, abre la página. Si Supabase Auth todavía no
+tiene usuarios, la aplicación mostrará **Crear administrador**. Escribe un
+nombre de usuario y una contraseña de al menos 8 caracteres. Esa primera
+cuenta será el administrador principal.
+
+Después de entrar, abre la pestaña **Usuarios** para crear administradores o
+usuarios estándar, cambiar contraseñas y activar o desactivar cuentas. Las
+contraseñas se guardan mediante Supabase Auth y nunca se almacenan en las
+tablas de la aplicación.
+
 ## 3. Configurar y volver a desplegar
 
 En **Build configuration**, puedes conservar estos comandos:
