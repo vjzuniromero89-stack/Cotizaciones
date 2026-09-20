@@ -1,4 +1,4 @@
--- RutaSmart · Esquema inicial para Supabase/PostgreSQL
+-- CotizacionesChina · Esquema inicial para Supabase/PostgreSQL
 -- Conserva la estructura actual de cotizaciones y órdenes, usando JSONB para
 -- cajas, tarifas, totales y productos.
 
@@ -83,4 +83,4 @@ revoke all on table public.records from anon;
 grant select, insert, update, delete on table public.records to authenticated;
 
 comment on table public.records is
-  'Cotizaciones internas, cotizaciones de clientes y órdenes de RutaSmart.';
+  'Cotizaciones internas, cotizaciones de clientes y órdenes de CotizacionesChina.';
