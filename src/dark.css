@@ -1,20 +1,582 @@
-:root{--ink:#f7f8fb;--muted:#9da3b0;--navy:#121319;--blue:#22c979;--cyan:#15251e;--lime:#22c979;--paper:#0e0f14;--line:#292b35;--surface:#16171d;--surface-2:#1b1d24;--field:#101116}
-html{background:var(--paper);color-scheme:dark}body{background:radial-gradient(circle at 82% 0,#17231e 0,transparent 27%),var(--paper);color:var(--ink)}#root>header{background:#121319;border-color:var(--line);box-shadow:0 8px 26px #0005}.brand b,.pageHead h1,.sectionTitle h2,.resultHead h2{color:#fff}.logo{background:#20222a;color:var(--lime);border:1px solid #30333d}.mainNav button{color:#a8adb8}.mainNav button:hover{background:#1b1d24;color:#fff}.mainNav button.active{background:var(--lime);color:#07140e}.pageHead small,.dialogHead small{color:var(--lime)}
-.panel,.results,.stats div,.profitMetric,.profitPanel,.profitRecord,.dialog,.detailSheet,.detailCard,.detailSection{background:var(--surface);border-color:var(--line);color:var(--ink);box-shadow:0 14px 36px #0003}.box,.productRow,.purchaseSummary,.finalMini,.profitFilters,.weightCompare,.weightLeg,.boxRow.head,.clientQuoteTools button{background:var(--surface-2);border-color:var(--line);color:var(--ink)}.sectionTitle span,.resultHead>span{background:#24262e;color:var(--lime);border:1px solid #343741}
-.settings,.add,.detailActions button,.editFooter>button:first-child,.iconBtn{background:#1b1d24;border-color:#343640;color:#f5f6f8}.settings:hover,.add:hover,.detailActions button:hover{border-color:var(--lime);color:var(--lime)}.saveQuote,.primary,.detailActions .clientQuoteButton{background:var(--lime);border-color:var(--lime);color:#08150f}.confirm{background:var(--lime);color:#08150f}
-.field input,.field select,select,.field textarea,.productRow input,.detailCard input,.detailSection input,.detailSection textarea,.profitControls input,.search input,.purchaseSummary input{background:var(--field);border-color:#343640;color:#fff}.field input::placeholder,.field textarea::placeholder,.productRow input::placeholder,.profitControls input::placeholder,.search input::placeholder{color:#747b89}.field input:focus,.field select:focus,select:focus,.productRow input:focus,.detailSection input:focus,.detailSection textarea:focus{border-color:var(--lime);box-shadow:0 0 0 3px #22c97922;outline:0}option{background:#15161c;color:#fff}
-.results{background:#13151b}.route,.landedGrid>div,.capacity{background:#1b1d24;border-color:#32353e}.route.winner{background:#1a201d;color:#fff;border-color:var(--lime)}.routeIcon{background:#222831;color:var(--lime)}.routeIcon.ship{background:#17271f;color:var(--lime)}.route mark{background:var(--lime);color:#08150f}.winner dt,.winner .weightLeg>div{color:var(--muted)}.winner .legs dt b,.winner .weightLeg b,.route.winner h3{color:#fff}.winner .weightCompare,.winner .weightLeg{background:#15171c;border-color:#30333b}.routeTotal,.winner .routeTotal{border-color:#ffffff24}.verdict{background:linear-gradient(100deg,#176d47,#22c979);color:#fff}.verdict small{color:#d6ffea}.bulb{background:#101611;color:#fff}.bar,.profitBar{background:#292c34}.bar i,.profitBar i{background:linear-gradient(90deg,#22c979,#7bf0ad)}
-.search,.record,.profitControls,.boxTable,.boxRow,.savedProducts>div{border-color:var(--line)}.record.clickable:hover{background:#1b1d24}.record h3,.recordSide strong,.stats b,.profitMetric b,.profitRecord h3,.profitBreakdown b,.detailTop h2,.detailCard>b,.detailSection h3{color:#fff}.orderDelete,.detailActions .danger,.removeProduct{background:#2a191b;border-color:#5a2a30;color:#ff858d}.badge.returned{background:#292c34;color:#c9cdd5}
-.profitMain{background:linear-gradient(135deg,#143928,#176d47);box-shadow:0 18px 42px #0004}.profitMetric i{background:#183326;color:var(--lime)}.profitFilters button.active{background:#292c34;color:#fff;box-shadow:none}.profitControls>label{background:var(--field);border-color:#343640}.profitRecord:hover{border-color:#31875e;box-shadow:0 10px 30px #0003}.profitAmount strong,.profitAmount span{color:#47dc91}.profitRecordTop,.profitAmount,.profitBreakdown{color:var(--ink)}
-.photoPicker{background:#121419;border-color:#3c434d;color:var(--lime)}.photoPicker span{color:var(--lime)!important}.purchaseTotal{border-color:var(--lime)}.noPhoto{background:#23252c;color:var(--muted)}.productCosts .unitCost{background:#176d47;color:#fff}.productCosts .unitCost span{color:#d6ffea}.chosenRoute{color:var(--lime)}.costBreakdown .selectedCost{background:#20232a;color:#fff;border:1px solid #343741}.productCosts .saleUnit{background:linear-gradient(135deg,#176d47,#1a8b58);border-color:#2ab878}.productCosts .saleUnit span{color:#d9ffea}.productCosts .saleUnit span small{color:#8de8b8}.boxRow.head{color:#b4bac5}.dialogTotal{background:#1b2a23}.overlay{background:#07080bdb}
-.unitPriceTable{border-color:var(--line)}.unitPriceHead{background:#20232a;color:#aeb5c0}.unitPriceRow+.unitPriceRow{border-color:var(--line)}.unitPriceRow>strong{color:#fff}.unitPriceRow>.salePriceValue{color:#28d681}
-.productCargoCard,.productBoxEditor{background:var(--surface-2);border-color:var(--line)}.productCargoHead{background:#20232a;border-color:var(--line)}.productInfoRow{background:transparent}.productBoxEditor input,.productBoxEditor select{background:var(--field);border-color:#343640;color:#fff}.addCompleteProduct{background:linear-gradient(135deg,#148d58,#1fc978);color:#07130d}.boxProductName,.linkedQuoteBoxes .boxRow>b{color:#28d681}
-.clientQuotePrint{color:#122236;color-scheme:light}.clientQuotePrint .clientQuoteTools button{background:#fff;border-color:#d5dee8;color:#122236}.clientQuotePrint .clientQuoteTools .printQuote{background:#123454;color:#fff}.clientQuotePrint footer{background:#fff}.clientQuotePrint .clientProductRow,.clientQuotePrint .clientQuoteSummary>div{color:#122236}
-.quoteUnifiedCard{background:var(--surface);border-color:var(--line);color:var(--ink);box-shadow:none}.quoteUnifiedCard .detailCard,.quoteUnifiedCard .detailSection{color:var(--ink)}.quoteUnifiedCard .detailCard>b,.quoteUnifiedCard .detailSection h3,.quoteUnifiedCard .detailGroupLabel b,.quoteUnifiedCard .savedProducts b,.quoteUnifiedCard .savedProducts strong,.quoteUnifiedCard .costBreakdown b{color:#fff}.quoteUnifiedCard .savedProducts>div{background:var(--surface-2);border-color:var(--line)}.quoteUnifiedCard .unitPriceTable,.quoteUnifiedCard .boxTable{background:var(--surface-2)}.quoteUnifiedCard .unitPriceRow,.quoteUnifiedCard .boxRow{color:var(--ink)}.quoteUnifiedCard .detailGroupLabel>span{background:#173629;color:#3be090}.quoteUnifiedCard .detailGrid,.quoteUnifiedCard .detailSection+.detailSection,.quoteUnifiedCard .detailGroupLabel.shippingGroup,.quoteUnifiedCard .detailGrid .detailCard:first-child{border-color:var(--line)}
-.internalProductTable,.internalProductRow,.internalShippingSummary,.internalShippingSummary>div,.internalTotalsSummary>div,.internalNotes{border-color:var(--line)}.internalProductHead,.internalTotalsSummary .internalGrandTotal{background:var(--surface-2)}.internalProductRow b,.internalShippingSummary b,.internalTotalsSummary b,.internalTotalsSummary strong,.internalNotes h3{color:#fff}.internalTotalsSummary .internalUnitTotal{background:#176d47;color:#d9ffea}.internalTotalsSummary .internalUnitTotal strong{color:#fff}
-.productAllocationSection,.allocationTable,.allocationRow{border-color:var(--line)}.allocationHead{background:var(--surface-2)}.allocationTitle b,.allocationRow b{color:#fff}.allocationRow .salePriceValue{color:#28d681}
-@media(max-width:700px){#root>header{background:#121319}.mainNav{border-top:1px solid var(--line)}}
-.quoteBuilder{background:var(--surface);border-color:var(--line);color:var(--ink);box-shadow:0 14px 36px #0003}.quoteClientGrid input,.quoteFull input,.quoteFull textarea,.saleRow input{background:var(--field);border-color:#343640;color:#fff}.saleItems,.saleRow,.saleRow label{border-color:var(--line)}.saleHead,.quoteTotals{background:var(--surface-2);color:var(--ink)}
-.productCbmBreakdown{background:#1b1d24;border-color:#32353e}.productCbmTable,.productCbmRow,.productCbmNote{border-color:#32353e}.productCbmHead{background:#15171c}.productCbmRow strong,.productCbmTitle>strong{color:#47dc91}
-.internalOverview,.internalOverview>div,.internalBlock,.internalBlock>header,.quoteProductList article,.quoteLogistics>div,.economicsList article,.allocationMethod,.internalQuoteV2 .internalNotes{border-color:var(--line)}.internalBlock>header,.quoteTotalStrip,.costResult,.profitResult{background:var(--surface-2)}.internalOverview b,.internalBlock h3,.quoteProductList b,.quoteLogistics b,.quoteTotalStrip strong,.economicsList b,.economicsList strong{color:#fff}.saleResult{background:#173629}.internalBlock>header span{background:#173629;color:#3be090}
-.calculatorProductPricing article{border-color:var(--line)}.pricingCost,.pricingProfit{background:var(--surface-2)}.pricingSale{background:#173629}.pricingSale>div{background:var(--field);border-color:#2d7c55}.pricingSale input{color:#fff}
+:root {
+  --ink: #f7f8fb;
+  --muted: #9da3b0;
+  --navy: #121319;
+  --blue: #22c979;
+  --cyan: #15251e;
+  --lime: #22c979;
+  --paper: #0e0f14;
+  --line: #292b35;
+  --surface: #16171d;
+  --surface-2: #1b1d24;
+  --field: #101116;
+}
+html {
+  background: var(--paper);
+  color-scheme: dark;
+}
+body {
+  background:
+    radial-gradient(circle at 82% 0, #17231e 0, transparent 27%), var(--paper);
+  color: var(--ink);
+}
+#root > header {
+  background: #121319;
+  border-color: var(--line);
+  box-shadow: 0 8px 26px #0005;
+}
+.brand b,
+.pageHead h1,
+.sectionTitle h2,
+.resultHead h2 {
+  color: #fff;
+}
+.logo {
+  background: #20222a;
+  color: var(--lime);
+  border: 1px solid #30333d;
+}
+.mainNav button {
+  color: #a8adb8;
+}
+.mainNav button:hover {
+  background: #1b1d24;
+  color: #fff;
+}
+.mainNav button.active {
+  background: var(--lime);
+  color: #07140e;
+}
+.pageHead small,
+.dialogHead small {
+  color: var(--lime);
+}
+.panel,
+.results,
+.stats div,
+.profitMetric,
+.profitPanel,
+.profitRecord,
+.dialog,
+.detailSheet,
+.detailCard,
+.detailSection {
+  background: var(--surface);
+  border-color: var(--line);
+  color: var(--ink);
+  box-shadow: 0 14px 36px #0003;
+}
+.box,
+.productRow,
+.purchaseSummary,
+.finalMini,
+.profitFilters,
+.weightCompare,
+.weightLeg,
+.boxRow.head,
+.clientQuoteTools button {
+  background: var(--surface-2);
+  border-color: var(--line);
+  color: var(--ink);
+}
+.sectionTitle span,
+.resultHead > span {
+  background: #24262e;
+  color: var(--lime);
+  border: 1px solid #343741;
+}
+.settings,
+.add,
+.detailActions button,
+.editFooter > button:first-child,
+.iconBtn {
+  background: #1b1d24;
+  border-color: #343640;
+  color: #f5f6f8;
+}
+.settings:hover,
+.add:hover,
+.detailActions button:hover {
+  border-color: var(--lime);
+  color: var(--lime);
+}
+.saveQuote,
+.primary,
+.detailActions .clientQuoteButton {
+  background: var(--lime);
+  border-color: var(--lime);
+  color: #08150f;
+}
+.confirm {
+  background: var(--lime);
+  color: #08150f;
+}
+.field input,
+.field select,
+select,
+.field textarea,
+.productRow input,
+.detailCard input,
+.detailSection input,
+.detailSection textarea,
+.profitControls input,
+.search input,
+.purchaseSummary input {
+  background: var(--field);
+  border-color: #343640;
+  color: #fff;
+}
+.field input::placeholder,
+.field textarea::placeholder,
+.productRow input::placeholder,
+.profitControls input::placeholder,
+.search input::placeholder {
+  color: #747b89;
+}
+.field input:focus,
+.field select:focus,
+select:focus,
+.productRow input:focus,
+.detailSection input:focus,
+.detailSection textarea:focus {
+  border-color: var(--lime);
+  box-shadow: 0 0 0 3px #22c97922;
+  outline: 0;
+}
+option {
+  background: #15161c;
+  color: #fff;
+}
+.results {
+  background: #13151b;
+}
+.route,
+.landedGrid > div,
+.capacity {
+  background: #1b1d24;
+  border-color: #32353e;
+}
+.route.winner {
+  background: #1a201d;
+  color: #fff;
+  border-color: var(--lime);
+}
+.routeIcon {
+  background: #222831;
+  color: var(--lime);
+}
+.routeIcon.ship {
+  background: #17271f;
+  color: var(--lime);
+}
+.route mark {
+  background: var(--lime);
+  color: #08150f;
+}
+.winner dt,
+.winner .weightLeg > div {
+  color: var(--muted);
+}
+.winner .legs dt b,
+.winner .weightLeg b,
+.route.winner h3 {
+  color: #fff;
+}
+.winner .weightCompare,
+.winner .weightLeg {
+  background: #15171c;
+  border-color: #30333b;
+}
+.routeTotal,
+.winner .routeTotal {
+  border-color: #ffffff24;
+}
+.verdict {
+  background: linear-gradient(100deg, #176d47, #22c979);
+  color: #fff;
+}
+.verdict small {
+  color: #d6ffea;
+}
+.bulb {
+  background: #101611;
+  color: #fff;
+}
+.bar,
+.profitBar {
+  background: #292c34;
+}
+.bar i,
+.profitBar i {
+  background: linear-gradient(90deg, #22c979, #7bf0ad);
+}
+.search,
+.record,
+.profitControls,
+.boxTable,
+.boxRow,
+.savedProducts > div {
+  border-color: var(--line);
+}
+.record.clickable:hover {
+  background: #1b1d24;
+}
+.record h3,
+.recordSide strong,
+.stats b,
+.profitMetric b,
+.profitRecord h3,
+.profitBreakdown b,
+.detailTop h2,
+.detailCard > b,
+.detailSection h3 {
+  color: #fff;
+}
+.orderDelete,
+.detailActions .danger,
+.removeProduct {
+  background: #2a191b;
+  border-color: #5a2a30;
+  color: #ff858d;
+}
+.badge.returned {
+  background: #292c34;
+  color: #c9cdd5;
+}
+.profitMain {
+  background: linear-gradient(135deg, #143928, #176d47);
+  box-shadow: 0 18px 42px #0004;
+}
+.profitMetric i {
+  background: #183326;
+  color: var(--lime);
+}
+.profitFilters button.active {
+  background: #292c34;
+  color: #fff;
+  box-shadow: none;
+}
+.profitControls > label {
+  background: var(--field);
+  border-color: #343640;
+}
+.profitRecord:hover {
+  border-color: #31875e;
+  box-shadow: 0 10px 30px #0003;
+}
+.profitAmount strong,
+.profitAmount span {
+  color: #47dc91;
+}
+.profitRecordTop,
+.profitAmount,
+.profitBreakdown {
+  color: var(--ink);
+}
+.photoPicker {
+  background: #121419;
+  border-color: #3c434d;
+  color: var(--lime);
+}
+.photoPicker span {
+  color: var(--lime) !important;
+}
+.purchaseTotal {
+  border-color: var(--lime);
+}
+.noPhoto {
+  background: #23252c;
+  color: var(--muted);
+}
+.productCosts .unitCost {
+  background: #176d47;
+  color: #fff;
+}
+.productCosts .unitCost span {
+  color: #d6ffea;
+}
+.chosenRoute {
+  color: var(--lime);
+}
+.costBreakdown .selectedCost {
+  background: #20232a;
+  color: #fff;
+  border: 1px solid #343741;
+}
+.productCosts .saleUnit {
+  background: linear-gradient(135deg, #176d47, #1a8b58);
+  border-color: #2ab878;
+}
+.productCosts .saleUnit span {
+  color: #d9ffea;
+}
+.productCosts .saleUnit span small {
+  color: #8de8b8;
+}
+.boxRow.head {
+  color: #b4bac5;
+}
+.dialogTotal {
+  background: #1b2a23;
+}
+.overlay {
+  background: #07080bdb;
+}
+.unitPriceTable {
+  border-color: var(--line);
+}
+.unitPriceHead {
+  background: #20232a;
+  color: #aeb5c0;
+}
+.unitPriceRow + .unitPriceRow {
+  border-color: var(--line);
+}
+.unitPriceRow > strong {
+  color: #fff;
+}
+.unitPriceRow > .salePriceValue {
+  color: #28d681;
+}
+.productCargoCard,
+.productBoxEditor {
+  background: var(--surface-2);
+  border-color: var(--line);
+}
+.productCargoHead {
+  background: #20232a;
+  border-color: var(--line);
+}
+.productInfoRow {
+  background: transparent;
+}
+.productBoxEditor input,
+.productBoxEditor select {
+  background: var(--field);
+  border-color: #343640;
+  color: #fff;
+}
+.addCompleteProduct {
+  background: linear-gradient(135deg, #148d58, #1fc978);
+  color: #07130d;
+}
+.boxProductName,
+.linkedQuoteBoxes .boxRow > b {
+  color: #28d681;
+}
+.clientQuotePrint {
+  color: #122236;
+  color-scheme: light;
+}
+.clientQuotePrint .clientQuoteTools button {
+  background: #fff;
+  border-color: #d5dee8;
+  color: #122236;
+}
+.clientQuotePrint .clientQuoteTools .printQuote {
+  background: #123454;
+  color: #fff;
+}
+.clientQuotePrint footer {
+  background: #fff;
+}
+.clientQuotePrint .clientProductRow,
+.clientQuotePrint .clientQuoteSummary > div {
+  color: #122236;
+}
+.quoteUnifiedCard {
+  background: var(--surface);
+  border-color: var(--line);
+  color: var(--ink);
+  box-shadow: none;
+}
+.quoteUnifiedCard .detailCard,
+.quoteUnifiedCard .detailSection {
+  color: var(--ink);
+}
+.quoteUnifiedCard .detailCard > b,
+.quoteUnifiedCard .detailSection h3,
+.quoteUnifiedCard .detailGroupLabel b,
+.quoteUnifiedCard .savedProducts b,
+.quoteUnifiedCard .savedProducts strong,
+.quoteUnifiedCard .costBreakdown b {
+  color: #fff;
+}
+.quoteUnifiedCard .savedProducts > div {
+  background: var(--surface-2);
+  border-color: var(--line);
+}
+.quoteUnifiedCard .unitPriceTable,
+.quoteUnifiedCard .boxTable {
+  background: var(--surface-2);
+}
+.quoteUnifiedCard .unitPriceRow,
+.quoteUnifiedCard .boxRow {
+  color: var(--ink);
+}
+.quoteUnifiedCard .detailGroupLabel > span {
+  background: #173629;
+  color: #3be090;
+}
+.quoteUnifiedCard .detailGrid,
+.quoteUnifiedCard .detailSection + .detailSection,
+.quoteUnifiedCard .detailGroupLabel.shippingGroup,
+.quoteUnifiedCard .detailGrid .detailCard:first-child {
+  border-color: var(--line);
+}
+.internalProductTable,
+.internalProductRow,
+.internalShippingSummary,
+.internalShippingSummary > div,
+.internalTotalsSummary > div,
+.internalNotes {
+  border-color: var(--line);
+}
+.internalProductHead,
+.internalTotalsSummary .internalGrandTotal {
+  background: var(--surface-2);
+}
+.internalProductRow b,
+.internalShippingSummary b,
+.internalTotalsSummary b,
+.internalTotalsSummary strong,
+.internalNotes h3 {
+  color: #fff;
+}
+.internalTotalsSummary .internalUnitTotal {
+  background: #176d47;
+  color: #d9ffea;
+}
+.internalTotalsSummary .internalUnitTotal strong {
+  color: #fff;
+}
+.productAllocationSection,
+.allocationTable,
+.allocationRow {
+  border-color: var(--line);
+}
+.allocationHead {
+  background: var(--surface-2);
+}
+.allocationTitle b,
+.allocationRow b {
+  color: #fff;
+}
+.allocationRow .salePriceValue {
+  color: #28d681;
+}
+@media (max-width: 700px) {
+  #root > header {
+    background: #121319;
+  }
+  .mainNav {
+    border-top: 1px solid var(--line);
+  }
+}
+.quoteBuilder {
+  background: var(--surface);
+  border-color: var(--line);
+  color: var(--ink);
+  box-shadow: 0 14px 36px #0003;
+}
+.quoteClientGrid input,
+.quoteFull input,
+.quoteFull textarea,
+.saleRow input {
+  background: var(--field);
+  border-color: #343640;
+  color: #fff;
+}
+.saleItems,
+.saleRow,
+.saleRow label {
+  border-color: var(--line);
+}
+.saleHead,
+.quoteTotals {
+  background: var(--surface-2);
+  color: var(--ink);
+}
+.productCbmBreakdown {
+  background: #1b1d24;
+  border-color: #32353e;
+}
+.productCbmTable,
+.productCbmRow,
+.productCbmNote {
+  border-color: #32353e;
+}
+.productCbmHead {
+  background: #15171c;
+}
+.productCbmRow strong,
+.productCbmTitle > strong {
+  color: #47dc91;
+}
+.internalOverview,
+.internalOverview > div,
+.internalBlock,
+.internalBlock > header,
+.quoteProductList article,
+.quoteLogistics > div,
+.economicsList article,
+.allocationMethod,
+.internalQuoteV2 .internalNotes {
+  border-color: var(--line);
+}
+.internalBlock > header,
+.quoteTotalStrip,
+.costResult,
+.profitResult {
+  background: var(--surface-2);
+}
+.internalOverview b,
+.internalBlock h3,
+.quoteProductList b,
+.quoteLogistics b,
+.quoteTotalStrip strong,
+.economicsList b,
+.economicsList strong {
+  color: #fff;
+}
+.saleResult {
+  background: #173629;
+}
+.internalBlock > header span {
+  background: #173629;
+  color: #3be090;
+}
+.calculatorProductPricing article {
+  border-color: var(--line);
+}
+.pricingCost,
+.pricingProfit {
+  background: var(--surface-2);
+}
+.pricingSale {
+  background: #173629;
+}
+.pricingSale > div {
+  background: var(--field);
+  border-color: #2d7c55;
+}
+.pricingSale input {
+  color: #fff;
+}
+.combinedProductHead,
+.productLandedTotal,
+.inlineProfit {
+  background: var(--surface-2);
+}
+.combinedProductRow {
+  border-color: var(--line);
+}
+.inlineSale {
+  background: #173629;
+}
+.inlineSale b {
+  color: #3be090;
+}
+.productLandedTotal {
+  color: #fff;
+}

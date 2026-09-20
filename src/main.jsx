@@ -88,6 +88,7 @@ function Nav({ page, setPage }) {
       {[
         ["calculator", Calculator, "Crear cotización", "Crear"],
         ["products", PackageSearch, "Productos", "Productos"],
+        ["customers", Users, "Clientes", "Clientes"],
         ["quotes", FileText, "Cotizaciones internas", "Internas"],
         [
           "clientQuotes",
@@ -95,7 +96,6 @@ function Nav({ page, setPage }) {
           "Cotizaciones para clientes",
           "Cotizaciones",
         ],
-        ["customers", Users, "Clientes", "Clientes"],
         ["orders", ClipboardList, "Órdenes", "Órdenes"],
         ["profits", TrendingUp, "Ganancias", "Ganancias"],
       ].map(([id, Icon, label, short]) => (
