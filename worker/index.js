@@ -32,7 +32,7 @@ async function restRows(env,path,options={}){
 }
 
 async function listRecords(env,type){
- const fields='id,number,record_type,customer_name,phone,description,route,total,total_boxes,status,notes,created_at,updated_at';
+ const fields='id,number,record_type,customer_name,phone,description,route,total,total_boxes,status,notes,totals,created_at,updated_at';
  return restRows(env,`records?record_type=eq.${encodeURIComponent(type)}&select=${fields}&order=created_at.desc`);
 }
 
@@ -110,24 +110,46 @@ async function handleApi(request,env,url){
   }
 
   if(url.pathname==='/api/records'&&request.method==='GET'){
-   const type=url.searchParams.get('type')==='order'?'order':'quote';
+   const requested=url.searchParams.get('type');
+   const type=requested==='order'?'order':requested==='product'?'product':'quote';
    return json(await listRecords(env,type));
   }
 
-  if(url.pathname==='/api/records'&&request.method==='POST'){
+  if(url.pathname==='/api/products'&&request.method==='POST'){
    const b=await request.json();
-   if(!b.customer?.trim())return json({error:'El cliente es obligatorio'},400);
-   const count=await countRecords(env,'quote');
+   if(!b.title?.trim())return json({error:'El nombre del producto es obligatorio'},400);
+   const count=await countRecords(env,'product');
    const id=crypto.randomUUID();
-   const number='COT-'+new Date().getFullYear()+'-'+String(count+1).padStart(4,'0');
+   const number='PRO-'+new Date().getFullYear()+'-'+String(count+1).padStart(4,'0');
    const route=b.selectedRoute==='direct'?'direct':'miami';
    const total=route==='miami'?b.result.landedMiami:b.result.landedDirect;
    await rest(env,'records',{
     method:'POST',
     headers:{'content-type':'application/json',Prefer:'return=minimal'},
-    body:JSON.stringify({id,number,record_type:'quote',customer_name:b.customer.trim(),phone:b.phone||'',description:b.description||'',boxes:b.boxes||[],rates:b.rates||{},totals:b.result||{},products:b.products||[],route,total,total_boxes:b.result.totalBoxes||0,status:'pending',notes:b.notes||''})
+    body:JSON.stringify({id,number,record_type:'product',customer_name:b.title.trim(),phone:'',description:b.description||'',boxes:b.boxes||[],rates:b.rates||{},totals:{...(b.result||{}),internalTotal:total},products:b.products||[],route,total,total_boxes:b.result.totalBoxes||0,status:'pending',notes:b.notes||''})
    });
    return json({id,number},201);
+  }
+
+  const createQuote=url.pathname.match(/^\/api\/products\/([^/]+)\/quote$/);
+  if(createQuote&&request.method==='POST'){
+   const b=await request.json();
+   if(!b.customer?.trim())return json({error:'El cliente es obligatorio'},400);
+   const source=await getRecord(env,createQuote[1]);
+   if(!source||source.record_type!=='product')return json({error:'Producto no encontrado'},404);
+   const products=(b.products||source.products||[]).map(p=>({...p,salePrice:Math.max(0,Number(p.salePrice)||0)}));
+   if(products.some(p=>!p.salePrice))return json({error:'Agrega el precio de venta de cada producto'},400);
+   const saleTotal=products.reduce((sum,p)=>sum+(Number(p.qty)||0)*p.salePrice,0);
+   const internalTotal=Number(source.total)||0;
+   const count=await countRecords(env,'quote');
+   const id=crypto.randomUUID();
+   const number='COT-'+new Date().getFullYear()+'-'+String(count+1).padStart(4,'0');
+   await rest(env,'records',{
+    method:'POST',
+    headers:{'content-type':'application/json',Prefer:'return=minimal'},
+    body:JSON.stringify({id,number,record_type:'quote',customer_name:b.customer.trim(),phone:b.phone||'',description:b.description||source.description||source.customer_name,boxes:source.boxes||[],rates:source.rates||{},totals:{...(source.totals||{}),internalTotal,saleTotal,profit:saleTotal-internalTotal,sourceProductId:source.id},products,route:source.route,total:internalTotal,total_boxes:source.total_boxes||0,status:'pending',notes:b.notes||source.notes||''})
+   });
+   return json({id,number,saleTotal,internalTotal},201);
   }
 
   const promote=url.pathname.match(/^\/api\/records\/([^/]+)\/promote$/);
