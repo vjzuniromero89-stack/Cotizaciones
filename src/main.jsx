@@ -41,6 +41,7 @@ const initialRates = {
   cnDivisor: 5000,
   miDivisor: 166,
   minCbm: true,
+  directKgPerCbm: 350,
 };
 const statusLabel = {
   pending: "Pendiente",
@@ -140,6 +141,10 @@ function SaveDialog({
   const internalTotal =
     form.selectedRoute === "miami" ? result.landedMiami : result.landedDirect;
   const totalCbm = Number(result.cbm || 0),
+    totalDirectBasis =
+      result.directChargeBy === "weight"
+        ? Number(result.actualKg || 0)
+        : totalCbm,
     preparedItems = items.map((p) => {
       const productBoxes = boxes.filter((b) => b.productId === p.id),
         freight = calculate(productBoxes, { ...rates, minCbm: false });
@@ -152,8 +157,12 @@ function SaveDialog({
         shipping =
           form.selectedRoute === "miami"
             ? freight.viaMiami
-            : totalCbm > 0
-              ? Number(result.direct || 0) * (freight.cbm / totalCbm)
+            : totalDirectBasis > 0
+              ? Number(result.direct || 0) *
+                ((result.directChargeBy === "weight"
+                  ? freight.actualKg
+                  : freight.cbm) /
+                  totalDirectBasis)
               : 0,
         totalCost = purchase + commission + shipping,
         unitCost = units ? totalCost / units : 0,
@@ -462,6 +471,12 @@ function CalculatorPage({ onSaved, initialCustomer }) {
               value={rates.miDivisor}
               onChange={(v) => rr("miDivisor", v)}
             />
+            <Field
+              label="Máximo kg por CBM directo"
+              value={rates.directKgPerCbm}
+              onChange={(v) => rr("directKgPerCbm", v)}
+              suffix="kg"
+            />
           </div>
           <label className="toggle">
             <input
@@ -566,7 +581,7 @@ function CalculatorPage({ onSaved, initialCustomer }) {
               <small>
                 {r.best === "miami"
                   ? "Vía 1: cobro por peso facturable en los dos trayectos"
-                  : "Vía 2: cobro distribuido por CBM ocupado"}
+                  : `Vía 2: cobro por ${r.directChargeBy === "weight" ? "peso" : r.directChargeBy === "minimum" ? "mínimo de 1 CBM" : "volumen"}`}
               </small>
             </div>
             <strong>
@@ -620,10 +635,14 @@ function CalculatorPage({ onSaved, initialCustomer }) {
                     <span>CBM total</span>
                     <span>CBM/unidad</span>
                     <span>% del espacio</span>
-                    <span>Paga por CBM</span>
+                    <span>Envío asignado</span>
                   </div>
                   {productRouteRows.map((p, i) => {
-                    const share = r.cbm > 0 ? p.cbm / r.cbm : 0,
+                    const basis =
+                        r.directChargeBy === "weight" ? p.actualKg : p.cbm,
+                      totalBasis =
+                        r.directChargeBy === "weight" ? r.actualKg : r.cbm,
+                      share = totalBasis > 0 ? basis / totalBasis : 0,
                       cost = Number(r.direct || 0) * share;
                     return (
                       <div className="productCbmRow" key={p.id || i}>
@@ -647,7 +666,7 @@ function CalculatorPage({ onSaved, initialCustomer }) {
               )}
             </div>
           </div>
-          {r.best === "direct" && rates.minCbm && r.cbm > 0 && r.cbm < 1 && (
+          {r.best === "direct" && r.directChargeBy === "minimum" && (
             <p className="productCbmNote">
               <Info /> El mínimo de 1 CBM se distribuye entre los productos
               según el espacio que ocupa cada uno.
@@ -726,16 +745,36 @@ function RouteTwo({ r, rates }) {
       <dl className="legs">
         <div>
           <dt>
-            <b>China → Managua</b>
+            <b>CBM por volumen</b>
+            <span>Según las medidas de las cajas</span>
+          </dt>
+          <dd>{r.cbm.toFixed(3)} CBM</dd>
+        </div>
+        <div>
+          <dt>
+            <b>CBM por peso</b>
+            <span>
+              {r.actualKg.toFixed(2)} kg ÷{" "}
+              {Number(r.kgPerCbm || 350).toFixed(0)} kg
+            </span>
+          </dt>
+          <dd>{r.weightCbm.toFixed(3)} CBM</dd>
+        </div>
+        <div>
+          <dt>
+            <b>
+              CBM a cobrar ·{" "}
+              {r.directChargeBy === "weight"
+                ? "Por peso"
+                : r.directChargeBy === "minimum"
+                  ? "Mínimo"
+                  : "Por volumen"}
+            </b>
             <span>
               {r.billCbm.toFixed(3)} CBM × {money(rates.cbmRate)}
             </span>
           </dt>
           <dd>{money(r.direct)}</dd>
-        </div>
-        <div>
-          <dt>Volumen real</dt>
-          <dd>{r.cbm.toFixed(3)} CBM</dd>
         </div>
       </dl>
       <div className="routeTotal">

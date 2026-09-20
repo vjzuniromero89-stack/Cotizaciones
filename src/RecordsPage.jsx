@@ -73,9 +73,10 @@ const productFreight = (boxes, rates = {}) =>
           Number(rates.miDivisor || 166);
       a.cnBill += Math.max(kg, volKg) * q;
       a.miBill += Math.max(lb, volLb) * q;
+      a.actualKg += kg * q;
       return a;
     },
-    { cnBill: 0, miBill: 0 },
+    { cnBill: 0, miBill: 0, actualKg: 0 },
   );
 const productLogistics = (data, product) => {
   const boxes = (data.boxes || []).filter(
@@ -373,11 +374,14 @@ function Detail({ id, type, onClose, onChanged }) {
                 freight.miBill * Number(rates.miRate || 1.5)) /
               totalMiamiBasis
             : 0
-          : totalCbm > 0
-            ? cbm / totalCbm
-            : productSubtotal > 0
-              ? purchase / productSubtotal
-              : 0,
+          : totals.directChargeBy === "weight" &&
+              Number(totals.actualKg || 0) > 0
+            ? freight.actualKg / Number(totals.actualKg)
+            : totalCbm > 0
+              ? cbm / totalCbm
+              : productSubtotal > 0
+                ? purchase / productSubtotal
+                : 0,
       shipping = selectedShipping * share,
       commission = (purchase * Number(totals.feePercent || 0)) / 100,
       totalCost = purchase + commission + shipping,
@@ -669,7 +673,7 @@ function Detail({ id, type, onClose, onChanged }) {
                 <span>
                   {shownRoute === "miami"
                     ? `${money(totals.cnCost)} + ${money(totals.miCost)}`
-                    : `${Number(totals.billCbm || totals.cbm || 0).toFixed(3)} CBM`}
+                    : `${Number(totals.billCbm || totals.cbm || 0).toFixed(3)} CBM cobrados por ${totals.directChargeBy === "weight" ? "peso" : totals.directChargeBy === "minimum" ? "mínimo" : "volumen"}`}
                 </span>
               </div>
               <div>
@@ -680,6 +684,11 @@ function Detail({ id, type, onClose, onChanged }) {
               <div>
                 <small>CBM total</small>
                 <b>{Number(totals.cbm || 0).toFixed(4)}</b>
+                {shownRoute === "direct" && (
+                  <span>
+                    Por peso: {Number(totals.weightCbm || 0).toFixed(4)}
+                  </span>
+                )}
               </div>
               <div>
                 <small>Envío</small>
