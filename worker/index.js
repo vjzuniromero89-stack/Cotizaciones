@@ -141,13 +141,15 @@ async function handleApi(request,env,url){
    if(products.some(p=>!p.salePrice))return json({error:'Agrega el precio de venta de cada producto'},400);
    const saleTotal=products.reduce((sum,p)=>sum+(Number(p.qty)||0)*p.salePrice,0);
    const internalTotal=Number(source.total)||0;
+   const profit=saleTotal-internalTotal;
+   const profitPercent=internalTotal>0?(profit/internalTotal)*100:0;
    const count=await countRecords(env,'quote');
    const id=crypto.randomUUID();
    const number='COT-'+new Date().getFullYear()+'-'+String(count+1).padStart(4,'0');
    await rest(env,'records',{
     method:'POST',
     headers:{'content-type':'application/json',Prefer:'return=minimal'},
-    body:JSON.stringify({id,number,record_type:'quote',customer_name:b.customer.trim(),phone:b.phone||'',description:b.description||source.description||source.customer_name,boxes:source.boxes||[],rates:source.rates||{},totals:{...(source.totals||{}),internalTotal,saleTotal,profit:saleTotal-internalTotal,sourceProductId:source.id},products,route:source.route,total:internalTotal,total_boxes:source.total_boxes||0,status:'pending',notes:b.notes||source.notes||''})
+    body:JSON.stringify({id,number,record_type:'quote',customer_name:b.customer.trim(),phone:b.phone||'',description:b.description||source.description||source.customer_name,boxes:source.boxes||[],rates:source.rates||{},totals:{...(source.totals||{}),internalTotal,saleTotal,profit,profitPercent,sourceProductId:source.id},products,route:source.route,total:internalTotal,total_boxes:source.total_boxes||0,status:'pending',notes:b.notes||source.notes||''})
    });
    return json({id,number,saleTotal,internalTotal},201);
   }
