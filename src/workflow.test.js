@@ -34,5 +34,6 @@ describe('flujo de productos y cotizaciones',()=>{
   expect(saved.total).toBe(150);
   expect(saved.totals.saleTotal).toBe(200);
   expect(saved.totals.profit).toBe(50);
+  expect(saved.totals.profitPercent).toBeCloseTo(33.33,2);
  });
 });

@@ -11,6 +11,7 @@ function QuoteDialog({product,onClose,onSaved}){
  const[busy,setBusy]=useState(false),[error,setError]=useState('');
  const total=items.reduce((s,p)=>s+(Number(p.qty)||0)*(Number(p.salePrice)||0),0);
  const profit=total-Number(product.total||0);
+ const profitPercent=Number(product.total)>0?(profit/Number(product.total))*100:0;
  const update=(i,v)=>setItems(x=>x.map((p,n)=>n===i?{...p,salePrice:v}:p));
  async function submit(e){e.preventDefault();setBusy(true);setError('');try{await api(`/products/${product.id}/quote`,{method:'POST',body:JSON.stringify({...form,products:items})});onSaved();onClose()}catch(e){setError(e.message)}finally{setBusy(false)}}
  return <div className="overlay" onMouseDown={e=>e.target===e.currentTarget&&onClose()}><form className="quoteBuilder" onSubmit={submit}>
@@ -18,7 +19,7 @@ function QuoteDialog({product,onClose,onSaved}){
   <div className="quoteClientGrid"><label><span>Cliente *</span><input value={form.customer} onChange={e=>setForm({...form,customer:e.target.value})}/></label><label><span>Teléfono / WhatsApp</span><input value={form.phone} onChange={e=>setForm({...form,phone:e.target.value})}/></label></div>
   <label className="quoteFull"><span>Descripción</span><input value={form.description} onChange={e=>setForm({...form,description:e.target.value})}/></label>
   <div className="saleItems"><div className="saleHead"><span>Producto</span><span>Cantidad</span><span>Precio venta/unidad</span><span>Subtotal</span></div>{items.map((p,i)=><div className="saleRow" key={p.id||i}><b>{p.name||'Producto'}</b><span>{Number(p.qty||0).toLocaleString()}</span><label><i>$</i><input type="number" min="0" step="any" required value={p.salePrice} onChange={e=>update(i,e.target.value)}/></label><strong>{money(Number(p.qty||0)*Number(p.salePrice||0))}</strong></div>)}</div>
-  <div className="quoteTotals"><div><span>Costo interno</span><b>{money(product.total)}</b></div><div><span>Venta al cliente · envío incluido</span><b>{money(total)}</b></div><div className={profit>=0?'profitPositive':'profitNegative'}><span>Ganancia estimada</span><strong>{money(profit)}</strong></div></div>
+  <div className="quoteTotals"><div><span>Costo interno</span><b>{money(product.total)}</b></div><div><span>Venta al cliente · envío incluido</span><b>{money(total)}</b></div><div className={profit>=0?'profitPositive':'profitNegative'}><span>Ganancia estimada</span><strong>{money(profit)}</strong></div><div className={'profitPercentage '+(profit>=0?'profitPositive':'profitNegative')}><span>Porcentaje de ganancia sobre el costo</span><strong>{profitPercent>=0?'+':''}{profitPercent.toFixed(2)}%</strong></div></div>
   <label className="quoteFull"><span>Notas para la cotización</span><textarea value={form.notes} onChange={e=>setForm({...form,notes:e.target.value})}/></label>
   {error&&<div className="saveError"><b>No se pudo crear la cotización</b><span>{error}</span></div>}
   <button className="primary" disabled={busy||!form.customer||!items.length}>{busy?'Creando…':'Crear cotización interna y del cliente'}</button>
