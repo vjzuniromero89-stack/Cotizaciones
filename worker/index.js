@@ -430,6 +430,31 @@ async function handleApi(request, env, url) {
     const catalogItem = url.pathname.match(
       /^\/api\/catalog-products\/([^/]+)$/,
     );
+    if (catalogItem && request.method === "PUT") {
+      const b = await request.json();
+      if (!b.name?.trim())
+        return json({ error: "Escribe el nombre del producto" }, 400);
+      const rows = await restRows(
+        env,
+        `catalog_products?id=eq.${encodeURIComponent(catalogItem[1])}&select=*`,
+        {
+          method: "PATCH",
+          headers: {
+            "content-type": "application/json",
+            Prefer: "return=representation",
+          },
+          body: JSON.stringify({
+            name: b.name.trim(),
+            image_url: b.imageUrl || "",
+            unit_price: Math.max(0, Number(b.price) || 0),
+            default_quantity: Math.max(0, Number(b.qty) || 0),
+            boxes: Array.isArray(b.boxes) ? b.boxes : [],
+          }),
+        },
+      );
+      if (!rows.length) return json({ error: "Producto no encontrado" }, 404);
+      return json(rows[0]);
+    }
     if (catalogItem && request.method === "DELETE") {
       const rows = await restRows(
         env,
