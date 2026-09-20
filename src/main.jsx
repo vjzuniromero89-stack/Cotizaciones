@@ -1,37 +1,806 @@
-import React,{useEffect,useMemo,useState}from'react';
-import{createRoot}from'react-dom/client';
-import{Ship,Plane,Settings2,Ruler,ArrowRight,CheckCircle2,Info,Calculator,FileText,ClipboardList,X,Save,ReceiptText,TrendingUp,PackageSearch}from'lucide-react';
-import'./style.css';import'./route-breakdown.css';import'./app.css';import{calculate}from'./calculate.js';
-import RecordsPage from'./RecordsPage.jsx';
-import WeightBreakdown from'./WeightBreakdown.jsx';
-import ProductSection,{blankProduct}from'./ProductSection.jsx';
-import ProfitPage from'./ProfitPage.jsx';
-import ProductsPage from'./ProductsPage.jsx';
-import'./landed.css';import'./dark.css';
-const money=n=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(n||0);
-const initialRates={cnRate:2,miRate:1.5,cbmRate:550,cnDivisor:5000,miDivisor:166,minCbm:true};
-const statusLabel={pending:'Pendiente',confirmed:'Confirmada',purchased:'Comprada',transit:'En tránsito',delivered:'Entregada',cancelled:'Cancelada'};
-const statusSteps=['confirmed','purchased','transit','delivered'];
-async function api(path,options){const res=await fetch('/api'+path,{headers:{'content-type':'application/json'},...options});if(!res.ok){const data=await res.json().catch(()=>({}));throw new Error([data.error,data.detail].filter(Boolean).join(': ')||'No se pudo completar')}return res.status===204?null:res.json()}
-function Field({label,value,onChange,type='number',suffix}){return <label className="field"><span>{label}</span><div><input type={type} step="any" min={type==='number'?0:undefined} value={value} onChange={e=>onChange(e.target.value)}/>{suffix&&<em>{suffix}</em>}</div></label>}
-function Nav({page,setPage}){return <nav className="mainNav">{[['calculator',Calculator,'Calcular','Calcular'],['products',PackageSearch,'Productos','Productos'],['quotes',FileText,'Cotizaciones internas','Internas'],['clientQuotes',ReceiptText,'Cotizaciones para clientes','Clientes'],['orders',ClipboardList,'Órdenes','Órdenes'],['profits',TrendingUp,'Ganancias','Ganancias']].map(([id,Icon,label,short])=><button key={id} className={page===id?'active':''} onClick={()=>setPage(id)}><Icon/><span className="navFull">{label}</span><span className="navShort">{short}</span></button>)}</nav>}
-function SaveDialog({onClose,onSave,result,boxes,rates,products}){
- const[form,setForm]=useState({customer:'',phone:'',description:products.map(p=>p.name).filter(Boolean).join(', '),notes:'',selectedRoute:result.best});
- const[items,setItems]=useState(products.map(p=>({...p,salePrice:''})));
- const[busy,setBusy]=useState(false),[error,setError]=useState('');
-	 const change=(k,v)=>setForm(x=>({...x,[k]:v}));
-	 const internalTotal=form.selectedRoute==='miami'?result.landedMiami:result.landedDirect;
-	 const totalCbm=Number(result.cbm||0),preparedItems=items.map(p=>{const productBoxes=boxes.filter(b=>b.productId===p.id),freight=calculate(productBoxes,{...rates,minCbm:false});return{p,freight}}),detailedItems=preparedItems.map(({p,freight})=>{const units=Number(p.qty||0),purchase=units*Number(p.price||0),commission=purchase*Number(result.feePercent||0)/100,shipping=form.selectedRoute==='miami'?freight.viaMiami:(totalCbm>0?Number(result.direct||0)*(freight.cbm/totalCbm):0),totalCost=purchase+commission+shipping,unitCost=units?totalCost/units:0,saleUnit=Number(p.salePrice||0),saleTotal=units*saleUnit,unitProfit=saleUnit-unitCost,profitPercent=unitCost>0?unitProfit/unitCost*100:0;return{p,totalCost,unitCost,saleUnit,saleTotal,unitProfit,profitPercent}});
-	 const saleTotal=detailedItems.reduce((s,x)=>s+x.saleTotal,0);
- const profit=saleTotal-internalTotal,profitPercent=internalTotal>0?profit/internalTotal*100:0;
- const updateSale=(id,v)=>setItems(x=>x.map(p=>p.id===id?{...p,salePrice:v}:p));
- async function submit(e){e.preventDefault();setBusy(true);setError('');try{await onSave({...form,boxes,rates,products:items,result});onClose()}catch(e){setError(e.message||'No se pudo guardar la cotización')}finally{setBusy(false)}}
-	 return <div className="overlay" onMouseDown={e=>e.target===e.currentTarget&&onClose()}><form className="dialog quoteFromCalculator" onSubmit={submit}><div className="dialogHead"><div><small>NUEVA COTIZACIÓN</small><h2>Cliente, costo y precio de venta</h2></div><button type="button" onClick={onClose}><X/></button></div><div className="quoteClientGrid"><Field label="Nombre del cliente *" type="text" value={form.customer} onChange={v=>change('customer',v)}/><Field label="Teléfono / WhatsApp" type="text" value={form.phone} onChange={v=>change('phone',v)}/></div><Field label="Descripción" type="text" value={form.description} onChange={v=>change('description',v)}/><label className="field"><span>Ruta cotizada</span><select value={form.selectedRoute} onChange={e=>change('selectedRoute',e.target.value)}><option value="miami">Vía 1 · China–Miami–Managua</option><option value="direct">Vía 2 · China–Managua</option></select></label><div className="calculatorProductPricing">{detailedItems.map(({p,totalCost,unitCost,saleUnit,saleTotal,unitProfit,profitPercent})=><article key={p.id}><div className="pricingProduct"><b>{p.name||'Producto'}</b><span>{Number(p.qty||0).toLocaleString()} unidades · {money(totalCost)} costo total</span></div><div className="pricingCost"><small>Costo real por unidad</small><strong>{money(unitCost)}</strong><span>{money(totalCost)} ÷ {Number(p.qty||0).toLocaleString()}</span></div><label className="pricingSale"><small>Precio de venta por unidad</small><div><i>$</i><input type="number" min="0" step="any" required value={p.salePrice} onChange={e=>updateSale(p.id,e.target.value)}/></div><span>{saleUnit>0?`${money(saleTotal)} venta total`:'Escribe el precio de venta'}</span></label><div className={unitProfit>=0?'pricingProfit positive':'pricingProfit negative'}><small>Ganancia por unidad</small><strong>{saleUnit>0?money(unitProfit):'—'}</strong><span>{saleUnit>0?`${profitPercent>=0?'+':''}${profitPercent.toFixed(2)}%`:'—'}</span></div></article>)}</div><div className="quoteTotals"><div><span>Costo interno</span><b>{money(internalTotal)}</b></div><div><span>Venta al cliente · envío incluido</span><b>{money(saleTotal)}</b></div><div className={profit>=0?'profitPositive':'profitNegative'}><span>Ganancia estimada</span><strong>{money(profit)}</strong></div><div className={'profitPercentage '+(profit>=0?'profitPositive':'profitNegative')}><span>Ganancia sobre el costo</span><strong>{profitPercent>=0?'+':''}{profitPercent.toFixed(2)}%</strong></div></div><label className="field"><span>Notas</span><textarea value={form.notes} onChange={e=>change('notes',e.target.value)} placeholder="Condiciones, anticipo, detalles…"/></label>{error&&<div className="saveError" role="alert"><b>No se pudo guardar</b><span>{error}</span></div>}<button className="primary" disabled={!form.customer||busy||items.some(p=>!Number(p.salePrice))}><Save/>{busy?'Guardando…':'Guardar cotización interna y del cliente'}</button></form></div>
+import React, { useEffect, useMemo, useState } from "react";
+import { createRoot } from "react-dom/client";
+import {
+  Ship,
+  Plane,
+  Settings2,
+  Ruler,
+  ArrowRight,
+  CheckCircle2,
+  Info,
+  Calculator,
+  FileText,
+  ClipboardList,
+  X,
+  Save,
+  ReceiptText,
+  TrendingUp,
+  PackageSearch,
+  Users,
+} from "lucide-react";
+import "./style.css";
+import "./route-breakdown.css";
+import "./app.css";
+import { calculate } from "./calculate.js";
+import RecordsPage from "./RecordsPage.jsx";
+import WeightBreakdown from "./WeightBreakdown.jsx";
+import ProductSection, { blankProduct } from "./ProductSection.jsx";
+import ProfitPage from "./ProfitPage.jsx";
+import ProductsPage from "./ProductsPage.jsx";
+import ClientsPage from "./ClientsPage.jsx";
+import "./landed.css";
+import "./dark.css";
+const money = (n) =>
+  new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(
+    n || 0,
+  );
+const initialRates = {
+  cnRate: 2,
+  miRate: 1.5,
+  cbmRate: 550,
+  cnDivisor: 5000,
+  miDivisor: 166,
+  minCbm: true,
+};
+const statusLabel = {
+  pending: "Pendiente",
+  confirmed: "Confirmada",
+  purchased: "Comprada",
+  transit: "En tránsito",
+  delivered: "Entregada",
+  cancelled: "Cancelada",
+};
+const statusSteps = ["confirmed", "purchased", "transit", "delivered"];
+async function api(path, options) {
+  const res = await fetch("/api" + path, {
+    headers: { "content-type": "application/json" },
+    ...options,
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(
+      [data.error, data.detail].filter(Boolean).join(": ") ||
+        "No se pudo completar",
+    );
+  }
+  return res.status === 204 ? null : res.json();
 }
-function CalculatorPage({onSaved}){const[products,setProducts]=useState([blankProduct()]);const[catalogProducts,setCatalogProducts]=useState([]);const[fee,setFee]=useState(3);const[productSummary,setProductSummary]=useState({productSubtotal:0,feePercent:3,feeAmount:0,merchandiseTotal:0,totalUnits:0,landedMiami:0,landedDirect:0,unitMiami:0,unitDirect:0});const[rates,setRates]=useState(initialRates);const[showRates,setShowRates]=useState(false);const[dialog,setDialog]=useState(false);useEffect(()=>{api('/catalog-products').then(setCatalogProducts).catch(()=>setCatalogProducts([]))},[]);const boxes=useMemo(()=>products.flatMap(p=>(p.boxes||[]).map(b=>({...b,productId:p.id,productName:p.name||'Producto'}))),[products]);const base=useMemo(()=>calculate(boxes,rates),[boxes,rates]);const r={...base,...productSummary};const productRouteRows=useMemo(()=>products.map(p=>{const productBoxes=p.boxes||[],metrics=calculate(productBoxes,{...rates,minCbm:false}),boxCount=productBoxes.reduce((sum,b)=>sum+Number(b.qty||0),0),units=Number(p.qty||0);return{...p,...metrics,boxCount,unitCbm:units?metrics.cbm/units:0}}),[products,rates]);const rr=(k,v)=>setRates(x=>({...x,[k]:v}));async function save(data){await api('/quotes',{method:'POST',body:JSON.stringify(data)});onSaved()}
-return <div className="workspace"><div className="pageHead"><div><small>NUEVO CÁLCULO</small><h1>Calculadora logística</h1><p>Calcula el costo real y guarda la cotización interna y del cliente.</p></div><button className="settings" onClick={()=>setShowRates(!showRates)}><Settings2/> Tarifas</button></div>{showRates&&<section className="panel rates"><div className="sectionTitle"><div><span>$</span><h2>Tarifas y reglas</h2></div></div><div className="rateGrid"><Field label="China → Miami" value={rates.cnRate} onChange={v=>rr('cnRate',v)} suffix="$/kg"/><Field label="Miami → Managua" value={rates.miRate} onChange={v=>rr('miRate',v)} suffix="$/lb"/><Field label="China → Managua" value={rates.cbmRate} onChange={v=>rr('cbmRate',v)} suffix="$/CBM"/><Field label="Divisor China" value={rates.cnDivisor} onChange={v=>rr('cnDivisor',v)}/><Field label="Divisor Miami" value={rates.miDivisor} onChange={v=>rr('miDivisor',v)}/></div><label className="toggle"><input type="checkbox" checked={rates.minCbm} onChange={e=>rr('minCbm',e.target.checked)}/><span/>Cobrar mínimo 1 CBM en ruta directa</label></section>}
-<ProductSection products={products} setProducts={setProducts} fee={fee} setFee={setFee} catalogProducts={catalogProducts} shipping={{viaMiami:r.viaMiami,direct:r.direct,onSummary:setProductSummary}}/><section className="results"><div className="resultHead"><span>03</span><div><h2>Costo puesto en Nicaragua</h2><p>Productos, comisión y envío incluidos</p></div></div><div className="routeGrid"><RouteOne r={r} rates={rates}/><RouteTwo r={r} rates={rates}/></div><div className="landedGrid"><div><span>Con Vía 1</span><b>{money(r.landedMiami)}</b><small>{r.totalUnits?money(r.unitMiami)+' por unidad':'Agrega cantidades'}</small></div><div><span>Con Vía 2</span><b>{money(r.landedDirect)}</b><small>{r.totalUnits?money(r.unitDirect)+' por unidad':'Agrega cantidades'}</small></div></div><div className="verdict"><CheckCircle2/><div><small>RECOMENDACIÓN</small><h2>{r.best==='miami'?'Vía 1 · China–Miami–Managua':'Vía 2 · China–Managua'}</h2><p>Ahorro estimado: <b>{money(r.saving)}</b></p></div><button className="saveQuote" onClick={()=>setDialog(true)}><Save/> Guardar cotización</button></div><div className="capacity"><div><span><Ruler/> APROVECHAMIENTO DEL CBM</span><b>{Math.min(100,r.cbm*100).toFixed(1)}%</b></div><div className="bar"><i style={{width:`${Math.min(100,r.cbm*100)}%`}}/></div><p><Info/> {r.cbm<1?<>Quedan <b>{r.space.toFixed(3)} CBM</b>. Puedes agregar aproximadamente <b>{r.more} cajas similares</b>.</>:<>La carga ocupa <b>{r.cbm.toFixed(3)} CBM</b>.</>}</p></div><div className="productCbmBreakdown"><div className="productCbmTitle"><div><b>Envío individual por producto</b><small>{r.best==='miami'?'Vía 1: cobro por peso facturable en los dos trayectos':'Vía 2: cobro distribuido por CBM ocupado'}</small></div><strong>{money(r.best==='miami'?r.viaMiami:r.direct)} total</strong></div><div className="productCbmTableWrap"><div className={'productCbmTable '+(r.best==='miami'?'viaMiamiTable':'directTable')}>{r.best==='miami'?<><div className="productCbmHead"><span>Producto</span><span>Cajas</span><span>CBM</span><span>China–Miami</span><span>Miami–Managua</span><span>Envío total</span></div>{productRouteRows.map((p,i)=><div className="productCbmRow" key={p.id||i}><div>{p.imageUrl?<img src={p.imageUrl} alt={p.name||'Producto'}/>:<span className="productCbmNoPhoto">Sin foto</span>}<b>{p.name||`Producto ${i+1}`}</b></div><span>{p.boxCount.toLocaleString()}</span><b>{p.cbm.toFixed(4)}</b><span>{p.cnBillKg.toFixed(2)} kg · {money(p.cnCost)}</span><span>{p.miBillLb.toFixed(2)} lb · {money(p.miCost)}</span><strong>{money(p.viaMiami)}</strong></div>)}</>:<><div className="productCbmHead"><span>Producto</span><span>Cajas</span><span>CBM total</span><span>CBM/unidad</span><span>% del espacio</span><span>Paga por CBM</span></div>{productRouteRows.map((p,i)=>{const share=r.cbm>0?p.cbm/r.cbm:0,cost=Number(r.direct||0)*share;return <div className="productCbmRow" key={p.id||i}><div>{p.imageUrl?<img src={p.imageUrl} alt={p.name||'Producto'}/>:<span className="productCbmNoPhoto">Sin foto</span>}<b>{p.name||`Producto ${i+1}`}</b></div><span>{p.boxCount.toLocaleString()}</span><b>{p.cbm.toFixed(4)}</b><span>{p.unitCbm.toFixed(6)}</span><span>{(share*100).toFixed(1)}%</span><strong>{money(cost)}</strong></div>})}</>}</div></div>{r.best==='direct'&&rates.minCbm&&r.cbm>0&&r.cbm<1&&<p className="productCbmNote"><Info/> El mínimo de 1 CBM se distribuye entre los productos según el espacio que ocupa cada uno.</p>}</div></section>{dialog&&<SaveDialog onClose={()=>setDialog(false)} onSave={save} result={r} boxes={boxes} rates={rates} products={products}/>}</div>}
-function RouteOne({r,rates}){return <article className={'route '+(r.best==='miami'?'winner':'')}><div className="routeIcon"><Plane/></div><div><small>VÍA 1 · DOS TRAYECTOS</small><h3>China <ArrowRight/> Miami <ArrowRight/> Managua</h3></div>{r.best==='miami'&&<mark>Recomendada</mark>}<WeightBreakdown r={r}/><dl className="legs"><div><dt><b>1. China → Miami</b><span>{r.cnBillKg.toFixed(2)} kg facturables × {money(rates.cnRate)}</span></dt><dd>{money(r.cnCost)}</dd></div><div><dt><b>2. Miami → Managua</b><span>{r.miBillLb.toFixed(2)} lb facturables × {money(rates.miRate)}</span></dt><dd>{money(r.miCost)}</dd></div></dl><div className="routeTotal"><span>TOTAL VÍA 1</span><strong>{money(r.viaMiami)}</strong></div></article>}
-function RouteTwo({r,rates}){return <article className={'route '+(r.best==='direct'?'winner':'')}><div className="routeIcon ship"><Ship/></div><div><small>VÍA 2 · DIRECTA</small><h3>China <ArrowRight/> Managua</h3></div>{r.best==='direct'&&<mark>Recomendada</mark>}<dl className="legs"><div><dt><b>China → Managua</b><span>{r.billCbm.toFixed(3)} CBM × {money(rates.cbmRate)}</span></dt><dd>{money(r.direct)}</dd></div><div><dt>Volumen real</dt><dd>{r.cbm.toFixed(3)} CBM</dd></div></dl><div className="routeTotal"><span>TOTAL VÍA 2</span><strong>{money(r.direct)}</strong></div></article>}
-function App(){const[page,setPage]=useState('calculator'),[refresh,setRefresh]=useState(0);function saved(){setRefresh(x=>x+1);setPage('quotes')}const recordType=page==='quotes'?'quote':page==='clientQuotes'?'client':'order';const changed=()=>setRefresh(x=>x+1);return <><header><div className="brand"><div className="logo"><Ship/></div><div><b>CotizacionesChina</b><small>Cotizaciones y órdenes</small></div></div><Nav page={page} setPage={setPage}/></header><main className="appMain">{page==='calculator'?<CalculatorPage onSaved={saved}/>:page==='products'?<ProductsPage refreshKey={refresh} onChange={changed} setPage={setPage}/>:page==='profits'?<ProfitPage refreshKey={refresh}/>:<RecordsPage type={recordType} refreshKey={refresh} onChange={changed} onCreateQuote={()=>setPage('calculator')}/>}</main></>}
-createRoot(document.getElementById('root')).render(<App/>);
+function Field({ label, value, onChange, type = "number", suffix }) {
+  return (
+    <label className="field">
+      <span>{label}</span>
+      <div>
+        <input
+          type={type}
+          step="any"
+          min={type === "number" ? 0 : undefined}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+        />
+        {suffix && <em>{suffix}</em>}
+      </div>
+    </label>
+  );
+}
+function Nav({ page, setPage }) {
+  return (
+    <nav className="mainNav">
+      {[
+        ["calculator", Calculator, "Crear cotización", "Crear"],
+        ["products", PackageSearch, "Productos", "Productos"],
+        ["quotes", FileText, "Cotizaciones internas", "Internas"],
+        [
+          "clientQuotes",
+          ReceiptText,
+          "Cotizaciones para clientes",
+          "Cotizaciones",
+        ],
+        ["customers", Users, "Clientes", "Clientes"],
+        ["orders", ClipboardList, "Órdenes", "Órdenes"],
+        ["profits", TrendingUp, "Ganancias", "Ganancias"],
+      ].map(([id, Icon, label, short]) => (
+        <button
+          key={id}
+          className={page === id ? "active" : ""}
+          onClick={() => setPage(id)}
+        >
+          <Icon />
+          <span className="navFull">{label}</span>
+          <span className="navShort">{short}</span>
+        </button>
+      ))}
+    </nav>
+  );
+}
+function SaveDialog({
+  onClose,
+  onSave,
+  result,
+  boxes,
+  rates,
+  products,
+  initialCustomer,
+}) {
+  const [form, setForm] = useState({
+    customer: initialCustomer?.name || "",
+    phone: initialCustomer?.phone || "",
+    description: products
+      .map((p) => p.name)
+      .filter(Boolean)
+      .join(", "),
+    notes: "",
+    selectedRoute: result.best,
+  });
+  const [items, setItems] = useState(
+    products.map((p) => ({ ...p, salePrice: "" })),
+  );
+  const [busy, setBusy] = useState(false),
+    [error, setError] = useState("");
+  const change = (k, v) => setForm((x) => ({ ...x, [k]: v }));
+  const internalTotal =
+    form.selectedRoute === "miami" ? result.landedMiami : result.landedDirect;
+  const totalCbm = Number(result.cbm || 0),
+    preparedItems = items.map((p) => {
+      const productBoxes = boxes.filter((b) => b.productId === p.id),
+        freight = calculate(productBoxes, { ...rates, minCbm: false });
+      return { p, freight };
+    }),
+    detailedItems = preparedItems.map(({ p, freight }) => {
+      const units = Number(p.qty || 0),
+        purchase = units * Number(p.price || 0),
+        commission = (purchase * Number(result.feePercent || 0)) / 100,
+        shipping =
+          form.selectedRoute === "miami"
+            ? freight.viaMiami
+            : totalCbm > 0
+              ? Number(result.direct || 0) * (freight.cbm / totalCbm)
+              : 0,
+        totalCost = purchase + commission + shipping,
+        unitCost = units ? totalCost / units : 0,
+        saleUnit = Number(p.salePrice || 0),
+        saleTotal = units * saleUnit,
+        unitProfit = saleUnit - unitCost,
+        profitPercent = unitCost > 0 ? (unitProfit / unitCost) * 100 : 0;
+      return {
+        p,
+        totalCost,
+        unitCost,
+        saleUnit,
+        saleTotal,
+        unitProfit,
+        profitPercent,
+      };
+    });
+  const saleTotal = detailedItems.reduce((s, x) => s + x.saleTotal, 0);
+  const profit = saleTotal - internalTotal,
+    profitPercent = internalTotal > 0 ? (profit / internalTotal) * 100 : 0;
+  const updateSale = (id, v) =>
+    setItems((x) => x.map((p) => (p.id === id ? { ...p, salePrice: v } : p)));
+  async function submit(e) {
+    e.preventDefault();
+    setBusy(true);
+    setError("");
+    try {
+      await onSave({ ...form, boxes, rates, products: items, result });
+      onClose();
+    } catch (e) {
+      setError(e.message || "No se pudo guardar la cotización");
+    } finally {
+      setBusy(false);
+    }
+  }
+  return (
+    <div
+      className="overlay"
+      onMouseDown={(e) => e.target === e.currentTarget && onClose()}
+    >
+      <form className="dialog quoteFromCalculator" onSubmit={submit}>
+        <div className="dialogHead">
+          <div>
+            <small>NUEVA COTIZACIÓN</small>
+            <h2>Cliente, costo y precio de venta</h2>
+          </div>
+          <button type="button" onClick={onClose}>
+            <X />
+          </button>
+        </div>
+        <div className="quoteClientGrid">
+          <Field
+            label="Nombre del cliente *"
+            type="text"
+            value={form.customer}
+            onChange={(v) => change("customer", v)}
+          />
+          <Field
+            label="Teléfono / WhatsApp"
+            type="text"
+            value={form.phone}
+            onChange={(v) => change("phone", v)}
+          />
+        </div>
+        <Field
+          label="Descripción"
+          type="text"
+          value={form.description}
+          onChange={(v) => change("description", v)}
+        />
+        <label className="field">
+          <span>Ruta cotizada</span>
+          <select
+            value={form.selectedRoute}
+            onChange={(e) => change("selectedRoute", e.target.value)}
+          >
+            <option value="miami">Vía 1 · China–Miami–Managua</option>
+            <option value="direct">Vía 2 · China–Managua</option>
+          </select>
+        </label>
+        <div className="calculatorProductPricing">
+          {detailedItems.map(
+            ({
+              p,
+              totalCost,
+              unitCost,
+              saleUnit,
+              saleTotal,
+              unitProfit,
+              profitPercent,
+            }) => (
+              <article key={p.id}>
+                <div className="pricingProduct">
+                  <b>{p.name || "Producto"}</b>
+                  <span>
+                    {Number(p.qty || 0).toLocaleString()} unidades ·{" "}
+                    {money(totalCost)} costo total
+                  </span>
+                </div>
+                <div className="pricingCost">
+                  <small>Costo real por unidad</small>
+                  <strong>{money(unitCost)}</strong>
+                  <span>
+                    {money(totalCost)} ÷ {Number(p.qty || 0).toLocaleString()}
+                  </span>
+                </div>
+                <label className="pricingSale">
+                  <small>Precio de venta por unidad</small>
+                  <div>
+                    <i>$</i>
+                    <input
+                      type="number"
+                      min="0"
+                      step="any"
+                      required
+                      value={p.salePrice}
+                      onChange={(e) => updateSale(p.id, e.target.value)}
+                    />
+                  </div>
+                  <span>
+                    {saleUnit > 0
+                      ? `${money(saleTotal)} venta total`
+                      : "Escribe el precio de venta"}
+                  </span>
+                </label>
+                <div
+                  className={
+                    unitProfit >= 0
+                      ? "pricingProfit positive"
+                      : "pricingProfit negative"
+                  }
+                >
+                  <small>Ganancia por unidad</small>
+                  <strong>{saleUnit > 0 ? money(unitProfit) : "—"}</strong>
+                  <span>
+                    {saleUnit > 0
+                      ? `${profitPercent >= 0 ? "+" : ""}${profitPercent.toFixed(2)}%`
+                      : "—"}
+                  </span>
+                </div>
+              </article>
+            ),
+          )}
+        </div>
+        <div className="quoteTotals">
+          <div>
+            <span>Costo interno</span>
+            <b>{money(internalTotal)}</b>
+          </div>
+          <div>
+            <span>Venta al cliente · envío incluido</span>
+            <b>{money(saleTotal)}</b>
+          </div>
+          <div className={profit >= 0 ? "profitPositive" : "profitNegative"}>
+            <span>Ganancia estimada</span>
+            <strong>{money(profit)}</strong>
+          </div>
+          <div
+            className={
+              "profitPercentage " +
+              (profit >= 0 ? "profitPositive" : "profitNegative")
+            }
+          >
+            <span>Ganancia sobre el costo</span>
+            <strong>
+              {profitPercent >= 0 ? "+" : ""}
+              {profitPercent.toFixed(2)}%
+            </strong>
+          </div>
+        </div>
+        <label className="field">
+          <span>Notas</span>
+          <textarea
+            value={form.notes}
+            onChange={(e) => change("notes", e.target.value)}
+            placeholder="Condiciones, anticipo, detalles…"
+          />
+        </label>
+        {error && (
+          <div className="saveError" role="alert">
+            <b>No se pudo guardar</b>
+            <span>{error}</span>
+          </div>
+        )}
+        <button
+          className="primary"
+          disabled={
+            !form.customer || busy || items.some((p) => !Number(p.salePrice))
+          }
+        >
+          <Save />
+          {busy ? "Guardando…" : "Guardar cotización interna y del cliente"}
+        </button>
+      </form>
+    </div>
+  );
+}
+function CalculatorPage({ onSaved, initialCustomer }) {
+  const [products, setProducts] = useState([blankProduct()]);
+  const [catalogProducts, setCatalogProducts] = useState([]);
+  const [fee, setFee] = useState(3);
+  const [productSummary, setProductSummary] = useState({
+    productSubtotal: 0,
+    feePercent: 3,
+    feeAmount: 0,
+    merchandiseTotal: 0,
+    totalUnits: 0,
+    landedMiami: 0,
+    landedDirect: 0,
+    unitMiami: 0,
+    unitDirect: 0,
+  });
+  const [rates, setRates] = useState(initialRates);
+  const [showRates, setShowRates] = useState(false);
+  const [dialog, setDialog] = useState(false);
+  useEffect(() => {
+    api("/catalog-products")
+      .then(setCatalogProducts)
+      .catch(() => setCatalogProducts([]));
+  }, []);
+  const boxes = useMemo(
+    () =>
+      products.flatMap((p) =>
+        (p.boxes || []).map((b) => ({
+          ...b,
+          productId: p.id,
+          productName: p.name || "Producto",
+        })),
+      ),
+    [products],
+  );
+  const base = useMemo(() => calculate(boxes, rates), [boxes, rates]);
+  const r = { ...base, ...productSummary };
+  const productRouteRows = useMemo(
+    () =>
+      products.map((p) => {
+        const productBoxes = p.boxes || [],
+          metrics = calculate(productBoxes, { ...rates, minCbm: false }),
+          boxCount = productBoxes.reduce(
+            (sum, b) => sum + Number(b.qty || 0),
+            0,
+          ),
+          units = Number(p.qty || 0);
+        return {
+          ...p,
+          ...metrics,
+          boxCount,
+          unitCbm: units ? metrics.cbm / units : 0,
+        };
+      }),
+    [products, rates],
+  );
+  const rr = (k, v) => setRates((x) => ({ ...x, [k]: v }));
+  async function save(data) {
+    await api("/quotes", { method: "POST", body: JSON.stringify(data) });
+    onSaved();
+  }
+  return (
+    <div className="workspace">
+      <div className="pageHead">
+        <div>
+          <small>NUEVA COTIZACIÓN</small>
+          <h1>Crear cotización</h1>
+          <p>
+            Calcula el costo real y guarda la cotización interna y del cliente.
+          </p>
+        </div>
+        <button className="settings" onClick={() => setShowRates(!showRates)}>
+          <Settings2 /> Tarifas
+        </button>
+      </div>
+      {showRates && (
+        <section className="panel rates">
+          <div className="sectionTitle">
+            <div>
+              <span>$</span>
+              <h2>Tarifas y reglas</h2>
+            </div>
+          </div>
+          <div className="rateGrid">
+            <Field
+              label="China → Miami"
+              value={rates.cnRate}
+              onChange={(v) => rr("cnRate", v)}
+              suffix="$/kg"
+            />
+            <Field
+              label="Miami → Managua"
+              value={rates.miRate}
+              onChange={(v) => rr("miRate", v)}
+              suffix="$/lb"
+            />
+            <Field
+              label="China → Managua"
+              value={rates.cbmRate}
+              onChange={(v) => rr("cbmRate", v)}
+              suffix="$/CBM"
+            />
+            <Field
+              label="Divisor China"
+              value={rates.cnDivisor}
+              onChange={(v) => rr("cnDivisor", v)}
+            />
+            <Field
+              label="Divisor Miami"
+              value={rates.miDivisor}
+              onChange={(v) => rr("miDivisor", v)}
+            />
+          </div>
+          <label className="toggle">
+            <input
+              type="checkbox"
+              checked={rates.minCbm}
+              onChange={(e) => rr("minCbm", e.target.checked)}
+            />
+            <span />
+            Cobrar mínimo 1 CBM en ruta directa
+          </label>
+        </section>
+      )}
+      <ProductSection
+        products={products}
+        setProducts={setProducts}
+        fee={fee}
+        setFee={setFee}
+        catalogProducts={catalogProducts}
+        shipping={{
+          viaMiami: r.viaMiami,
+          direct: r.direct,
+          onSummary: setProductSummary,
+        }}
+      />
+      <section className="results">
+        <div className="resultHead">
+          <span>03</span>
+          <div>
+            <h2>Costo puesto en Nicaragua</h2>
+            <p>Productos, comisión y envío incluidos</p>
+          </div>
+        </div>
+        <div className="routeGrid">
+          <RouteOne r={r} rates={rates} />
+          <RouteTwo r={r} rates={rates} />
+        </div>
+        <div className="landedGrid">
+          <div>
+            <span>Con Vía 1</span>
+            <b>{money(r.landedMiami)}</b>
+            <small>
+              {r.totalUnits
+                ? money(r.unitMiami) + " por unidad"
+                : "Agrega cantidades"}
+            </small>
+          </div>
+          <div>
+            <span>Con Vía 2</span>
+            <b>{money(r.landedDirect)}</b>
+            <small>
+              {r.totalUnits
+                ? money(r.unitDirect) + " por unidad"
+                : "Agrega cantidades"}
+            </small>
+          </div>
+        </div>
+        <div className="verdict">
+          <CheckCircle2 />
+          <div>
+            <small>RECOMENDACIÓN</small>
+            <h2>
+              {r.best === "miami"
+                ? "Vía 1 · China–Miami–Managua"
+                : "Vía 2 · China–Managua"}
+            </h2>
+            <p>
+              Ahorro estimado: <b>{money(r.saving)}</b>
+            </p>
+          </div>
+          <button className="saveQuote" onClick={() => setDialog(true)}>
+            <Save /> Guardar cotización
+          </button>
+        </div>
+        <div className="capacity">
+          <div>
+            <span>
+              <Ruler /> APROVECHAMIENTO DEL CBM
+            </span>
+            <b>{Math.min(100, r.cbm * 100).toFixed(1)}%</b>
+          </div>
+          <div className="bar">
+            <i style={{ width: `${Math.min(100, r.cbm * 100)}%` }} />
+          </div>
+          <p>
+            <Info />{" "}
+            {r.cbm < 1 ? (
+              <>
+                Quedan <b>{r.space.toFixed(3)} CBM</b>. Puedes agregar
+                aproximadamente <b>{r.more} cajas similares</b>.
+              </>
+            ) : (
+              <>
+                La carga ocupa <b>{r.cbm.toFixed(3)} CBM</b>.
+              </>
+            )}
+          </p>
+        </div>
+        <div className="productCbmBreakdown">
+          <div className="productCbmTitle">
+            <div>
+              <b>Envío individual por producto</b>
+              <small>
+                {r.best === "miami"
+                  ? "Vía 1: cobro por peso facturable en los dos trayectos"
+                  : "Vía 2: cobro distribuido por CBM ocupado"}
+              </small>
+            </div>
+            <strong>
+              {money(r.best === "miami" ? r.viaMiami : r.direct)} total
+            </strong>
+          </div>
+          <div className="productCbmTableWrap">
+            <div
+              className={
+                "productCbmTable " +
+                (r.best === "miami" ? "viaMiamiTable" : "directTable")
+              }
+            >
+              {r.best === "miami" ? (
+                <>
+                  <div className="productCbmHead">
+                    <span>Producto</span>
+                    <span>Cajas</span>
+                    <span>CBM</span>
+                    <span>China–Miami</span>
+                    <span>Miami–Managua</span>
+                    <span>Envío total</span>
+                  </div>
+                  {productRouteRows.map((p, i) => (
+                    <div className="productCbmRow" key={p.id || i}>
+                      <div>
+                        {p.imageUrl ? (
+                          <img src={p.imageUrl} alt={p.name || "Producto"} />
+                        ) : (
+                          <span className="productCbmNoPhoto">Sin foto</span>
+                        )}
+                        <b>{p.name || `Producto ${i + 1}`}</b>
+                      </div>
+                      <span>{p.boxCount.toLocaleString()}</span>
+                      <b>{p.cbm.toFixed(4)}</b>
+                      <span>
+                        {p.cnBillKg.toFixed(2)} kg · {money(p.cnCost)}
+                      </span>
+                      <span>
+                        {p.miBillLb.toFixed(2)} lb · {money(p.miCost)}
+                      </span>
+                      <strong>{money(p.viaMiami)}</strong>
+                    </div>
+                  ))}
+                </>
+              ) : (
+                <>
+                  <div className="productCbmHead">
+                    <span>Producto</span>
+                    <span>Cajas</span>
+                    <span>CBM total</span>
+                    <span>CBM/unidad</span>
+                    <span>% del espacio</span>
+                    <span>Paga por CBM</span>
+                  </div>
+                  {productRouteRows.map((p, i) => {
+                    const share = r.cbm > 0 ? p.cbm / r.cbm : 0,
+                      cost = Number(r.direct || 0) * share;
+                    return (
+                      <div className="productCbmRow" key={p.id || i}>
+                        <div>
+                          {p.imageUrl ? (
+                            <img src={p.imageUrl} alt={p.name || "Producto"} />
+                          ) : (
+                            <span className="productCbmNoPhoto">Sin foto</span>
+                          )}
+                          <b>{p.name || `Producto ${i + 1}`}</b>
+                        </div>
+                        <span>{p.boxCount.toLocaleString()}</span>
+                        <b>{p.cbm.toFixed(4)}</b>
+                        <span>{p.unitCbm.toFixed(6)}</span>
+                        <span>{(share * 100).toFixed(1)}%</span>
+                        <strong>{money(cost)}</strong>
+                      </div>
+                    );
+                  })}
+                </>
+              )}
+            </div>
+          </div>
+          {r.best === "direct" && rates.minCbm && r.cbm > 0 && r.cbm < 1 && (
+            <p className="productCbmNote">
+              <Info /> El mínimo de 1 CBM se distribuye entre los productos
+              según el espacio que ocupa cada uno.
+            </p>
+          )}
+        </div>
+      </section>
+      {dialog && (
+        <SaveDialog
+          onClose={() => setDialog(false)}
+          onSave={save}
+          result={r}
+          boxes={boxes}
+          rates={rates}
+          products={products}
+          initialCustomer={initialCustomer}
+        />
+      )}
+    </div>
+  );
+}
+function RouteOne({ r, rates }) {
+  return (
+    <article className={"route " + (r.best === "miami" ? "winner" : "")}>
+      <div className="routeIcon">
+        <Plane />
+      </div>
+      <div>
+        <small>VÍA 1 · DOS TRAYECTOS</small>
+        <h3>
+          China <ArrowRight /> Miami <ArrowRight /> Managua
+        </h3>
+      </div>
+      {r.best === "miami" && <mark>Recomendada</mark>}
+      <WeightBreakdown r={r} />
+      <dl className="legs">
+        <div>
+          <dt>
+            <b>1. China → Miami</b>
+            <span>
+              {r.cnBillKg.toFixed(2)} kg facturables × {money(rates.cnRate)}
+            </span>
+          </dt>
+          <dd>{money(r.cnCost)}</dd>
+        </div>
+        <div>
+          <dt>
+            <b>2. Miami → Managua</b>
+            <span>
+              {r.miBillLb.toFixed(2)} lb facturables × {money(rates.miRate)}
+            </span>
+          </dt>
+          <dd>{money(r.miCost)}</dd>
+        </div>
+      </dl>
+      <div className="routeTotal">
+        <span>TOTAL VÍA 1</span>
+        <strong>{money(r.viaMiami)}</strong>
+      </div>
+    </article>
+  );
+}
+function RouteTwo({ r, rates }) {
+  return (
+    <article className={"route " + (r.best === "direct" ? "winner" : "")}>
+      <div className="routeIcon ship">
+        <Ship />
+      </div>
+      <div>
+        <small>VÍA 2 · DIRECTA</small>
+        <h3>
+          China <ArrowRight /> Managua
+        </h3>
+      </div>
+      {r.best === "direct" && <mark>Recomendada</mark>}
+      <dl className="legs">
+        <div>
+          <dt>
+            <b>China → Managua</b>
+            <span>
+              {r.billCbm.toFixed(3)} CBM × {money(rates.cbmRate)}
+            </span>
+          </dt>
+          <dd>{money(r.direct)}</dd>
+        </div>
+        <div>
+          <dt>Volumen real</dt>
+          <dd>{r.cbm.toFixed(3)} CBM</dd>
+        </div>
+      </dl>
+      <div className="routeTotal">
+        <span>TOTAL VÍA 2</span>
+        <strong>{money(r.direct)}</strong>
+      </div>
+    </article>
+  );
+}
+function App() {
+  const [page, setPage] = useState("calculator"),
+    [refresh, setRefresh] = useState(0),
+    [quoteCustomer, setQuoteCustomer] = useState(null);
+  function createQuote(customer = null) {
+    setQuoteCustomer(customer);
+    setPage("calculator");
+  }
+  function navigate(next) {
+    if (next === "calculator") setQuoteCustomer(null);
+    setPage(next);
+  }
+  function saved() {
+    setRefresh((x) => x + 1);
+    setPage("quotes");
+  }
+  const recordType =
+    page === "quotes" ? "quote" : page === "clientQuotes" ? "client" : "order";
+  const changed = () => setRefresh((x) => x + 1);
+  return (
+    <>
+      <header>
+        <div className="brand">
+          <div className="logo">
+            <Ship />
+          </div>
+          <div>
+            <b>CotizacionesChina</b>
+            <small>Cotizaciones y órdenes</small>
+          </div>
+        </div>
+        <Nav page={page} setPage={navigate} />
+      </header>
+      <main className="appMain">
+        {page === "calculator" ? (
+          <CalculatorPage onSaved={saved} initialCustomer={quoteCustomer} />
+        ) : page === "products" ? (
+          <ProductsPage
+            refreshKey={refresh}
+            onChange={changed}
+            setPage={navigate}
+          />
+        ) : page === "customers" ? (
+          <ClientsPage refreshKey={refresh} onCreateQuote={createQuote} />
+        ) : page === "profits" ? (
+          <ProfitPage refreshKey={refresh} />
+        ) : (
+          <RecordsPage
+            type={recordType}
+            refreshKey={refresh}
+            onChange={changed}
+            onCreateQuote={() => createQuote(null)}
+          />
+        )}
+      </main>
+    </>
+  );
+}
+createRoot(document.getElementById("root")).render(<App />);

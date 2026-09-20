@@ -1,69 +1,820 @@
-import React,{useEffect,useState}from'react';
-import{PackageSearch,X,Trash2,ReceiptText,Route,CalendarDays,Package,Weight,ImagePlus,Plus,Save}from'lucide-react';
-import'./products-page.css';
+import React, { useEffect, useState } from "react";
+import {
+  PackageSearch,
+  X,
+  Trash2,
+  ReceiptText,
+  Route,
+  CalendarDays,
+  Package,
+  Weight,
+  ImagePlus,
+  Plus,
+  Save,
+} from "lucide-react";
+import "./products-page.css";
 
-const money=n=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(n||0);
-async function api(path,options){const r=await fetch('/api'+path,{headers:{'content-type':'application/json'},...options});const data=r.status===204?null:await r.json().catch(()=>({}));if(!r.ok)throw new Error([data?.error,data?.detail].filter(Boolean).join(': ')||'No se pudo completar');return data}
-
-function QuoteDialog({product,onClose,onSaved}){
- const[form,setForm]=useState({customer:'',phone:'',description:product.description||product.customer_name,notes:''});
- const[items,setItems]=useState((product.products||[]).map(p=>({...p,salePrice:''})));
- const[busy,setBusy]=useState(false),[error,setError]=useState('');
- const total=items.reduce((s,p)=>s+(Number(p.qty)||0)*(Number(p.salePrice)||0),0);
- const profit=total-Number(product.total||0);
- const profitPercent=Number(product.total)>0?(profit/Number(product.total))*100:0;
- const update=(i,v)=>setItems(x=>x.map((p,n)=>n===i?{...p,salePrice:v}:p));
- async function submit(e){e.preventDefault();setBusy(true);setError('');try{await api(`/products/${product.id}/quote`,{method:'POST',body:JSON.stringify({...form,products:items})});onSaved();onClose()}catch(e){setError(e.message)}finally{setBusy(false)}}
- return <div className="overlay" onMouseDown={e=>e.target===e.currentTarget&&onClose()}><form className="quoteBuilder" onSubmit={submit}>
-  <div className="dialogHead"><div><small>COTIZACIÓN PARA CLIENTE</small><h2>Definir precios de venta</h2></div><button type="button" onClick={onClose}><X/></button></div>
-  <div className="quoteClientGrid"><label><span>Cliente *</span><input value={form.customer} onChange={e=>setForm({...form,customer:e.target.value})}/></label><label><span>Teléfono / WhatsApp</span><input value={form.phone} onChange={e=>setForm({...form,phone:e.target.value})}/></label></div>
-  <label className="quoteFull"><span>Descripción</span><input value={form.description} onChange={e=>setForm({...form,description:e.target.value})}/></label>
-  <div className="saleItems"><div className="saleHead"><span>Producto</span><span>Cantidad</span><span>Precio venta/unidad</span><span>Subtotal</span></div>{items.map((p,i)=><div className="saleRow" key={p.id||i}><b>{p.name||'Producto'}</b><span>{Number(p.qty||0).toLocaleString()}</span><label><i>$</i><input type="number" min="0" step="any" required value={p.salePrice} onChange={e=>update(i,e.target.value)}/></label><strong>{money(Number(p.qty||0)*Number(p.salePrice||0))}</strong></div>)}</div>
-  <div className="quoteTotals"><div><span>Costo interno</span><b>{money(product.total)}</b></div><div><span>Venta al cliente · envío incluido</span><b>{money(total)}</b></div><div className={profit>=0?'profitPositive':'profitNegative'}><span>Ganancia estimada</span><strong>{money(profit)}</strong></div><div className={'profitPercentage '+(profit>=0?'profitPositive':'profitNegative')}><span>Porcentaje de ganancia sobre el costo</span><strong>{profitPercent>=0?'+':''}{profitPercent.toFixed(2)}%</strong></div></div>
-  <label className="quoteFull"><span>Notas para la cotización</span><textarea value={form.notes} onChange={e=>setForm({...form,notes:e.target.value})}/></label>
-  {error&&<div className="saveError"><b>No se pudo crear la cotización</b><span>{error}</span></div>}
-  <button className="primary" disabled={busy||!form.customer||!items.length}>{busy?'Creando…':'Crear cotización interna y del cliente'}</button>
- </form></div>
+const money = (n) =>
+  new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(
+    n || 0,
+  );
+async function api(path, options) {
+  const r = await fetch("/api" + path, {
+    headers: { "content-type": "application/json" },
+    ...options,
+  });
+  const data = r.status === 204 ? null : await r.json().catch(() => ({}));
+  if (!r.ok)
+    throw new Error(
+      [data?.error, data?.detail].filter(Boolean).join(": ") ||
+        "No se pudo completar",
+    );
+  return data;
 }
 
-function ProductDetail({id,onClose,onChanged}){
- const[data,setData]=useState(null),[quote,setQuote]=useState(false),[busy,setBusy]=useState(false);
- useEffect(()=>{api('/records/'+id).then(setData)},[id]);
- if(!data)return <div className="overlay"><div className="detailSheet loadingDetail">Cargando producto…</div></div>;
- const shipping=data.route==='miami'?data.totals.viaMiami:data.totals.direct;
- const boxes=Array.isArray(data.boxes)?data.boxes:[];
- const totals=data.totals||{};
- const boxCbm=b=>{const factor=b.unit==='cm'?1e-6:0.000016387064;return Math.max(0,Number(b.l)||0)*Math.max(0,Number(b.w)||0)*Math.max(0,Number(b.h)||0)*factor};
- async function remove(){if(!confirm('¿Eliminar este producto guardado?'))return;setBusy(true);try{await api('/records/'+id,{method:'DELETE'});onChanged();onClose()}finally{setBusy(false)}}
- return <><div className="overlay" onMouseDown={e=>e.target===e.currentTarget&&onClose()}><section className="detailSheet productRecordDetail">
-  <div className="detailTop"><div><span className="badge pending">Producto</span><small>EXPEDIENTE DE COSTOS</small><h2>{data.number}</h2></div><button className="iconBtn" onClick={onClose}><X/></button></div>
-  <div className="detailActions"><button className="danger" disabled={busy} onClick={remove}><Trash2/> Eliminar</button><button className="clientQuoteButton" onClick={()=>setQuote(true)}><ReceiptText/> Crear cotización</button></div>
-  <div className="detailGrid"><div className="detailCard"><label>Producto / referencia</label><b>{data.customer_name}</b><span><CalendarDays/> Guardado {new Date(data.created_at).toLocaleString()}</span></div><div className="detailCard"><label>Descripción</label><b>{data.description||'Sin descripción'}</b><span><Route/> {data.route==='miami'?'China → Miami → Managua':'China → Managua'}</span></div></div>
-  <div className="detailSection"><h3><Package/> Información de cajas ({data.total_boxes||0})</h3>{boxes.length?<div className="productBoxTable linkedBoxes"><div className="productBoxRow head"><span>Producto</span><span>Cant.</span><span>Productos/caja</span><span>Medidas</span><span>Peso/caja</span><span>CBM/caja</span><span>CBM total</span></div>{boxes.map((b,i)=>{const cbm=boxCbm(b),qty=Math.max(0,Number(b.qty)||0);return <div className="productBoxRow" key={b.id||i}><b className="boxProductName">{b.productName||data.products?.find(p=>p.id===b.productId)?.name||'Producto'}</b><b>{qty}</b><span>{b.unitsPerBox||'—'}</span><span>{b.l} × {b.w} × {b.h} {b.unit}</span><span>{b.weight} {b.weightUnit}</span><span>{cbm.toFixed(4)}</span><b>{(cbm*qty).toFixed(4)}</b></div>})}</div>:<p className="boxEmpty">Este producto no tiene cajas registradas.</p>}</div>
-  <div className="detailSection"><h3><Weight/> Peso y volumen guardados</h3><div className="productLogisticsSummary"><div><span>CBM total</span><b>{Number(totals.cbm||0).toFixed(4)} m³</b></div><div><span>Peso crudo total</span><b>{Number(totals.actualKg||0).toFixed(2)} kg</b><small>{Number(totals.actualLb||0).toFixed(2)} lb</small></div>{data.route==='miami'?<><div><span>China → Miami</span><b>{Number(totals.cnBillKg||0).toFixed(2)} kg</b><small>{Number(totals.cnVolumeKg||0)>Number(totals.actualKg||0)?'Cobro por peso volumétrico':'Cobro por peso crudo'}</small></div><div><span>Miami → Managua</span><b>{Number(totals.miBillLb||0).toFixed(2)} lb</b><small>{Number(totals.miVolumeLb||0)>Number(totals.actualLb||0)?'Cobro por peso volumétrico':'Cobro por peso crudo'}</small></div></>:<div><span>Ruta directa</span><b>{Number(totals.cbm||0).toFixed(4)} CBM</b><small>Cobro por espacio</small></div>}</div></div>
-  <div className="detailSection"><h3>Productos y costos</h3><div className="savedProducts">{data.products.map((p,i)=><div key={i}>{p.imageUrl?<img src={p.imageUrl} alt=""/>:<span className="noPhoto">Sin foto</span>}<p><b>{p.name||'Producto'}</b><small>{p.qty} × {money(p.price)}</small></p><strong>{money(Number(p.qty)*Number(p.price))}</strong></div>)}</div><div className="costBreakdown productCosts"><div><span>Subtotal productos</span><b>{money(data.totals.productSubtotal)}</b></div><div><span>Comisión ({data.totals.feePercent}%)</span><b>{money(data.totals.feeAmount)}</b></div><div><span>Envío seleccionado</span><b>{money(shipping)}</b></div><div className="selectedCost"><span>Costo total puesto en Nicaragua</span><strong>{money(data.total)}</strong></div></div></div>
- </section></div>{quote&&<QuoteDialog product={data} onClose={()=>setQuote(false)} onSaved={onChanged}/>}</>
+function QuoteDialog({ product, onClose, onSaved }) {
+  const [form, setForm] = useState({
+    customer: "",
+    phone: "",
+    description: product.description || product.customer_name,
+    notes: "",
+  });
+  const [items, setItems] = useState(
+    (product.products || []).map((p) => ({ ...p, salePrice: "" })),
+  );
+  const [busy, setBusy] = useState(false),
+    [error, setError] = useState("");
+  const total = items.reduce(
+    (s, p) => s + (Number(p.qty) || 0) * (Number(p.salePrice) || 0),
+    0,
+  );
+  const profit = total - Number(product.total || 0);
+  const profitPercent =
+    Number(product.total) > 0 ? (profit / Number(product.total)) * 100 : 0;
+  const update = (i, v) =>
+    setItems((x) => x.map((p, n) => (n === i ? { ...p, salePrice: v } : p)));
+  async function submit(e) {
+    e.preventDefault();
+    setBusy(true);
+    setError("");
+    try {
+      await api(`/products/${product.id}/quote`, {
+        method: "POST",
+        body: JSON.stringify({ ...form, products: items }),
+      });
+      onSaved();
+      onClose();
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setBusy(false);
+    }
+  }
+  return (
+    <div
+      className="overlay"
+      onMouseDown={(e) => e.target === e.currentTarget && onClose()}
+    >
+      <form className="quoteBuilder" onSubmit={submit}>
+        <div className="dialogHead">
+          <div>
+            <small>COTIZACIÓN PARA CLIENTE</small>
+            <h2>Definir precios de venta</h2>
+          </div>
+          <button type="button" onClick={onClose}>
+            <X />
+          </button>
+        </div>
+        <div className="quoteClientGrid">
+          <label>
+            <span>Cliente *</span>
+            <input
+              value={form.customer}
+              onChange={(e) => setForm({ ...form, customer: e.target.value })}
+            />
+          </label>
+          <label>
+            <span>Teléfono / WhatsApp</span>
+            <input
+              value={form.phone}
+              onChange={(e) => setForm({ ...form, phone: e.target.value })}
+            />
+          </label>
+        </div>
+        <label className="quoteFull">
+          <span>Descripción</span>
+          <input
+            value={form.description}
+            onChange={(e) => setForm({ ...form, description: e.target.value })}
+          />
+        </label>
+        <div className="saleItems">
+          <div className="saleHead">
+            <span>Producto</span>
+            <span>Cantidad</span>
+            <span>Precio venta/unidad</span>
+            <span>Subtotal</span>
+          </div>
+          {items.map((p, i) => (
+            <div className="saleRow" key={p.id || i}>
+              <b>{p.name || "Producto"}</b>
+              <span>{Number(p.qty || 0).toLocaleString()}</span>
+              <label>
+                <i>$</i>
+                <input
+                  type="number"
+                  min="0"
+                  step="any"
+                  required
+                  value={p.salePrice}
+                  onChange={(e) => update(i, e.target.value)}
+                />
+              </label>
+              <strong>
+                {money(Number(p.qty || 0) * Number(p.salePrice || 0))}
+              </strong>
+            </div>
+          ))}
+        </div>
+        <div className="quoteTotals">
+          <div>
+            <span>Costo interno</span>
+            <b>{money(product.total)}</b>
+          </div>
+          <div>
+            <span>Venta al cliente · envío incluido</span>
+            <b>{money(total)}</b>
+          </div>
+          <div className={profit >= 0 ? "profitPositive" : "profitNegative"}>
+            <span>Ganancia estimada</span>
+            <strong>{money(profit)}</strong>
+          </div>
+          <div
+            className={
+              "profitPercentage " +
+              (profit >= 0 ? "profitPositive" : "profitNegative")
+            }
+          >
+            <span>Porcentaje de ganancia sobre el costo</span>
+            <strong>
+              {profitPercent >= 0 ? "+" : ""}
+              {profitPercent.toFixed(2)}%
+            </strong>
+          </div>
+        </div>
+        <label className="quoteFull">
+          <span>Notas para la cotización</span>
+          <textarea
+            value={form.notes}
+            onChange={(e) => setForm({ ...form, notes: e.target.value })}
+          />
+        </label>
+        {error && (
+          <div className="saveError">
+            <b>No se pudo crear la cotización</b>
+            <span>{error}</span>
+          </div>
+        )}
+        <button
+          className="primary"
+          disabled={busy || !form.customer || !items.length}
+        >
+          {busy ? "Creando…" : "Crear cotización interna y del cliente"}
+        </button>
+      </form>
+    </div>
+  );
 }
 
-function RegisterProductDialog({onClose,onSaved}){
- const[form,setForm]=useState({name:'',imageUrl:'',price:'',qty:'',boxes:[{id:crypto.randomUUID(),qty:'',unitsPerBox:'',l:'',w:'',h:'',unit:'cm',weight:'',weightUnit:'kg'}]}),[busy,setBusy]=useState(false),[error,setError]=useState('');
- const update=(k,v)=>setForm(x=>({...x,[k]:v}));
- const updateBox=(id,k,v)=>setForm(x=>({...x,boxes:x.boxes.map(b=>b.id===id?{...b,[k]:v}:b)}));
- async function upload(file){if(!file)return;setBusy(true);try{const key=crypto.randomUUID()+'-'+file.name.replace(/[^a-zA-Z0-9._-]/g,'_');const r=await fetch('/api/uploads/'+key,{method:'PUT',headers:{'content-type':file.type||'application/octet-stream'},body:file});const data=await r.json();if(!r.ok)throw new Error(data.error||data.detail);update('imageUrl',data.url)}catch(e){setError(e.message)}finally{setBusy(false)}}
- async function submit(e){e.preventDefault();setBusy(true);setError('');try{await api('/catalog-products',{method:'POST',body:JSON.stringify({name:form.name,imageUrl:form.imageUrl,price:form.price,qty:form.qty,boxes:form.boxes})});onSaved();onClose()}catch(e){setError(e.message)}finally{setBusy(false)}}
- return <div className="overlay" onMouseDown={e=>e.target===e.currentTarget&&onClose()}><form className="dialog registerProductDialog" onSubmit={submit}><div className="dialogHead"><div><small>CATÁLOGO</small><h2>Registrar producto</h2></div><button type="button" onClick={onClose}><X/></button></div><div className="registerProductMain"><label className="catalogPhotoPicker">{form.imageUrl?<img src={form.imageUrl} alt=""/>:<><ImagePlus/><span>Agregar foto</span></>}<input type="file" accept="image/*" onChange={e=>upload(e.target.files[0])}/></label><div className="registerFields"><label><span>Nombre del producto *</span><input required value={form.name} onChange={e=>update('name',e.target.value)}/></label><label><span>Precio de compra por unidad</span><input type="number" min="0" step="any" value={form.price} onChange={e=>update('price',e.target.value)}/></label><label><span>Cantidad de referencia</span><input type="number" min="0" value={form.qty} onChange={e=>update('qty',e.target.value)}/></label></div></div><div className="registeredBoxes"><h3><Package/> Información de cajas</h3>{form.boxes.map((b,i)=><div className="registerBoxRow" key={b.id}><b>Tipo {i+1}</b>{[['Cantidad cajas','qty'],['Productos/caja','unitsPerBox'],['Largo','l'],['Ancho','w'],['Alto','h'],['Peso/caja','weight']].map(([label,key])=><label key={key}><span>{label}</span><input type="number" min="0" step="any" value={b[key]} onChange={e=>updateBox(b.id,key,e.target.value)}/></label>)}<label><span>Medidas</span><select value={b.unit} onChange={e=>updateBox(b.id,'unit',e.target.value)}><option value="in">Pulgadas</option><option value="cm">Centímetros</option></select></label><label><span>Unidad peso</span><select value={b.weightUnit} onChange={e=>updateBox(b.id,'weightUnit',e.target.value)}><option value="kg">Kilogramos</option><option value="lb">Libras</option></select></label>{form.boxes.length>1&&<button type="button" onClick={()=>update('boxes',form.boxes.filter(x=>x.id!==b.id))}><Trash2/></button>}</div>)}</div>{error&&<div className="saveError"><b>No se pudo guardar</b><span>{error}</span></div>}<button className="primary" disabled={busy||!form.name}><Save/>{busy?'Guardando…':'Guardar producto'}</button></form></div>
+function ProductDetail({ id, onClose, onChanged }) {
+  const [data, setData] = useState(null),
+    [quote, setQuote] = useState(false),
+    [busy, setBusy] = useState(false);
+  useEffect(() => {
+    api("/records/" + id).then(setData);
+  }, [id]);
+  if (!data)
+    return (
+      <div className="overlay">
+        <div className="detailSheet loadingDetail">Cargando producto…</div>
+      </div>
+    );
+  const shipping =
+    data.route === "miami" ? data.totals.viaMiami : data.totals.direct;
+  const boxes = Array.isArray(data.boxes) ? data.boxes : [];
+  const totals = data.totals || {};
+  const boxCbm = (b) => {
+    const factor = b.unit === "cm" ? 1e-6 : 0.000016387064;
+    return (
+      Math.max(0, Number(b.l) || 0) *
+      Math.max(0, Number(b.w) || 0) *
+      Math.max(0, Number(b.h) || 0) *
+      factor
+    );
+  };
+  async function remove() {
+    if (!confirm("¿Eliminar este producto guardado?")) return;
+    setBusy(true);
+    try {
+      await api("/records/" + id, { method: "DELETE" });
+      onChanged();
+      onClose();
+    } finally {
+      setBusy(false);
+    }
+  }
+  return (
+    <>
+      <div
+        className="overlay"
+        onMouseDown={(e) => e.target === e.currentTarget && onClose()}
+      >
+        <section className="detailSheet productRecordDetail">
+          <div className="detailTop">
+            <div>
+              <span className="badge pending">Producto</span>
+              <small>EXPEDIENTE DE COSTOS</small>
+              <h2>{data.number}</h2>
+            </div>
+            <button className="iconBtn" onClick={onClose}>
+              <X />
+            </button>
+          </div>
+          <div className="detailActions">
+            <button className="danger" disabled={busy} onClick={remove}>
+              <Trash2 /> Eliminar
+            </button>
+            <button
+              className="clientQuoteButton"
+              onClick={() => setQuote(true)}
+            >
+              <ReceiptText /> Crear cotización
+            </button>
+          </div>
+          <div className="detailGrid">
+            <div className="detailCard">
+              <label>Producto / referencia</label>
+              <b>{data.customer_name}</b>
+              <span>
+                <CalendarDays /> Guardado{" "}
+                {new Date(data.created_at).toLocaleString()}
+              </span>
+            </div>
+            <div className="detailCard">
+              <label>Descripción</label>
+              <b>{data.description || "Sin descripción"}</b>
+              <span>
+                <Route />{" "}
+                {data.route === "miami"
+                  ? "China → Miami → Managua"
+                  : "China → Managua"}
+              </span>
+            </div>
+          </div>
+          <div className="detailSection">
+            <h3>
+              <Package /> Información de cajas ({data.total_boxes || 0})
+            </h3>
+            {boxes.length ? (
+              <div className="productBoxTable linkedBoxes">
+                <div className="productBoxRow head">
+                  <span>Producto</span>
+                  <span>Cant.</span>
+                  <span>Productos/caja</span>
+                  <span>Medidas</span>
+                  <span>Peso/caja</span>
+                  <span>CBM/caja</span>
+                  <span>CBM total</span>
+                </div>
+                {boxes.map((b, i) => {
+                  const cbm = boxCbm(b),
+                    qty = Math.max(0, Number(b.qty) || 0);
+                  return (
+                    <div className="productBoxRow" key={b.id || i}>
+                      <b className="boxProductName">
+                        {b.productName ||
+                          data.products?.find((p) => p.id === b.productId)
+                            ?.name ||
+                          "Producto"}
+                      </b>
+                      <b>{qty}</b>
+                      <span>{b.unitsPerBox || "—"}</span>
+                      <span>
+                        {b.l} × {b.w} × {b.h} {b.unit}
+                      </span>
+                      <span>
+                        {b.weight} {b.weightUnit}
+                      </span>
+                      <span>{cbm.toFixed(4)}</span>
+                      <b>{(cbm * qty).toFixed(4)}</b>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <p className="boxEmpty">
+                Este producto no tiene cajas registradas.
+              </p>
+            )}
+          </div>
+          <div className="detailSection">
+            <h3>
+              <Weight /> Peso y volumen guardados
+            </h3>
+            <div className="productLogisticsSummary">
+              <div>
+                <span>CBM total</span>
+                <b>{Number(totals.cbm || 0).toFixed(4)} m³</b>
+              </div>
+              <div>
+                <span>Peso crudo total</span>
+                <b>{Number(totals.actualKg || 0).toFixed(2)} kg</b>
+                <small>{Number(totals.actualLb || 0).toFixed(2)} lb</small>
+              </div>
+              {data.route === "miami" ? (
+                <>
+                  <div>
+                    <span>China → Miami</span>
+                    <b>{Number(totals.cnBillKg || 0).toFixed(2)} kg</b>
+                    <small>
+                      {Number(totals.cnVolumeKg || 0) >
+                      Number(totals.actualKg || 0)
+                        ? "Cobro por peso volumétrico"
+                        : "Cobro por peso crudo"}
+                    </small>
+                  </div>
+                  <div>
+                    <span>Miami → Managua</span>
+                    <b>{Number(totals.miBillLb || 0).toFixed(2)} lb</b>
+                    <small>
+                      {Number(totals.miVolumeLb || 0) >
+                      Number(totals.actualLb || 0)
+                        ? "Cobro por peso volumétrico"
+                        : "Cobro por peso crudo"}
+                    </small>
+                  </div>
+                </>
+              ) : (
+                <div>
+                  <span>Ruta directa</span>
+                  <b>{Number(totals.cbm || 0).toFixed(4)} CBM</b>
+                  <small>Cobro por espacio</small>
+                </div>
+              )}
+            </div>
+          </div>
+          <div className="detailSection">
+            <h3>Productos y costos</h3>
+            <div className="savedProducts">
+              {data.products.map((p, i) => (
+                <div key={i}>
+                  {p.imageUrl ? (
+                    <img src={p.imageUrl} alt="" />
+                  ) : (
+                    <span className="noPhoto">Sin foto</span>
+                  )}
+                  <p>
+                    <b>{p.name || "Producto"}</b>
+                    <small>
+                      {p.qty} × {money(p.price)}
+                    </small>
+                  </p>
+                  <strong>{money(Number(p.qty) * Number(p.price))}</strong>
+                </div>
+              ))}
+            </div>
+            <div className="costBreakdown productCosts">
+              <div>
+                <span>Subtotal productos</span>
+                <b>{money(data.totals.productSubtotal)}</b>
+              </div>
+              <div>
+                <span>Comisión ({data.totals.feePercent}%)</span>
+                <b>{money(data.totals.feeAmount)}</b>
+              </div>
+              <div>
+                <span>Envío seleccionado</span>
+                <b>{money(shipping)}</b>
+              </div>
+              <div className="selectedCost">
+                <span>Costo total puesto en Nicaragua</span>
+                <strong>{money(data.total)}</strong>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+      {quote && (
+        <QuoteDialog
+          product={data}
+          onClose={() => setQuote(false)}
+          onSaved={onChanged}
+        />
+      )}
+    </>
+  );
 }
 
-function CatalogSection({refreshKey}){
- const[items,setItems]=useState([]),[loading,setLoading]=useState(true);
- async function load(){setLoading(true);try{setItems(await api('/catalog-products'))}catch{setItems([])}finally{setLoading(false)}}
- useEffect(()=>{load()},[refreshKey]);
- async function remove(e,id){e.stopPropagation();if(!confirm('¿Eliminar este producto del catálogo?'))return;await api('/catalog-products/'+id,{method:'DELETE'});load()}
- return <section className="catalogSection"><div className="catalogTitle"><div><small>CATÁLOGO PERMANENTE</small><h2>Mis productos</h2><p>Cada producto conserva su foto, precio y sus propias cajas.</p></div><b>{items.length} guardados</b></div>{loading?<div className="catalogEmpty">Cargando productos…</div>:items.length?<div className="catalogGrid">{items.map(p=><article className="catalogCard" key={p.id}>{p.image_url?<img src={p.image_url} alt={p.name}/>:<span className="catalogNoPhoto">Sin foto</span>}<div><h3>{p.name}</h3><p>{Number(p.default_quantity||0).toLocaleString()} unidades · {(p.boxes||[]).reduce((n,b)=>n+Number(b.qty||0),0)} cajas</p><strong>{money(p.unit_price)} <small>por unidad</small></strong></div><button onClick={e=>remove(e,p.id)} title="Eliminar del catálogo"><Trash2/></button></article>)}</div>:<div className="catalogEmpty"><PackageSearch/><b>Aún no hay productos guardados</b><span>Pulsa “Registrar producto” para guardar tu primer producto con su foto, precio y cajas.</span></div>}</section>
+function RegisterProductDialog({ onClose, onSaved }) {
+  const [form, setForm] = useState({
+      name: "",
+      imageUrl: "",
+      price: "",
+      qty: "",
+      boxes: [
+        {
+          id: crypto.randomUUID(),
+          qty: "",
+          unitsPerBox: "",
+          l: "",
+          w: "",
+          h: "",
+          unit: "cm",
+          weight: "",
+          weightUnit: "kg",
+        },
+      ],
+    }),
+    [busy, setBusy] = useState(false),
+    [error, setError] = useState("");
+  const update = (k, v) => setForm((x) => ({ ...x, [k]: v }));
+  const updateBox = (id, k, v) =>
+    setForm((x) => ({
+      ...x,
+      boxes: x.boxes.map((b) => (b.id === id ? { ...b, [k]: v } : b)),
+    }));
+  async function upload(file) {
+    if (!file) return;
+    setBusy(true);
+    try {
+      const key =
+        crypto.randomUUID() + "-" + file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+      const r = await fetch("/api/uploads/" + key, {
+        method: "PUT",
+        headers: { "content-type": file.type || "application/octet-stream" },
+        body: file,
+      });
+      const data = await r.json();
+      if (!r.ok) throw new Error(data.error || data.detail);
+      update("imageUrl", data.url);
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setBusy(false);
+    }
+  }
+  async function submit(e) {
+    e.preventDefault();
+    setBusy(true);
+    setError("");
+    try {
+      await api("/catalog-products", {
+        method: "POST",
+        body: JSON.stringify({
+          name: form.name,
+          imageUrl: form.imageUrl,
+          price: form.price,
+          qty: form.qty,
+          boxes: form.boxes,
+        }),
+      });
+      onSaved();
+      onClose();
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setBusy(false);
+    }
+  }
+  return (
+    <div
+      className="overlay"
+      onMouseDown={(e) => e.target === e.currentTarget && onClose()}
+    >
+      <form className="dialog registerProductDialog" onSubmit={submit}>
+        <div className="dialogHead">
+          <div>
+            <small>CATÁLOGO</small>
+            <h2>Registrar producto</h2>
+          </div>
+          <button type="button" onClick={onClose}>
+            <X />
+          </button>
+        </div>
+        <div className="registerProductMain">
+          <label className="catalogPhotoPicker">
+            {form.imageUrl ? (
+              <img src={form.imageUrl} alt="" />
+            ) : (
+              <>
+                <ImagePlus />
+                <span>Agregar foto</span>
+              </>
+            )}
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => upload(e.target.files[0])}
+            />
+          </label>
+          <div className="registerFields">
+            <label>
+              <span>Nombre del producto *</span>
+              <input
+                required
+                value={form.name}
+                onChange={(e) => update("name", e.target.value)}
+              />
+            </label>
+            <label>
+              <span>Precio de compra por unidad</span>
+              <input
+                type="number"
+                min="0"
+                step="any"
+                value={form.price}
+                onChange={(e) => update("price", e.target.value)}
+              />
+            </label>
+            <label>
+              <span>Cantidad de referencia</span>
+              <input
+                type="number"
+                min="0"
+                value={form.qty}
+                onChange={(e) => update("qty", e.target.value)}
+              />
+            </label>
+          </div>
+        </div>
+        <div className="registeredBoxes">
+          <h3>
+            <Package /> Información de cajas
+          </h3>
+          {form.boxes.map((b, i) => (
+            <div className="registerBoxRow" key={b.id}>
+              <b>Tipo {i + 1}</b>
+              {[
+                ["Cantidad cajas", "qty"],
+                ["Productos/caja", "unitsPerBox"],
+                ["Largo", "l"],
+                ["Ancho", "w"],
+                ["Alto", "h"],
+                ["Peso/caja", "weight"],
+              ].map(([label, key]) => (
+                <label key={key}>
+                  <span>{label}</span>
+                  <input
+                    type="number"
+                    min="0"
+                    step="any"
+                    value={b[key]}
+                    onChange={(e) => updateBox(b.id, key, e.target.value)}
+                  />
+                </label>
+              ))}
+              <label>
+                <span>Medidas</span>
+                <select
+                  value={b.unit}
+                  onChange={(e) => updateBox(b.id, "unit", e.target.value)}
+                >
+                  <option value="in">Pulgadas</option>
+                  <option value="cm">Centímetros</option>
+                </select>
+              </label>
+              <label>
+                <span>Unidad peso</span>
+                <select
+                  value={b.weightUnit}
+                  onChange={(e) =>
+                    updateBox(b.id, "weightUnit", e.target.value)
+                  }
+                >
+                  <option value="kg">Kilogramos</option>
+                  <option value="lb">Libras</option>
+                </select>
+              </label>
+              {form.boxes.length > 1 && (
+                <button
+                  type="button"
+                  onClick={() =>
+                    update(
+                      "boxes",
+                      form.boxes.filter((x) => x.id !== b.id),
+                    )
+                  }
+                >
+                  <Trash2 />
+                </button>
+              )}
+            </div>
+          ))}
+        </div>
+        {error && (
+          <div className="saveError">
+            <b>No se pudo guardar</b>
+            <span>{error}</span>
+          </div>
+        )}
+        <button className="primary" disabled={busy || !form.name}>
+          <Save />
+          {busy ? "Guardando…" : "Guardar producto"}
+        </button>
+      </form>
+    </div>
+  );
 }
 
-export default function ProductsPage({refreshKey,onChange}){
- const[registering,setRegistering]=useState(false),[catalogRefresh,setCatalogRefresh]=useState(0);
- function saved(){setCatalogRefresh(x=>x+1);onChange()}
- return <div className="workspace"><div className="pageHead"><div><small>CATÁLOGO PERMANENTE</small><h1>Productos</h1><p>Registra y administra tus productos. Los cálculos se realizan únicamente en la pestaña Calcular.</p></div><button className="newProduct" onClick={()=>setRegistering(true)}><Plus/> Registrar producto</button></div><CatalogSection refreshKey={refreshKey+catalogRefresh}/>{registering&&<RegisterProductDialog onClose={()=>setRegistering(false)} onSaved={saved}/>}</div>
+function CatalogSection({ refreshKey }) {
+  const [items, setItems] = useState([]),
+    [loading, setLoading] = useState(true),
+    [selected, setSelected] = useState(null);
+  async function load() {
+    setLoading(true);
+    try {
+      setItems(await api("/catalog-products"));
+    } catch {
+      setItems([]);
+    } finally {
+      setLoading(false);
+    }
+  }
+  useEffect(() => {
+    load();
+  }, [refreshKey]);
+  async function remove(e, id) {
+    e.stopPropagation();
+    if (!confirm("¿Eliminar este producto del catálogo?")) return;
+    await api("/catalog-products/" + id, { method: "DELETE" });
+    load();
+  }
+  return (
+    <section className="catalogSection">
+      <div className="catalogTitle">
+        <div>
+          <small>CATÁLOGO PERMANENTE</small>
+          <h2>Mis productos</h2>
+          <p>Cada producto conserva su foto, precio y sus propias cajas.</p>
+        </div>
+        <b>{items.length} guardados</b>
+      </div>
+      {loading ? (
+        <div className="catalogEmpty">Cargando productos…</div>
+      ) : items.length ? (
+        <div className="catalogGrid">
+          {items.map((p) => (
+            <article
+              className="catalogCard"
+              key={p.id}
+              role="button"
+              tabIndex="0"
+              onClick={() => setSelected(p)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") setSelected(p);
+              }}
+            >
+              {p.image_url ? (
+                <img src={p.image_url} alt={p.name} />
+              ) : (
+                <span className="catalogNoPhoto">Sin foto</span>
+              )}
+              <div>
+                <h3>{p.name}</h3>
+                <p>
+                  {Number(p.default_quantity || 0).toLocaleString()} unidades ·{" "}
+                  {(p.boxes || []).reduce((n, b) => n + Number(b.qty || 0), 0)}{" "}
+                  cajas
+                </p>
+                <strong>
+                  {money(p.unit_price)} <small>por unidad</small>
+                </strong>
+              </div>
+              <button
+                onClick={(e) => remove(e, p.id)}
+                title="Eliminar del catálogo"
+              >
+                <Trash2 />
+              </button>
+            </article>
+          ))}
+        </div>
+      ) : (
+        <div className="catalogEmpty">
+          <PackageSearch />
+          <b>Aún no hay productos guardados</b>
+          <span>
+            Pulsa “Registrar producto” para guardar tu primer producto con su
+            foto, precio y cajas.
+          </span>
+        </div>
+      )}
+      {selected && (
+        <CatalogProductDetail
+          product={selected}
+          onClose={() => setSelected(null)}
+        />
+      )}
+    </section>
+  );
+}
+
+function CatalogProductDetail({ product, onClose }) {
+  const boxes = product.boxes || [];
+  const cbm = (b) =>
+    Number(b.l || 0) *
+    Number(b.w || 0) *
+    Number(b.h || 0) *
+    (b.unit === "in" ? 0.000016387064 : 0.000001);
+  return (
+    <div
+      className="overlay"
+      onMouseDown={(e) => e.target === e.currentTarget && onClose()}
+    >
+      <section className="catalogDetail">
+        <div className="dialogHead">
+          <div>
+            <small>PRODUCTO GUARDADO</small>
+            <h2>{product.name}</h2>
+          </div>
+          <button onClick={onClose}>
+            <X />
+          </button>
+        </div>
+        <div className="catalogDetailHero">
+          {product.image_url ? (
+            <img src={product.image_url} alt={product.name} />
+          ) : (
+            <span className="catalogNoPhoto">Sin foto</span>
+          )}
+          <div>
+            <span>Precio de compra por unidad</span>
+            <strong>{money(product.unit_price)}</strong>
+            <small>
+              Cantidad de referencia:{" "}
+              {Number(product.default_quantity || 0).toLocaleString()}
+            </small>
+          </div>
+        </div>
+        <h3>
+          <Package /> Información de la caja
+        </h3>
+        {boxes.length ? (
+          <div className="catalogDetailBoxes">
+            {boxes.map((b, i) => (
+              <article key={b.id || i}>
+                <b>Caja {i + 1}</b>
+                <span>
+                  {b.qty || 0} cajas · {b.unitsPerBox || 0} productos/caja
+                </span>
+                <span>
+                  {b.l || 0} × {b.w || 0} × {b.h || 0}{" "}
+                  {b.unit === "in" ? "pulgadas" : "cm"}
+                </span>
+                <span>
+                  {b.weight || 0} {b.weightUnit || "kg"} por caja
+                </span>
+                <strong>{cbm(b).toFixed(4)} CBM por caja</strong>
+              </article>
+            ))}
+          </div>
+        ) : (
+          <p>Sin información de caja.</p>
+        )}
+      </section>
+    </div>
+  );
+}
+
+export default function ProductsPage({ refreshKey, onChange }) {
+  const [registering, setRegistering] = useState(false),
+    [catalogRefresh, setCatalogRefresh] = useState(0);
+  function saved() {
+    setCatalogRefresh((x) => x + 1);
+    onChange();
+  }
+  return (
+    <div className="workspace">
+      <div className="pageHead">
+        <div>
+          <small>CATÁLOGO PERMANENTE</small>
+          <h1>Productos</h1>
+          <p>
+            Registra y administra tus productos. Los cálculos se realizan
+            únicamente en la pestaña Calcular.
+          </p>
+        </div>
+        <button className="newProduct" onClick={() => setRegistering(true)}>
+          <Plus /> Registrar producto
+        </button>
+      </div>
+      <CatalogSection refreshKey={refreshKey + catalogRefresh} />
+      {registering && (
+        <RegisterProductDialog
+          onClose={() => setRegistering(false)}
+          onSaved={saved}
+        />
+      )}
+    </div>
+  );
 }

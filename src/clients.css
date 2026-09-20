@@ -1,0 +1,215 @@
+.clientsPage {
+  max-width: 1180px;
+}
+.clientSummary {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin: 20px 0;
+}
+.clientSummary > div {
+  background: #171a21;
+  border: 1px solid #282d37;
+  border-radius: 14px;
+  padding: 18px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.clientSummary svg {
+  width: 20px;
+  color: #23cc80;
+}
+.clientSummary span {
+  color: #979eaa;
+}
+.clientSummary b {
+  font-size: 22px;
+  margin-left: auto;
+}
+.clientSearch {
+  height: 48px;
+  background: #12151b;
+  border: 1px solid #282d37;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 15px;
+  margin-bottom: 16px;
+}
+.clientSearch svg {
+  width: 18px;
+  color: #828996;
+}
+.clientSearch input {
+  width: 100%;
+  background: none;
+  border: 0;
+  color: #fff;
+  outline: 0;
+}
+.clientGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+  gap: 14px;
+}
+.clientCard {
+  background: #171a21;
+  border: 1px solid #282d37;
+  border-radius: 14px;
+  padding: 16px;
+  color: #fff;
+  text-align: left;
+  display: grid;
+  grid-template-columns: 48px 1fr auto;
+  gap: 13px;
+  align-items: center;
+  cursor: pointer;
+}
+.clientCard:hover {
+  border-color: #25c77d;
+  transform: translateY(-1px);
+}
+.clientAvatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 13px;
+  display: grid;
+  place-items: center;
+  background: #163828;
+  color: #35dd91;
+  font-weight: 800;
+}
+.clientCard h3 {
+  margin: 0 0 5px;
+}
+.clientCard p,
+.clientCard small {
+  margin: 0;
+  color: #9299a5;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.clientCard p svg {
+  width: 14px;
+}
+.clientCard strong {
+  color: #36d98d;
+}
+.clientDetail {
+  width: min(720px, calc(100vw - 24px));
+  max-height: 90vh;
+  overflow: auto;
+  background: #171a20;
+  border: 1px solid #2a3039;
+  border-radius: 20px;
+  padding: 24px;
+}
+.clientDetailHead {
+  display: grid;
+  grid-template-columns: 56px 1fr auto;
+  gap: 14px;
+  align-items: center;
+}
+.clientDetailHead .clientAvatar {
+  width: 56px;
+  height: 56px;
+}
+.clientDetailHead small {
+  color: #31d487;
+}
+.clientDetailHead h2 {
+  margin: 3px 0;
+}
+.clientDetailHead p {
+  margin: 0;
+  color: #939aa5;
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.clientDetailHead p svg {
+  width: 15px;
+}
+.clientDetailHead > button {
+  align-self: start;
+  background: #222730;
+  border: 0;
+  color: #fff;
+  border-radius: 10px;
+  padding: 9px;
+}
+.newClientQuote {
+  width: 100%;
+  margin: 22px 0 14px;
+  background: #20c979;
+  border: 0;
+  border-radius: 11px;
+  padding: 13px;
+  font-weight: 800;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+}
+.clientStats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.clientStats div {
+  background: #20242c;
+  border-radius: 12px;
+  padding: 14px;
+  display: flex;
+  justify-content: space-between;
+}
+.clientHistory h3 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.clientHistory article {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 14px 0;
+  border-top: 1px solid #2a3039;
+}
+.clientHistory article > div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.clientHistory span {
+  color: #9299a5;
+}
+.clientHistory svg {
+  width: 14px;
+}
+.clientHistory strong {
+  color: #35d98c;
+  text-align: right;
+}
+@media (max-width: 650px) {
+  .clientSummary {
+    grid-template-columns: 1fr;
+  }
+  .clientGrid {
+    grid-template-columns: 1fr;
+  }
+  .clientCard {
+    grid-template-columns: 44px 1fr;
+  }
+  .clientCard > strong {
+    grid-column: 2;
+  }
+  .clientDetail {
+    padding: 18px;
+  }
+  .clientStats {
+    grid-template-columns: 1fr;
+  }
+}
