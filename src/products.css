@@ -322,8 +322,12 @@
   font-size: 12px;
 }
 .singleBoxInfo .productBoxEditor {
-  grid-template-columns: repeat(8, minmax(72px, 1fr)) repeat(2, minmax(130px, 1.25fr));
+  grid-template-columns: repeat(8, minmax(0, 1fr));
   margin: 0;
+}
+.singleBoxInfo .productCbmResult {
+  grid-column: span 4;
+  min-width: 0;
 }
 .singleBoxInfo .productBoxEditor label:first-child {
   grid-column: auto;
@@ -447,6 +451,9 @@
   .singleBoxInfo .productBoxEditor {
     grid-template-columns: repeat(4, 1fr);
   }
+  .singleBoxInfo .productCbmResult {
+    grid-column: span 2;
+  }
 }
 @media (max-width: 560px) {
   .singleBoxInfo {
@@ -454,6 +461,9 @@
   }
   .singleBoxInfo .productBoxEditor {
     grid-template-columns: repeat(2, 1fr);
+  }
+  .singleBoxInfo .productCbmResult {
+    grid-column: span 1;
   }
   .singleBoxInfo .productBoxEditor label:first-child {
     grid-column: auto;
