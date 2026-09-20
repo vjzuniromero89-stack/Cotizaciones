@@ -13,13 +13,14 @@ import {
   Save,
 } from "lucide-react";
 import "./products-page.css";
+import { authFetch } from "./auth.js";
 
 const money = (n) =>
   new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(
     n || 0,
   );
 async function api(path, options) {
-  const r = await fetch("/api" + path, {
+  const r = await authFetch("/api" + path, {
     headers: { "content-type": "application/json" },
     ...options,
   });
@@ -449,7 +450,7 @@ function RegisterProductDialog({ onClose, onSaved }) {
     try {
       const key =
         crypto.randomUUID() + "-" + file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
-      const r = await fetch("/api/uploads/" + key, {
+      const r = await authFetch("/api/uploads/" + key, {
         method: "PUT",
         headers: { "content-type": file.type || "application/octet-stream" },
         body: file,

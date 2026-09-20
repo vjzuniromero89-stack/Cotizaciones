@@ -1,0 +1,99 @@
+.authScreen {
+  min-height: 100vh;
+  max-width: none !important;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: radial-gradient(circle at top, #153c2c, #080b10 55%);
+}
+.authCard {
+  width: min(440px, 100%);
+  background: #171a20;
+  border: 1px solid #303640;
+  border-radius: 22px;
+  padding: 28px;
+  color: #fff;
+  box-shadow: 0 25px 80px #0008;
+}
+.authBrand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #303640;
+}
+.authBrand > span {
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  background: #20ca79;
+  border-radius: 13px;
+  color: #082a1b;
+}
+.authBrand h1 {
+  font-size: 20px;
+  margin: 0;
+}
+.authBrand p,
+.authIntro p {
+  color: #969da8;
+  margin: 3px 0 0;
+}
+.authIntro {
+  text-align: center;
+  padding: 25px 0 15px;
+}
+.authIntro > svg {
+  color: #31d58a;
+  width: 34px;
+  height: 34px;
+}
+.authIntro h2 {
+  margin: 8px 0 4px;
+}
+.authCard form {
+  display: grid;
+  gap: 15px;
+}
+.authCard label > span {
+  display: block;
+  color: #a9b0ba;
+  font-size: 12px;
+  font-weight: 800;
+  margin-bottom: 6px;
+}
+.authCard label > div {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #101319;
+  border: 1px solid #353c47;
+  border-radius: 10px;
+  padding: 0 12px;
+}
+.authCard label svg {
+  width: 17px;
+  color: #7e8794;
+}
+.authCard input {
+  height: 46px;
+  width: 100%;
+  background: none;
+  border: 0;
+  outline: 0;
+  color: #fff;
+}
+.authCard form > button {
+  height: 48px;
+  border: 0;
+  border-radius: 10px;
+  background: #20ca79;
+  font-weight: 900;
+}
+.authError {
+  padding: 11px;
+  border-radius: 9px;
+  background: #4a2020;
+  color: #ffb5b5;
+}

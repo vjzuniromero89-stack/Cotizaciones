@@ -9,13 +9,14 @@ import {
   CalendarDays,
 } from "lucide-react";
 import "./clients.css";
+import { authFetch } from "./auth.js";
 
 const money = (n) =>
   new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(
     n || 0,
   );
 async function api(path) {
-  const r = await fetch("/api" + path);
+  const r = await authFetch("/api" + path);
   if (!r.ok) throw new Error("No se pudieron cargar los clientes");
   return r.json();
 }

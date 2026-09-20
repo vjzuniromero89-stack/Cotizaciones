@@ -1,4 +1,5 @@
 import React from "react";
+import { authFetch } from "./auth.js";
 import { Plus, Trash2, ImagePlus, PackagePlus } from "lucide-react";
 import "./products.css";
 const money = (n) =>
@@ -117,7 +118,7 @@ export default function ProductSection({
     try {
       const key =
         crypto.randomUUID() + "-" + file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
-      const r = await fetch("/api/uploads/" + key, {
+      const r = await authFetch("/api/uploads/" + key, {
         method: "PUT",
         headers: { "content-type": file.type || "application/octet-stream" },
         body: file,

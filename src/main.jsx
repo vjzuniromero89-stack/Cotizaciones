@@ -17,6 +17,8 @@ import {
   TrendingUp,
   PackageSearch,
   Users,
+  LogOut,
+  UserCog,
 } from "lucide-react";
 import "./style.css";
 import "./route-breakdown.css";
@@ -28,6 +30,9 @@ import ProductSection, { blankProduct } from "./ProductSection.jsx";
 import ProfitPage from "./ProfitPage.jsx";
 import ProductsPage from "./ProductsPage.jsx";
 import ClientsPage from "./ClientsPage.jsx";
+import UsersPage from "./UsersPage.jsx";
+import AuthPage from "./AuthPage.jsx";
+import { authFetch, clearSession, getSession } from "./auth.js";
 import "./landed.css";
 import "./dark.css";
 const money = (n) =>
@@ -53,7 +58,7 @@ const statusLabel = {
 };
 const statusSteps = ["confirmed", "purchased", "transit", "delivered"];
 async function api(path, options) {
-  const res = await fetch("/api" + path, {
+  const res = await authFetch("/api" + path, {
     headers: { "content-type": "application/json" },
     ...options,
   });
@@ -83,7 +88,7 @@ function Field({ label, value, onChange, type = "number", suffix }) {
     </label>
   );
 }
-function Nav({ page, setPage }) {
+function Nav({ page, setPage, currentUser }) {
   return (
     <nav className="mainNav">
       {[
@@ -99,6 +104,9 @@ function Nav({ page, setPage }) {
         ],
         ["orders", ClipboardList, "Órdenes", "Órdenes"],
         ["profits", TrendingUp, "Ganancias", "Ganancias"],
+        ...(currentUser?.role === "admin"
+          ? [["users", UserCog, "Usuarios", "Usuarios"]]
+          : []),
       ].map(([id, Icon, label, short]) => (
         <button
           key={id}
@@ -814,7 +822,26 @@ function RouteTwo({ r, rates }) {
 function App() {
   const [page, setPage] = useState("calculator"),
     [refresh, setRefresh] = useState(0),
-    [quoteCustomer, setQuoteCustomer] = useState(null);
+    [quoteCustomer, setQuoteCustomer] = useState(null),
+    [currentUser, setCurrentUser] = useState(null),
+    [authLoading, setAuthLoading] = useState(true),
+    [needsSetup, setNeedsSetup] = useState(false);
+  useEffect(() => {
+    const session = getSession();
+    Promise.all([
+      fetch("/api/auth/status").then((r) => r.json()),
+      session
+        ? authFetch("/api/auth/me").then((r) => (r.ok ? r.json() : null))
+        : Promise.resolve(null),
+    ])
+      .then(([status, user]) => {
+        setNeedsSetup(Boolean(status.needsSetup));
+        setCurrentUser(user);
+        if (!user && session) clearSession();
+        setAuthLoading(false);
+      })
+      .catch(() => setAuthLoading(false));
+  }, []);
   function createQuote(customer = null) {
     setQuoteCustomer(customer);
     setPage("calculator");
@@ -830,6 +857,23 @@ function App() {
   const recordType =
     page === "quotes" ? "quote" : page === "clientQuotes" ? "client" : "order";
   const changed = () => setRefresh((x) => x + 1);
+  if (authLoading)
+    return <div className="authLoading">Verificando acceso…</div>;
+  if (!currentUser)
+    return (
+      <AuthPage
+        needsSetup={needsSetup}
+        onAuthenticated={(session) => {
+          setCurrentUser(session.user);
+          setNeedsSetup(false);
+        }}
+      />
+    );
+  function logout() {
+    clearSession();
+    setCurrentUser(null);
+    setPage("calculator");
+  }
   return (
     <>
       <header>
@@ -842,7 +886,18 @@ function App() {
             <small>Cotizaciones y órdenes</small>
           </div>
         </div>
-        <Nav page={page} setPage={navigate} />
+        <Nav page={page} setPage={navigate} currentUser={currentUser} />
+        <div className="sessionUser">
+          <span>
+            {currentUser.username}
+            <small>
+              {currentUser.role === "admin" ? "Administrador" : "Usuario"}
+            </small>
+          </span>
+          <button onClick={logout} title="Cerrar sesión">
+            <LogOut />
+          </button>
+        </div>
       </header>
       <main className="appMain">
         {page === "calculator" ? (
@@ -857,6 +912,8 @@ function App() {
           <ClientsPage refreshKey={refresh} onCreateQuote={createQuote} />
         ) : page === "profits" ? (
           <ProfitPage refreshKey={refresh} />
+        ) : page === "users" && currentUser.role === "admin" ? (
+          <UsersPage />
         ) : (
           <RecordsPage
             type={recordType}

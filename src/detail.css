@@ -516,10 +516,9 @@
 }
 .clientProductHead.clientProductLogistics,
 .clientProductRow.clientProductLogistics {
-  grid-template-columns: minmax(
-      180px,
-      1.45fr
-    ) 65px 52px 120px 82px 76px 105px 100px;
+  grid-template-columns:
+    minmax(180px, 1.45fr)
+    65px 52px 120px 82px 76px 105px 100px;
   gap: 10px;
   align-items: center;
   padding: 11px 12px;
@@ -608,10 +607,9 @@
   }
   .clientProductHead.clientProductLogistics,
   .clientProductRow.clientProductLogistics {
-    grid-template-columns: minmax(
-        125px,
-        1.35fr
-      ) 42px 34px 83px 57px 52px 70px 72px;
+    grid-template-columns:
+      minmax(125px, 1.35fr)
+      42px 34px 83px 57px 52px 70px 72px;
     gap: 6px;
     padding: 8px;
     font-size: 9px;

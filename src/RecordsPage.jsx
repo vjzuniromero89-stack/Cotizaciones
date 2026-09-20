@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import "./detail.css";
 import "./product-detail.css";
+import { authFetch } from "./auth.js";
 
 const money = (n) =>
   new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(
@@ -34,7 +35,7 @@ const labels = {
 };
 const steps = ["confirmed", "purchased", "transit", "delivered"];
 async function api(path, options) {
-  const r = await fetch("/api" + path, {
+  const r = await authFetch("/api" + path, {
     headers: { "content-type": "application/json" },
     ...options,
   });
