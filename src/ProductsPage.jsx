@@ -1,5 +1,5 @@
 import React,{useEffect,useState}from'react';
-import{Search,PackageSearch,X,Trash2,ReceiptText,Route,CalendarDays}from'lucide-react';
+import{Search,PackageSearch,X,Trash2,ReceiptText,Route,CalendarDays,Package,Weight}from'lucide-react';
 import'./products-page.css';
 
 const money=n=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(n||0);
@@ -30,11 +30,16 @@ function ProductDetail({id,onClose,onChanged}){
  useEffect(()=>{api('/records/'+id).then(setData)},[id]);
  if(!data)return <div className="overlay"><div className="detailSheet loadingDetail">Cargando producto…</div></div>;
  const shipping=data.route==='miami'?data.totals.viaMiami:data.totals.direct;
+ const boxes=Array.isArray(data.boxes)?data.boxes:[];
+ const totals=data.totals||{};
+ const boxCbm=b=>{const factor=b.unit==='cm'?1e-6:0.000016387064;return Math.max(0,Number(b.l)||0)*Math.max(0,Number(b.w)||0)*Math.max(0,Number(b.h)||0)*factor};
  async function remove(){if(!confirm('¿Eliminar este producto guardado?'))return;setBusy(true);try{await api('/records/'+id,{method:'DELETE'});onChanged();onClose()}finally{setBusy(false)}}
  return <><div className="overlay" onMouseDown={e=>e.target===e.currentTarget&&onClose()}><section className="detailSheet productRecordDetail">
   <div className="detailTop"><div><span className="badge pending">Producto</span><small>EXPEDIENTE DE COSTOS</small><h2>{data.number}</h2></div><button className="iconBtn" onClick={onClose}><X/></button></div>
   <div className="detailActions"><button className="danger" disabled={busy} onClick={remove}><Trash2/> Eliminar</button><button className="clientQuoteButton" onClick={()=>setQuote(true)}><ReceiptText/> Crear cotización</button></div>
   <div className="detailGrid"><div className="detailCard"><label>Producto / referencia</label><b>{data.customer_name}</b><span><CalendarDays/> Guardado {new Date(data.created_at).toLocaleString()}</span></div><div className="detailCard"><label>Descripción</label><b>{data.description||'Sin descripción'}</b><span><Route/> {data.route==='miami'?'China → Miami → Managua':'China → Managua'}</span></div></div>
+  <div className="detailSection"><h3><Package/> Información de cajas ({data.total_boxes||0})</h3>{boxes.length?<div className="productBoxTable"><div className="productBoxRow head"><span>Cant.</span><span>Medidas</span><span>Peso crudo/caja</span><span>CBM/caja</span><span>CBM total</span></div>{boxes.map((b,i)=>{const cbm=boxCbm(b),qty=Math.max(0,Number(b.qty)||0);return <div className="productBoxRow" key={b.id||i}><b>{qty}</b><span>{b.l} × {b.w} × {b.h} {b.unit}</span><span>{b.weight} {b.weightUnit}</span><span>{cbm.toFixed(4)}</span><b>{(cbm*qty).toFixed(4)}</b></div>})}</div>:<p className="boxEmpty">Este producto no tiene cajas registradas.</p>}</div>
+  <div className="detailSection"><h3><Weight/> Peso y volumen guardados</h3><div className="productLogisticsSummary"><div><span>CBM total</span><b>{Number(totals.cbm||0).toFixed(4)} m³</b></div><div><span>Peso crudo total</span><b>{Number(totals.actualKg||0).toFixed(2)} kg</b><small>{Number(totals.actualLb||0).toFixed(2)} lb</small></div>{data.route==='miami'?<><div><span>China → Miami</span><b>{Number(totals.cnBillKg||0).toFixed(2)} kg</b><small>{Number(totals.cnVolumeKg||0)>Number(totals.actualKg||0)?'Cobro por peso volumétrico':'Cobro por peso crudo'}</small></div><div><span>Miami → Managua</span><b>{Number(totals.miBillLb||0).toFixed(2)} lb</b><small>{Number(totals.miVolumeLb||0)>Number(totals.actualLb||0)?'Cobro por peso volumétrico':'Cobro por peso crudo'}</small></div></>:<div><span>Ruta directa</span><b>{Number(totals.cbm||0).toFixed(4)} CBM</b><small>Cobro por espacio</small></div>}</div></div>
   <div className="detailSection"><h3>Productos y costos</h3><div className="savedProducts">{data.products.map((p,i)=><div key={i}>{p.imageUrl?<img src={p.imageUrl} alt=""/>:<span className="noPhoto">Sin foto</span>}<p><b>{p.name||'Producto'}</b><small>{p.qty} × {money(p.price)}</small></p><strong>{money(Number(p.qty)*Number(p.price))}</strong></div>)}</div><div className="costBreakdown productCosts"><div><span>Subtotal productos</span><b>{money(data.totals.productSubtotal)}</b></div><div><span>Comisión ({data.totals.feePercent}%)</span><b>{money(data.totals.feeAmount)}</b></div><div><span>Envío seleccionado</span><b>{money(shipping)}</b></div><div className="selectedCost"><span>Costo total puesto en Nicaragua</span><strong>{money(data.total)}</strong></div></div></div>
  </section></div>{quote&&<QuoteDialog product={data} onClose={()=>setQuote(false)} onSaved={onChanged}/>}</>
 }

@@ -12,12 +12,12 @@ function ClientQuote({data,onClose}){
  const total=Number(data.totals?.saleTotal??Number(data.total||0)*1.30),totalUnits=Number(data.totals?.totalUnits||0);
  return <div className="clientQuoteOverlay"><section className="clientQuotePrint">
   <div className="clientQuoteTools"><button onClick={onClose}><X/> Cerrar</button><button className="printQuote" onClick={()=>window.print()}><Printer/> Imprimir / guardar PDF</button></div>
-  <header className="clientQuoteHeader"><div className="quoteBrand"><span>RS</span><div><b>RutaSmart</b><small>Compras y logística internacional</small></div></div><div className="quoteTitle"><small>COTIZACIÓN PARA CLIENTE</small><strong>{data.number}</strong></div></header>
+  <header className="clientQuoteHeader"><div className="quoteBrand"><span>CC</span><div><b>CotizacionesChina</b><small>Compras y logística internacional</small></div></div><div className="quoteTitle"><small>COTIZACIÓN PARA CLIENTE</small><strong>{data.number}</strong></div></header>
   <div className="clientQuoteMeta"><div><small>PREPARADA PARA</small><strong>{data.customer_name}</strong>{data.phone&&<span>{data.phone}</span>}</div><div><small>FECHA</small><strong>{new Date(data.created_at).toLocaleDateString('es-NI',{year:'numeric',month:'long',day:'numeric'})}</strong><span>Entrega en Managua, Nicaragua</span></div></div>
   <div className="clientProductTable"><div className="clientProductHead clientProductPrices"><span>Descripción</span><span>Cantidad</span><span>Precio</span><span>Subtotal</span></div>{data.products?.length?<>{data.products.map((p,i)=><div className="clientProductRow clientProductPrices" key={i}><span>{p.name||'Producto'}</span><b>{Number(p.qty||0).toLocaleString()}</b><b>{money(p.salePrice??p.price)}</b><b>{money(Number(p.qty||0)*Number((p.salePrice??p.price)||0))}</b></div>)}</>:<div className="clientProductRow"><span>{data.description||'Productos cotizados'}</span><b>{totalUnits.toLocaleString()}</b></div>}</div>
   <div className="clientQuoteSummary"><div><span>Total de unidades</span><b>{totalUnits.toLocaleString()}</b></div><div className="clientGrandTotal"><span>Total puesto en Managua<br/><small>Incluyendo envío</small></span><strong>{money(total)}</strong></div></div>
   <div className="clientQuoteNotes"><b>Servicio incluido</b><p>Compra, gestión logística y envío de los productos hasta Managua, Nicaragua.</p></div>
-  <footer><span>Gracias por confiar en RutaSmart.</span><b>Cotización válida sujeta a confirmación de disponibilidad.</b></footer>
+  <footer><span>Gracias por confiar en CotizacionesChina.</span><b>Cotización válida sujeta a confirmación de disponibilidad.</b></footer>
  </section></div>
 }
 
