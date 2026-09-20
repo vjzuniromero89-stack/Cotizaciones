@@ -686,41 +686,67 @@ function CatalogSection({ refreshKey, onCatalogChanged }) {
         <div className="catalogEmpty">Cargando productos…</div>
       ) : items.length ? (
         <div className="catalogGrid">
-          {items.map((p) => (
-            <article
-              className="catalogCard"
-              key={p.id}
-              role="button"
-              tabIndex="0"
-              onClick={() => setSelected(p)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") setSelected(p);
-              }}
-            >
-              {p.image_url ? (
-                <img src={p.image_url} alt={p.name} />
-              ) : (
-                <span className="catalogNoPhoto">Sin foto</span>
-              )}
-              <div>
-                <h3>{p.name}</h3>
-                <p>
-                  {Number(p.default_quantity || 0).toLocaleString()} unidades ·{" "}
-                  {(p.boxes || []).reduce((n, b) => n + Number(b.qty || 0), 0)}{" "}
-                  cajas
-                </p>
-                <strong>
-                  {money(p.unit_price)} <small>por unidad</small>
-                </strong>
-              </div>
-              <button
-                onClick={(e) => remove(e, p.id)}
-                title="Eliminar del catálogo"
-              >
-                <Trash2 />
-              </button>
-            </article>
-          ))}
+          {items.map((p) => {
+            const boxes = p.boxes || [];
+            const totalBoxes = boxes.reduce((n, b) => n + Number(b.qty || 0), 0);
+            const totalVolumeCbm = boxes.reduce((n, b) => n + boxVolumeCbm(b), 0);
+            const totalWeightCbm = boxes.reduce((n, b) => n + boxWeightCbm(b), 0);
+            return (
+              <article className="catalogCard catalogCardFull" key={p.id}>
+                <div className="catalogProductTop">
+                  {p.image_url ? (
+                    <img src={p.image_url} alt={p.name} />
+                  ) : (
+                    <span className="catalogNoPhoto">Sin foto</span>
+                  )}
+                  <div className="catalogProductIdentity">
+                    <small>PRODUCTO GUARDADO</small>
+                    <h3>{p.name}</h3>
+                    <span>{Number(p.default_quantity || 0).toLocaleString()} unidades</span>
+                  </div>
+                  <div className="catalogCardActions">
+                    <button
+                      className="catalogEditButton"
+                      onClick={() => setSelected(p)}
+                      title="Ver y editar producto"
+                    >
+                      <Pencil /> <span>Editar</span>
+                    </button>
+                    <button
+                      className="catalogDeleteButton"
+                      onClick={(e) => remove(e, p.id)}
+                      title="Eliminar del catálogo"
+                    >
+                      <Trash2 />
+                    </button>
+                  </div>
+                </div>
+
+                <div className="catalogProductSummary">
+                  <div><span>Precio por unidad</span><strong>{money(p.unit_price)}</strong></div>
+                  <div><span>Cantidad registrada</span><strong>{Number(p.default_quantity || 0).toLocaleString()}</strong></div>
+                  <div><span>Total de compra</span><strong>{money(Number(p.unit_price || 0) * Number(p.default_quantity || 0))}</strong></div>
+                  <div><span>Total de cajas</span><strong>{totalBoxes.toLocaleString()}</strong></div>
+                  <div className="cbmSummary"><span>CBM por volumen</span><strong>{totalVolumeCbm.toFixed(4)} CBM</strong></div>
+                  <div className="cbmSummary"><span>CBM por peso</span><strong>{totalWeightCbm.toFixed(4)} CBM</strong></div>
+                </div>
+
+                <div className="catalogBoxesInline">
+                  {boxes.length ? boxes.map((b, i) => (
+                    <div className="catalogBoxInline" key={b.id || i}>
+                      <b>Caja {i + 1}</b>
+                      <span><small>Cantidad</small>{Number(b.qty || 0).toLocaleString()} cajas</span>
+                      <span><small>Productos/caja</small>{Number(b.unitsPerBox || 0).toLocaleString()}</span>
+                      <span><small>Medidas</small>{b.l || 0} × {b.w || 0} × {b.h || 0} {b.unit === "in" ? "in" : "cm"}</span>
+                      <span><small>Peso/caja</small>{b.weight || 0} {b.weightUnit || "kg"}</span>
+                      <span><small>CBM volumen</small>{boxVolumeCbm(b).toFixed(4)}</span>
+                      <span><small>CBM peso</small>{boxWeightCbm(b).toFixed(4)}</span>
+                    </div>
+                  )) : <p className="catalogNoBoxes">Sin información de caja.</p>}
+                </div>
+              </article>
+            );
+          })}
         </div>
       ) : (
         <div className="catalogEmpty">

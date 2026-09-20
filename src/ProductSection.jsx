@@ -75,6 +75,14 @@ export default function ProductSection({
       (sum, p) =>
         sum + (p.boxes || []).reduce((n, b) => n + (Number(b.qty) || 0), 0),
       0,
+    ),
+    totalVolumeCbm = products.reduce(
+      (sum, p) => sum + (p.boxes || []).reduce((n, b) => n + boxVolumeCbm(b), 0),
+      0,
+    ),
+    totalWeightCbm = products.reduce(
+      (sum, p) => sum + (p.boxes || []).reduce((n, b) => n + boxWeightCbm(b), 0),
+      0,
     );
   const update = (id, k, v) =>
     setProducts((x) => x.map((p) => (p.id === id ? { ...p, [k]: v } : p)));
@@ -351,6 +359,26 @@ export default function ProductSection({
             </article>
           );
         })}
+      </div>
+      <div className="quotationCbmTotals">
+        <div className="quotationCbmTotalsTitle">
+          <PackagePlus />
+          <div>
+            <small>TOTAL DE TODOS LOS PRODUCTOS</small>
+            <b>Resumen de CBM de la cotización</b>
+          </div>
+          <span>{totalBoxes.toLocaleString()} cajas</span>
+        </div>
+        <div className="quotationCbmTotal volume">
+          <span>CBM total por volumen</span>
+          <strong>{totalVolumeCbm.toFixed(4)} CBM</strong>
+          <small>Suma de las medidas de todas las cajas</small>
+        </div>
+        <div className="quotationCbmTotal weight">
+          <span>CBM total por peso</span>
+          <strong>{totalWeightCbm.toFixed(4)} CBM</strong>
+          <small>Peso total en kg ÷ 350</small>
+        </div>
       </div>
       <button
         className="add addCompleteProduct"
