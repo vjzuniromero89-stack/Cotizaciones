@@ -45,4 +45,35 @@ describe("shipping calculator", () => {
     expect(r.directChargeBy).toBe("weight");
     expect(r.direct).toBeCloseTo((600 / 350) * 550);
   });
+  it("combines all products before comparing volume with the 350 kg per CBM limit", () => {
+    const r = calculate(
+      [
+        {
+          qty: 1,
+          l: 100,
+          w: 100,
+          h: 100,
+          unit: "cm",
+          weight: 500,
+          weightUnit: "kg",
+        },
+        {
+          qty: 1,
+          l: 100,
+          w: 100,
+          h: 100,
+          unit: "cm",
+          weight: 100,
+          weightUnit: "kg",
+        },
+      ],
+      { cbmRate: 550, directKgPerCbm: 350, minCbm: true },
+    );
+    expect(r.cbm).toBeCloseTo(2);
+    expect(r.actualKg).toBeCloseTo(600);
+    expect(r.weightCapacityKg).toBeCloseTo(700);
+    expect(r.weightCbm).toBeCloseTo(600 / 350);
+    expect(r.directChargeBy).toBe("volume");
+    expect(r.billCbm).toBeCloseTo(2);
+  });
 });

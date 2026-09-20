@@ -743,16 +743,30 @@ function RouteTwo({ r, rates }) {
       </div>
       {r.best === "direct" && <mark>Recomendada</mark>}
       <dl className="legs">
-        <div>
+        <div
+          className={r.directChargeBy === "volume" ? "directMethodWinner" : ""}
+        >
           <dt>
-            <b>CBM por volumen</b>
-            <span>Según las medidas de las cajas</span>
+            <b>
+              CBM por volumen{" "}
+              {r.directChargeBy === "volume" && <em>ENVÍO SELECCIONADO</em>}
+            </b>
+            <span>
+              Capacidad: {r.cbm.toFixed(3)} CBM ×{" "}
+              {Number(r.kgPerCbm || 350).toFixed(0)} kg ={" "}
+              {r.weightCapacityKg.toFixed(2)} kg
+            </span>
           </dt>
           <dd>{r.cbm.toFixed(3)} CBM</dd>
         </div>
-        <div>
+        <div
+          className={r.directChargeBy === "weight" ? "directMethodWinner" : ""}
+        >
           <dt>
-            <b>CBM por peso</b>
+            <b>
+              CBM por peso{" "}
+              {r.directChargeBy === "weight" && <em>ENVÍO SELECCIONADO</em>}
+            </b>
             <span>
               {r.actualKg.toFixed(2)} kg ÷{" "}
               {Number(r.kgPerCbm || 350).toFixed(0)} kg
@@ -760,7 +774,20 @@ function RouteTwo({ r, rates }) {
           </dt>
           <dd>{r.weightCbm.toFixed(3)} CBM</dd>
         </div>
-        <div>
+        <div
+          className={
+            r.overweightKg > 0
+              ? "directWeightStatus overweight"
+              : "directWeightStatus withinLimit"
+          }
+        >
+          <span>
+            {r.overweightKg > 0
+              ? `El peso total supera la capacidad por ${r.overweightKg.toFixed(2)} kg.`
+              : `El peso total está dentro del límite de ${r.weightCapacityKg.toFixed(2)} kg para ${r.cbm.toFixed(3)} CBM.`}
+          </span>
+        </div>
+        <div className="directChargeFinal">
           <dt>
             <b>
               CBM a cobrar ·{" "}

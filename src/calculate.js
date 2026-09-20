@@ -38,6 +38,8 @@ export function calculate(boxes, rates) {
   const viaMiami = cnCost + miCost;
   const kgPerCbm = Math.max(1, num(rates.directKgPerCbm, 350)),
     weightCbm = actualKg / kgPerCbm,
+    weightCapacityKg = cbm * kgPerCbm,
+    overweightKg = Math.max(0, actualKg - weightCapacityKg),
     minimumCbm = rates.minCbm ? 1 : 0;
   const billCbm = Math.max(cbm, weightCbm, minimumCbm),
     directChargeBy =
@@ -55,6 +57,8 @@ export function calculate(boxes, rates) {
     actualLb,
     cbm,
     weightCbm,
+    weightCapacityKg,
+    overweightKg,
     kgPerCbm,
     directChargeBy,
     cnVolumeKg,
