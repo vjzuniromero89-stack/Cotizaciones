@@ -21,6 +21,8 @@ const money = (n) =>
   new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(
     n || 0,
   );
+const cordobas = (n) =>
+  `C$${new Intl.NumberFormat("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format((n || 0) * 37)}`;
 const labels = {
   pending: "Pendiente",
   returned: "Archivada",
@@ -86,10 +88,14 @@ const productLogistics = (data, product) => {
       (sum, b) => sum + boxCbm(b) * Number(b.qty || 0),
       0,
     );
+  const mainBox = boxes[0] || {};
   return {
     boxCount,
     totalCbm,
     unitCbm: Number(product.qty || 0) > 0 ? totalCbm / Number(product.qty) : 0,
+    boxSize: mainBox.l
+      ? `${mainBox.l} × ${mainBox.w} × ${mainBox.h} ${mainBox.unit === "in" ? "in" : "cm"}`
+      : "Sin medida",
   };
 };
 
@@ -183,9 +189,10 @@ function ClientQuote({ data, onClose, onConfirmed, onDeleted }) {
               <span>Producto</span>
               <span>Unidades</span>
               <span>Cajas</span>
+              <span>Tamaño de caja</span>
               <span>CBM/unidad</span>
               <span>CBM total</span>
-              <span>Precio</span>
+              <span>Precio por unidad</span>
               <span>Subtotal</span>
             </div>
             {data.products?.length ? (
@@ -211,9 +218,15 @@ function ClientQuote({ data, onClose, onConfirmed, onDeleted }) {
                       </div>
                       <b>{Number(p.qty || 0).toLocaleString()}</b>
                       <b>{logistics.boxCount.toLocaleString()}</b>
+                      <b className="clientBoxSize">{logistics.boxSize}</b>
                       <b>{logistics.unitCbm.toFixed(6)}</b>
                       <b>{logistics.totalCbm.toFixed(4)}</b>
-                      <b>{money(p.salePrice ?? p.price)}</b>
+                      <div className="clientDualPrice">
+                        <b>US{money(p.salePrice ?? p.price)}</b>
+                        <small>
+                          {cordobas(Number(p.salePrice ?? p.price))}
+                        </small>
+                      </div>
                       <b>
                         {money(
                           Number(p.qty || 0) *
