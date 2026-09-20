@@ -36,4 +36,22 @@ describe('flujo de productos y cotizaciones',()=>{
   expect(saved.totals.profit).toBe(50);
   expect(saved.totals.profitPercent).toBeCloseTo(33.33,2);
  });
+
+ it('guarda desde la calculadora una cotización interna y para cliente',async()=>{
+  const fetchMock=vi.fn()
+   .mockResolvedValueOnce(new Response('',{status:200,headers:{'content-range':'0-0/0'}}))
+   .mockResolvedValueOnce(new Response('',{status:201}))
+   .mockResolvedValueOnce(new Response('',{status:201}));
+  vi.stubGlobal('fetch',fetchMock);
+  const result={landedMiami:180,landedDirect:250,totalBoxes:3,totalUnits:100};
+  const response=await worker.fetch(new Request('https://cotizaciones.test/api/quotes',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({customer:'Wendy',selectedRoute:'miami',result,products:[{name:'Bolso',qty:100,price:1,salePrice:3,boxes:[]}],boxes:[],rates:{}})}),env);
+  expect(response.status).toBe(201);
+  const saved=JSON.parse(fetchMock.mock.calls[1][1].body);
+  expect(saved.record_type).toBe('quote');
+  expect(saved.customer_name).toBe('Wendy');
+  expect(saved.total).toBe(180);
+  expect(saved.totals.saleTotal).toBe(300);
+  expect(saved.totals.profit).toBe(120);
+  expect(saved.products[0].salePrice).toBe(3);
+ });
 });
