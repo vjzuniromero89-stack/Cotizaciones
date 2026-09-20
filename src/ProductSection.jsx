@@ -40,6 +40,21 @@ function NumberField({ label, value, onChange }) {
     </label>
   );
 }
+const boxVolumeCbm = (box) => {
+  const factor = box.unit === "in" ? 0.000016387064 : 0.000001;
+  return (
+    (Number(box.l) || 0) *
+    (Number(box.w) || 0) *
+    (Number(box.h) || 0) *
+    factor *
+    (Number(box.qty) || 0)
+  );
+};
+const boxWeightCbm = (box) => {
+  const totalWeight = (Number(box.weight) || 0) * (Number(box.qty) || 0);
+  const totalKg = box.weightUnit === "lb" ? totalWeight / 2.2046226218 : totalWeight;
+  return totalKg / 350;
+};
 export default function ProductSection({
   products,
   setProducts,
@@ -200,6 +215,8 @@ export default function ProductSection({
       <div className="productCargoList">
         {products.map((p, i) => {
           const b = p.boxes?.[0] || blankBox();
+          const volumeCbm = boxVolumeCbm(b);
+          const weightCbm = boxWeightCbm(b);
           return (
             <article className="productCargoCard unifiedProductCard" key={p.id}>
               <div className="productCargoHead">
@@ -319,6 +336,16 @@ export default function ProductSection({
                       <option value="lb">Libras</option>
                     </select>
                   </label>
+                  <div className="productCbmResult volume">
+                    <span>CBM por volumen</span>
+                    <strong>{volumeCbm.toFixed(4)} CBM</strong>
+                    <small>Medidas × cajas</small>
+                  </div>
+                  <div className="productCbmResult weight">
+                    <span>CBM por peso</span>
+                    <strong>{weightCbm.toFixed(4)} CBM</strong>
+                    <small>Peso total kg ÷ 350</small>
+                  </div>
                 </div>
               </div>
             </article>

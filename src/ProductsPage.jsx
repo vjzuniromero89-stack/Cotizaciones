@@ -11,6 +11,7 @@ import {
   ImagePlus,
   Plus,
   Save,
+  Pencil,
 } from "lucide-react";
 import "./products-page.css";
 import { authFetch } from "./auth.js";
@@ -19,6 +20,17 @@ const money = (n) =>
   new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(
     n || 0,
   );
+const boxVolumeCbm = (box) =>
+  (Number(box.l) || 0) *
+  (Number(box.w) || 0) *
+  (Number(box.h) || 0) *
+  (box.unit === "in" ? 0.000016387064 : 0.000001) *
+  (Number(box.qty) || 0);
+const boxWeightCbm = (box) => {
+  const totalWeight = (Number(box.weight) || 0) * (Number(box.qty) || 0);
+  const totalKg = box.weightUnit === "lb" ? totalWeight / 2.2046226218 : totalWeight;
+  return totalKg / 350;
+};
 async function api(path, options) {
   const r = await authFetch("/api" + path, {
     headers: { "content-type": "application/json" },
@@ -416,13 +428,15 @@ function ProductDetail({ id, onClose, onChanged }) {
   );
 }
 
-function RegisterProductDialog({ onClose, onSaved }) {
+function RegisterProductDialog({ onClose, onSaved, product = null }) {
   const [form, setForm] = useState({
-      name: "",
-      imageUrl: "",
-      price: "",
-      qty: "",
-      boxes: [
+      name: product?.name || "",
+      imageUrl: product?.image_url || "",
+      price: product?.unit_price ?? "",
+      qty: product?.default_quantity ?? "",
+      boxes: product?.boxes?.length
+        ? product.boxes.map((b) => ({ ...b, id: b.id || crypto.randomUUID() }))
+        : [
         {
           id: crypto.randomUUID(),
           qty: "",
@@ -469,8 +483,8 @@ function RegisterProductDialog({ onClose, onSaved }) {
     setBusy(true);
     setError("");
     try {
-      await api("/catalog-products", {
-        method: "POST",
+      await api(product ? "/catalog-products/" + product.id : "/catalog-products", {
+        method: product ? "PUT" : "POST",
         body: JSON.stringify({
           name: form.name,
           imageUrl: form.imageUrl,
@@ -496,7 +510,7 @@ function RegisterProductDialog({ onClose, onSaved }) {
         <div className="dialogHead">
           <div>
             <small>CATÁLOGO</small>
-            <h2>Registrar producto</h2>
+            <h2>{product ? "Editar producto" : "Registrar producto"}</h2>
           </div>
           <button type="button" onClick={onClose}>
             <X />
@@ -596,6 +610,14 @@ function RegisterProductDialog({ onClose, onSaved }) {
                   <option value="lb">Libras</option>
                 </select>
               </label>
+              <div className="catalogCbmResult">
+                <span>CBM por volumen</span>
+                <strong>{boxVolumeCbm(b).toFixed(4)} CBM</strong>
+              </div>
+              <div className="catalogCbmResult">
+                <span>CBM por peso</span>
+                <strong>{boxWeightCbm(b).toFixed(4)} CBM</strong>
+              </div>
               {form.boxes.length > 1 && (
                 <button
                   type="button"
@@ -620,14 +642,14 @@ function RegisterProductDialog({ onClose, onSaved }) {
         )}
         <button className="primary" disabled={busy || !form.name}>
           <Save />
-          {busy ? "Guardando…" : "Guardar producto"}
+          {busy ? "Guardando…" : product ? "Guardar cambios" : "Guardar producto"}
         </button>
       </form>
     </div>
   );
 }
 
-function CatalogSection({ refreshKey }) {
+function CatalogSection({ refreshKey, onCatalogChanged }) {
   const [items, setItems] = useState([]),
     [loading, setLoading] = useState(true),
     [selected, setSelected] = useState(null);
@@ -714,14 +736,20 @@ function CatalogSection({ refreshKey }) {
         <CatalogProductDetail
           product={selected}
           onClose={() => setSelected(null)}
+          onSaved={() => {
+            setSelected(null);
+            load();
+            onCatalogChanged();
+          }}
         />
       )}
     </section>
   );
 }
 
-function CatalogProductDetail({ product, onClose }) {
+function CatalogProductDetail({ product, onClose, onSaved }) {
   const boxes = product.boxes || [];
+  const [editing, setEditing] = useState(false);
   const cbm = (b) =>
     Number(b.l || 0) *
     Number(b.w || 0) *
@@ -738,9 +766,12 @@ function CatalogProductDetail({ product, onClose }) {
             <small>PRODUCTO GUARDADO</small>
             <h2>{product.name}</h2>
           </div>
-          <button onClick={onClose}>
-            <X />
-          </button>
+          <div className="catalogDetailActions">
+            <button className="editCatalogProduct" onClick={() => setEditing(true)}>
+              <Pencil /> Editar producto
+            </button>
+            <button onClick={onClose} aria-label="Cerrar"><X /></button>
+          </div>
         </div>
         <div className="catalogDetailHero">
           {product.image_url ? (
@@ -783,6 +814,13 @@ function CatalogProductDetail({ product, onClose }) {
           <p>Sin información de caja.</p>
         )}
       </section>
+      {editing && (
+        <RegisterProductDialog
+          product={product}
+          onClose={() => setEditing(false)}
+          onSaved={onSaved}
+        />
+      )}
     </div>
   );
 }
@@ -809,7 +847,10 @@ export default function ProductsPage({ refreshKey, onChange }) {
           <Plus /> Registrar producto
         </button>
       </div>
-      <CatalogSection refreshKey={refreshKey + catalogRefresh} />
+      <CatalogSection
+        refreshKey={refreshKey + catalogRefresh}
+        onCatalogChanged={saved}
+      />
       {registering && (
         <RegisterProductDialog
           onClose={() => setRegistering(false)}

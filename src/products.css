@@ -204,7 +204,7 @@
 }
 .productBoxEditor {
   display: grid;
-  grid-template-columns: 75px repeat(8, minmax(75px, 1fr)) auto;
+  grid-template-columns: repeat(8, minmax(75px, 1fr)) minmax(130px, 1.2fr) minmax(130px, 1.2fr);
   gap: 9px;
   align-items: end;
   padding: 12px;
@@ -212,6 +212,40 @@
   border: 1px solid var(--line);
   border-radius: 11px;
   margin-bottom: 9px;
+}
+.productCbmResult {
+  min-height: 58px;
+  border: 1px solid #b9e8d3;
+  border-radius: 9px;
+  background: #effcf6;
+  padding: 7px 9px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.productCbmResult span {
+  color: #177652;
+  font-size: 10px;
+  font-weight: 800;
+}
+.productCbmResult strong {
+  color: #119663;
+  font: 800 14px Manrope;
+  white-space: nowrap;
+}
+.productCbmResult small {
+  color: var(--muted);
+  font-size: 9px;
+}
+@media (max-width: 1100px) {
+  .productBoxEditor {
+    grid-template-columns: repeat(4, minmax(90px, 1fr));
+  }
+}
+@media (max-width: 620px) {
+  .productBoxEditor {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 .productBoxEditor label > span {
   display: block;
@@ -288,7 +322,7 @@
   font-size: 12px;
 }
 .singleBoxInfo .productBoxEditor {
-  grid-template-columns: repeat(8, minmax(75px, 1fr));
+  grid-template-columns: repeat(8, minmax(72px, 1fr)) repeat(2, minmax(130px, 1.25fr));
   margin: 0;
 }
 .singleBoxInfo .productBoxEditor label:first-child {
