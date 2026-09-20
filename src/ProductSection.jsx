@@ -2,8 +2,8 @@ import React from'react';
 import{Plus,Trash2,ImagePlus,PackagePlus}from'lucide-react';
 import'./products.css';
 const money=n=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(n||0);
-const blankBox=()=>({id:crypto.randomUUID(),qty:1,unitsPerBox:'',l:12,w:12,h:12,unit:'in',weight:10,weightUnit:'kg'});
-const blank=()=>({id:crypto.randomUUID(),name:'',price:0,qty:1,imageUrl:'',uploading:false,boxes:[blankBox()]});
+const blankBox=()=>({id:crypto.randomUUID(),qty:'',unitsPerBox:'',l:'',w:'',h:'',unit:'cm',weight:'',weightUnit:'kg'});
+const blank=()=>({id:crypto.randomUUID(),name:'',price:'',qty:'',imageUrl:'',uploading:false,boxes:[blankBox()]});
 function NumberField({label,value,onChange}){return <label><span>{label}</span><input type="number" min="0" step="any" value={value} onChange={e=>onChange(e.target.value)}/></label>}
 export default function ProductSection({products,setProducts,fee,setFee,shipping}){
  const subtotal=products.reduce((s,p)=>s+(Number(p.price)||0)*(Number(p.qty)||0),0),feeAmount=subtotal*Number(fee||0)/100,totalProducts=subtotal+feeAmount,units=products.reduce((s,p)=>s+(Number(p.qty)||0),0),totalBoxes=products.reduce((sum,p)=>sum+(p.boxes||[]).reduce((n,b)=>n+(Number(b.qty)||0),0),0);
