@@ -115,6 +115,28 @@ async function handleApi(request,env,url){
    return json(await listRecords(env,type));
   }
 
+  if(url.pathname==='/api/catalog-products'&&request.method==='GET'){
+   return json(await restRows(env,'catalog_products?select=*&order=created_at.desc'));
+  }
+
+  if(url.pathname==='/api/catalog-products'&&request.method==='POST'){
+   const b=await request.json();
+   if(!b.name?.trim())return json({error:'Escribe el nombre del producto'},400);
+   const rows=await restRows(env,'catalog_products?select=*',{
+    method:'POST',
+    headers:{'content-type':'application/json',Prefer:'return=representation'},
+    body:JSON.stringify({name:b.name.trim(),image_url:b.imageUrl||'',unit_price:Math.max(0,Number(b.price)||0),default_quantity:Math.max(0,Number(b.qty)||0),boxes:Array.isArray(b.boxes)?b.boxes:[]})
+   });
+   return json(rows[0],201);
+  }
+
+  const catalogItem=url.pathname.match(/^\/api\/catalog-products\/([^/]+)$/);
+  if(catalogItem&&request.method==='DELETE'){
+   const rows=await restRows(env,`catalog_products?id=eq.${encodeURIComponent(catalogItem[1])}&select=id`,{method:'DELETE',headers:{Prefer:'return=representation'}});
+   if(!rows.length)return json({error:'Producto no encontrado'},404);
+   return new Response(null,{status:204});
+  }
+
   if(url.pathname==='/api/products'&&request.method==='POST'){
    const b=await request.json();
    if(!b.title?.trim())return json({error:'El nombre del producto es obligatorio'},400);
@@ -128,6 +150,10 @@ async function handleApi(request,env,url){
     headers:{'content-type':'application/json',Prefer:'return=minimal'},
     body:JSON.stringify({id,number,record_type:'product',customer_name:b.title.trim(),phone:'',description:b.description||'',boxes:b.boxes||[],rates:b.rates||{},totals:{...(b.result||{}),internalTotal:total},products:b.products||[],route,total,total_boxes:b.result.totalBoxes||0,status:'pending',notes:b.notes||''})
    });
+   const catalog=(b.products||[]).filter(p=>p.name?.trim()).map(p=>({name:p.name.trim(),image_url:p.imageUrl||'',unit_price:Math.max(0,Number(p.price)||0),default_quantity:Math.max(0,Number(p.qty)||0),boxes:Array.isArray(p.boxes)?p.boxes:[]}));
+   if(catalog.length){
+    try{await rest(env,'catalog_products?on_conflict=name',{method:'POST',headers:{'content-type':'application/json',Prefer:'resolution=merge-duplicates,return=minimal'},body:JSON.stringify(catalog)})}catch(error){console.warn('El catálogo aún no está disponible',String(error.message||error))}
+   }
    return json({id,number},201);
   }
 
