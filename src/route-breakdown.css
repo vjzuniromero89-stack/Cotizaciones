@@ -108,27 +108,3 @@
 .route .legs .directChargeFinal dd {
   font-size: 21px;
 }
-.route .legs .directWeightStatus {
-  margin: 5px 0;
-  padding: 9px 11px;
-  border: 0;
-  border-radius: 8px;
-  font-size: 11px;
-  font-weight: 800;
-}
-.route .legs .directWeightStatus.withinLimit {
-  background: #123f2d;
-  color: #55efa4;
-}
-.route.winner .legs .directWeightStatus.withinLimit {
-  background: #e0f7ea;
-  color: #087744;
-}
-.route .legs .directWeightStatus.overweight {
-  background: #5b3021;
-  color: #ffbc95;
-}
-.route.winner .legs .directWeightStatus.overweight {
-  background: #fff0e8;
-  color: #a84213;
-}

@@ -71,7 +71,6 @@ describe("shipping calculator", () => {
     );
     expect(r.cbm).toBeCloseTo(2);
     expect(r.actualKg).toBeCloseTo(600);
-    expect(r.weightCapacityKg).toBeCloseTo(700);
     expect(r.weightCbm).toBeCloseTo(600 / 350);
     expect(r.directChargeBy).toBe("volume");
     expect(r.billCbm).toBeCloseTo(2);
