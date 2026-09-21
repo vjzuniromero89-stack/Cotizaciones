@@ -644,8 +644,21 @@ function Detail({ id, type, onClose, onChanged }) {
         form.route,
         Number(form.totals?.feePercent ?? 0),
       );
+      // Solo se envían los campos que edita esta pantalla. OJO: nunca
+      // incluir "status" aquí — el Worker interpreta cualquier campo
+      // "status" en el PATCH como un cambio de estado de una ORDEN
+      // (confirmed/purchased/transit/delivered/cancelled) y rechaza
+      // cualquier otro valor (como "pending") con "Estado inválido",
+      // aunque estemos editando una cotización, no una orden.
       const payload = {
-        ...form,
+        customer_name: form.customer_name,
+        phone: form.phone,
+        description: form.description,
+        notes: form.notes,
+        route: form.route,
+        products: form.products || [],
+        boxes: form.boxes || [],
+        rates: form.rates || {},
         totals: liveTotals,
         total: liveTotals.internalTotal,
         total_boxes: Math.round(liveTotals.totalBoxes) || 0,
