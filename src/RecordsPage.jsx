@@ -505,7 +505,8 @@ function Detail({ id, type, onClose, onChanged }) {
   const [data, setData] = useState(null),
     [edit, setEdit] = useState(false),
     [form, setForm] = useState(null),
-    [busy, setBusy] = useState(false);
+    [busy, setBusy] = useState(false),
+    [saveError, setSaveError] = useState("");
   useEffect(() => {
     api("/records/" + id).then((x) => {
       setData(x);
@@ -634,6 +635,7 @@ function Detail({ id, type, onClose, onChanged }) {
     }));
   async function save() {
     setBusy(true);
+    setSaveError("");
     try {
       const liveTotals = computeLiveTotals(
         form.products || [],
@@ -646,7 +648,7 @@ function Detail({ id, type, onClose, onChanged }) {
         ...form,
         totals: liveTotals,
         total: liveTotals.internalTotal,
-        total_boxes: liveTotals.totalBoxes,
+        total_boxes: Math.round(liveTotals.totalBoxes) || 0,
       };
       await api("/records/" + id, {
         method: "PATCH",
@@ -656,6 +658,8 @@ function Detail({ id, type, onClose, onChanged }) {
       setForm({ ...data, ...payload });
       setEdit(false);
       onChanged();
+    } catch (e) {
+      setSaveError(e?.message || "No se pudo guardar los cambios.");
     } finally {
       setBusy(false);
     }
@@ -1234,21 +1238,30 @@ function Detail({ id, type, onClose, onChanged }) {
         </div>
         {edit && (
           <div className="editFooter">
-            <button
-              onClick={() => {
-                setEdit(false);
-                setForm({ ...data });
-              }}
-            >
-              Cancelar
-            </button>
-            <button
-              className="primary"
-              disabled={!form.customer_name || busy}
-              onClick={save}
-            >
-              {busy ? "Guardando…" : "Guardar cambios"}
-            </button>
+            {saveError && (
+              <div className="saveError" role="alert">
+                <b>No se pudo guardar</b>
+                <span>{saveError}</span>
+              </div>
+            )}
+            <div className="editFooterActions">
+              <button
+                onClick={() => {
+                  setEdit(false);
+                  setForm({ ...data });
+                  setSaveError("");
+                }}
+              >
+                Cancelar
+              </button>
+              <button
+                className="primary"
+                disabled={!form.customer_name || busy}
+                onClick={save}
+              >
+                {busy ? "Guardando…" : "Guardar cambios"}
+              </button>
+            </div>
           </div>
         )}
       </section>

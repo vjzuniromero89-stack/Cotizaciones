@@ -61,7 +61,7 @@
   margin: -42px 50px 18px 0;
 }
 .detailActions button,
-.editFooter > button:first-child {
+.editFooterActions > button:first-child {
   border: 1px solid var(--line);
   background: #fff;
   border-radius: 9px;
@@ -189,9 +189,14 @@
 }
 .editFooter {
   display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 16px;
+}
+.editFooterActions {
+  display: flex;
   justify-content: flex-end;
   gap: 9px;
-  margin-top: 16px;
 }
 .editFooter .primary {
   width: auto;
