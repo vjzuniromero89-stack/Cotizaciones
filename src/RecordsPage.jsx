@@ -93,10 +93,17 @@ const productLogistics = (data, product) => {
       0,
     );
   const mainBox = boxes[0] || {};
+  const unitsPerBox =
+    Number(mainBox.unitsPerBox || 0) > 0
+      ? Number(mainBox.unitsPerBox)
+      : boxCount > 0
+        ? Number(product.qty || 0) / boxCount
+        : 0;
   return {
     boxCount,
     totalCbm,
     unitCbm: Number(product.qty || 0) > 0 ? totalCbm / Number(product.qty) : 0,
+    unitsPerBox,
     boxSize: mainBox.l
       ? `${mainBox.l} × ${mainBox.w} × ${mainBox.h} ${mainBox.unit === "in" ? "in" : "cm"}`
       : "Sin medida",
@@ -257,6 +264,7 @@ function ClientQuote({ data, onClose, onDeleted }) {
               <span>Producto</span>
               <span>Unidades</span>
               <span>Cajas</span>
+              <span>Productos/caja</span>
               <span>Tamaño de caja</span>
               <span>CBM/unidad</span>
               <span>CBM total</span>
@@ -282,10 +290,19 @@ function ClientQuote({ data, onClose, onDeleted }) {
                         ) : (
                           <span className="clientProductNoPhoto">Sin foto</span>
                         )}
-                        <b>{p.name || "Producto"}</b>
+                        <b title={p.name || "Producto"}>
+                          {p.name || "Producto"}
+                        </b>
                       </div>
                       <b>{Number(p.qty || 0).toLocaleString()}</b>
                       <b>{logistics.boxCount.toLocaleString()}</b>
+                      <b>
+                        {logistics.unitsPerBox
+                          ? Number.isInteger(logistics.unitsPerBox)
+                            ? logistics.unitsPerBox.toLocaleString()
+                            : logistics.unitsPerBox.toFixed(1)
+                          : "—"}
+                      </b>
                       <b className="clientBoxSize">{logistics.boxSize}</b>
                       <b>{logistics.unitCbm.toFixed(6)}</b>
                       <b>{logistics.totalCbm.toFixed(4)}</b>
