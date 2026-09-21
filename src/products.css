@@ -384,36 +384,36 @@
   overflow: hidden;
 }
 .livePricingHead {
-  padding: 14px 16px;
+  padding: 8px 10px;
   border-bottom: 1px solid #27352f;
 }
-.livePricingHead small { color: var(--lime); font-size: 10px; font-weight: 900; letter-spacing: 1px; }
+.livePricingHead small { color: var(--lime); font-size: 8px; font-weight: 900; letter-spacing: .8px; }
 .livePricingRow {
   display: grid;
-  grid-template-columns: 44px minmax(0, 1fr) auto;
+  grid-template-columns: 32px minmax(0, 1fr) auto;
   align-items: center;
-  gap: 12px;
-  padding: 10px 15px;
+  gap: 8px;
+  padding: 7px 10px;
   border-bottom: 1px solid #27312d;
 }
 .livePricingRow:last-child { border-bottom: 0; }
-.livePricingImage { width: 44px; height: 44px; border-radius: 8px; overflow: hidden; display: grid; place-items: center; background: #0b1110; color: #5c776b; }
+.livePricingImage { width: 32px; height: 32px; border-radius: 6px; overflow: hidden; display: grid; place-items: center; background: #0b1110; color: #5c776b; }
 .livePricingImage img { width: 100%; height: 100%; object-fit: cover; }
 .livePricingImage svg { width: 19px; }
-.livePricingName { min-width: 0; font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.livePricingUnitCost { color: #38dda0; font-size: 14px; text-align: right; white-space: nowrap; }
+.livePricingName { min-width: 0; font-size: 10px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.livePricingUnitCost { color: #38dda0; font-size: 11px; text-align: right; white-space: nowrap; }
 .livePricingUnitCost span { color: #71857b; margin: 0 3px; }
 .productPanel > .addCompleteProduct + .liveProductPricing { margin-top: 14px; }
 @media (min-width: 850px) {
-  .productPanel > .liveProductPricing { width: calc(100% - 370px); display: inline-block; vertical-align: top; margin-right: 14px; }
-  .productPanel > .purchaseSummary { width: 350px; display: inline-flex; vertical-align: top; }
+  .productPanel > .liveProductPricing { width: calc(100% - 382px); display: inline-block; vertical-align: top; margin-right: 14px; box-sizing: border-box; }
+  .productPanel > .purchaseSummary { width: 362px; display: inline-block; vertical-align: top; box-sizing: border-box; }
 }
 @media (max-width: 700px) {
   .livePricingUnitCost { font-size: 12px; }
 }
 @media (max-width: 430px) {
-  .livePricingRow { grid-template-columns: 38px minmax(0, 1fr) auto; gap: 8px; padding: 9px 10px; }
-  .livePricingImage { width: 38px; height: 38px; }
+  .livePricingRow { grid-template-columns: 30px minmax(0, 1fr) auto; gap: 7px; padding: 7px 8px; }
+  .livePricingImage { width: 30px; height: 30px; }
   .livePricingUnitCost { font-size: 10px; }
 }
 .unifiedProductCard .productInfoRow {

@@ -215,6 +215,33 @@
   color: var(--muted);
   font-size: 14px;
 }
+.recordProductPrices {
+  display: grid;
+  gap: 3px;
+  margin-top: 7px;
+}
+.recordProductPrices > div {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
+  max-width: 100%;
+  padding: 3px 7px;
+  border: 1px solid color-mix(in srgb, var(--line) 80%, #24cc8a 20%);
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--panel) 92%, #24cc8a 8%);
+  font-size: 11px;
+}
+.recordProductPrices span {
+  color: var(--muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.recordProductPrices b {
+  color: #1fc98b;
+  white-space: nowrap;
+}
 .recordSide {
   text-align: right;
   display: grid;

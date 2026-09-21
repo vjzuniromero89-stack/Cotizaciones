@@ -101,6 +101,72 @@ const productLogistics = (data, product) => {
   };
 };
 
+const recordProductPrices = (record, clientPrices) => {
+  const products = record.products || [],
+    totals = record.totals || {},
+    rates = record.rates || {},
+    boxes = record.boxes || [],
+    exchangeRate = Number(rates.exchangeRate || 36.62),
+    selectedShipping =
+      record.route === "miami"
+        ? Number(totals.viaMiami || 0)
+        : Number(totals.direct || 0),
+    totalCbm = Number(totals.cbm || 0),
+    productSubtotal =
+      Number(totals.productSubtotal) ||
+      products.reduce(
+        (sum, p) => sum + Number(p.qty || 0) * Number(p.price || 0),
+        0,
+      ),
+    prepared = products.map((p) => {
+      const productBoxes = boxes.filter(
+          (b) =>
+            b.productId === p.id ||
+            (!b.productId && b.productName === p.name),
+        ),
+        cbm = productBoxes.reduce(
+          (sum, b) => sum + boxCbm(b) * Number(b.qty || 0),
+          0,
+        ),
+        freight = productFreight(productBoxes, rates),
+        purchase = Number(p.qty || 0) * Number(p.price || 0);
+      return { p, cbm, freight, purchase };
+    }),
+    totalMiamiBasis = prepared.reduce(
+      (sum, x) =>
+        sum +
+        x.freight.cnBill * Number(rates.cnRate || 2) +
+        x.freight.miBill * Number(rates.miRate || 1.5),
+      0,
+    );
+  return prepared.map(({ p, cbm, freight, purchase }) => {
+    const units = Number(p.qty || 0);
+    if (clientPrices) {
+      const price = Number(p.salePrice ?? p.price ?? 0);
+      return { p, price, exchangeRate };
+    }
+    const share =
+        record.route === "miami"
+          ? totalMiamiBasis > 0
+            ? (freight.cnBill * Number(rates.cnRate || 2) +
+                freight.miBill * Number(rates.miRate || 1.5)) /
+              totalMiamiBasis
+            : 0
+          : totals.directChargeBy === "weight" &&
+              Number(totals.actualKg || 0) > 0
+            ? freight.actualKg / Number(totals.actualKg)
+            : totalCbm > 0
+              ? cbm / totalCbm
+              : productSubtotal > 0
+                ? purchase / productSubtotal
+                : 0,
+      shipping = selectedShipping * share,
+      commission = (purchase * Number(totals.feePercent || 0)) / 100,
+      price = units ? (purchase + commission + shipping) / units : 0;
+    return { p, price, exchangeRate };
+  });
+};
+
 function ClientQuote({ data, onClose, onConfirmed, onDeleted }) {
   const total = Number(data.totals?.saleTotal ?? Number(data.total || 0) * 1.3),
     totalUnits = Number(data.totals?.totalUnits || 0),
@@ -900,6 +966,7 @@ export default function RecordsPage({
               const shownTotal = isClient
                 ? Number(x.totals?.saleTotal ?? x.total * 1.3)
                 : Number(x.total);
+              const productPrices = recordProductPrices(x, isClient);
               return (
                 <article
                   className="record clickable"
@@ -920,6 +987,18 @@ export default function RecordsPage({
                         : " · " +
                           (x.route === "miami" ? "Vía Miami" : "Vía directa")}
                     </p>
+                    <div className="recordProductPrices">
+                      {productPrices.map(({ p, price, exchangeRate }, i) => (
+                        <div key={p.id || i}>
+                          <span>{p.name || "Producto"}</span>
+                          <b>
+                            {isClient ? "Venta" : "Costo"}: US${" "}
+                            {price.toFixed(2)} · C${" "}
+                            {(price * exchangeRate).toFixed(2)}
+                          </b>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                   <div className="recordSide">
                     <strong>{money(shownTotal)}</strong>

@@ -6,12 +6,16 @@ const money = (n) =>
   new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(
     n || 0,
   );
-const cordobas = (n) =>
-  new Intl.NumberFormat("es-NI", {
-    style: "currency",
-    currency: "NIO",
+const unitDollars = (n) =>
+  `US$ ${new Intl.NumberFormat("en-US", {
     minimumFractionDigits: 2,
-  }).format(n || 0);
+    maximumFractionDigits: 2,
+  }).format(n || 0)}`;
+const cordobas = (n) =>
+  `C$ ${new Intl.NumberFormat("es-NI", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(n || 0)}`;
 const blankBox = () => ({
   id: crypto.randomUUID(),
   qty: "",
@@ -431,7 +435,7 @@ export default function ProductSection({
             </div>
             <b className="livePricingName">{row.p.name || "Producto"}</b>
             <strong className="livePricingUnitCost">
-              {money(row.unitCost)} <span>·</span> {cordobas(row.unitCost * exchangeRate)}
+              {unitDollars(row.unitCost)} <span>·</span> {cordobas(row.unitCost * exchangeRate)}
             </strong>
           </article>
         ))}
