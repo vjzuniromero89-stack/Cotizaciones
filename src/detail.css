@@ -7,7 +7,7 @@
   transform: translateX(2px);
 }
 .detailSheet {
-  width: min(760px, 100%);
+  width: min(1600px, 96vw);
   max-height: 92vh;
   overflow: auto;
   background: #f7f9fc;
@@ -1303,17 +1303,17 @@
   overflow-x: auto;
 }
 .combinedProductTable {
-  min-width: 1480px;
+  min-width: 1238px;
 }
 .combinedProductHead,
 .combinedProductRow {
   display: grid;
   grid-template-columns:
-    minmax(210px, 1.5fr)
-    90px 85px 105px 110px 100px 110px 125px 55px 75px minmax(210px, 1.35fr);
-  gap: 10px;
+    minmax(170px, 1.3fr)
+    88px 82px 100px 105px 95px 100px 118px 50px 70px minmax(190px, 1.2fr);
+  gap: 7px;
   align-items: center;
-  padding: 12px 16px;
+  padding: 12px 14px;
 }
 .combinedProductHead {
   background: var(--surface-2, #f3f6f9);
@@ -1387,6 +1387,12 @@
 }
 .cellInputNum {
   text-align: right;
+  -moz-appearance: textfield;
+}
+.cellInputNum::-webkit-outer-spin-button,
+.cellInputNum::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
 .cellInputRow {
   display: flex;
@@ -1396,7 +1402,7 @@
   color: var(--muted);
 }
 .cellInputRow .cellInput {
-  width: 52px;
+  width: 68px;
   flex: none;
 }
 .inlineSaleEdit {
