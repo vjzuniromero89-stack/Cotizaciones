@@ -524,6 +524,10 @@
   border-color: #bfe9d3;
   background: #eafff3;
 }
+.clientQuoteTools .whatsappQuote:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
 .clientProductTableWrap {
   overflow-x: auto;
   border-radius: 12px;

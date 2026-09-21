@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import html2canvas from "html2canvas";
 import {
   Search,
   FileText,
@@ -32,30 +33,8 @@ const whatsappNumber = (phone) => {
   if (!digits) return "";
   return digits.length <= 8 ? "505" + digits : digits;
 };
-const whatsappQuoteMessage = (data, { total, totalUnits, totalBoxes, totalCbm }) => {
-  const lines = data.products?.length
-    ? data.products.map(
-        (p) =>
-          `• ${p.name || "Producto"} — ${Number(p.qty || 0).toLocaleString()} uds — ${money(
-            Number(p.qty || 0) * Number((p.salePrice ?? p.price) || 0),
-          )}`,
-      )
-    : [data.description || "Productos cotizados"];
-  return [
-    `*CotizacionesChina* · Compras y logística internacional`,
-    `Cotización ${data.number} para ${data.customer_name}`,
-    "",
-    ...lines,
-    "",
-    `Total de unidades: ${totalUnits.toLocaleString()}`,
-    `Total de cajas: ${totalBoxes.toLocaleString()}`,
-    `CBM total: ${totalCbm.toFixed(4)} m³`,
-    "",
-    `*Total puesto en Managua (incluyendo envío): ${money(total)}*`,
-    "",
-    "Cotización válida sujeta a confirmación de disponibilidad.",
-  ].join("\n");
-};
+const whatsappCaption = (data, total) =>
+  `Cotización ${data.number} — ${data.customer_name} — Total: ${money(total)}`;
 const labels = {
   pending: "Pendiente",
   returned: "Archivada",
@@ -208,6 +187,8 @@ const recordProductPrices = (record, clientPrices) => {
 
 function ClientQuote({ data, onClose, onDeleted }) {
   const [preview, setPreview] = useState(false);
+  const [sharing, setSharing] = useState(false);
+  const printRef = useRef(null);
   const total = Number(data.totals?.saleTotal ?? Number(data.total || 0) * 1.3),
     totalUnits = Number(data.totals?.totalUnits || 0),
     totalBoxes = Number(
@@ -232,9 +213,54 @@ function ClientQuote({ data, onClose, onDeleted }) {
     onDeleted();
     onClose();
   }
+  async function shareViaWhatsApp() {
+    if (!printRef.current || sharing) return;
+    setSharing(true);
+    try {
+      const canvas = await html2canvas(printRef.current, {
+        scale: 2,
+        backgroundColor: "#ffffff",
+        useCORS: true,
+        ignoreElements: (el) => el.classList?.contains("clientQuoteTools"),
+      });
+      const blob = await new Promise((resolve) =>
+        canvas.toBlob(resolve, "image/png"),
+      );
+      if (!blob) throw new Error("No se pudo generar la imagen");
+      const fileName = `${data.number || "cotizacion"}.png`;
+      const file = new File([blob], fileName, { type: "image/png" });
+      const caption = whatsappCaption(data, total);
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        try {
+          await navigator.share({ files: [file], title: caption, text: caption });
+        } catch (err) {
+          if (err?.name !== "AbortError") throw err;
+        }
+      } else {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+        window.open(
+          `https://wa.me/${whatsappNumber(data.phone)}?text=${encodeURIComponent(
+            `${caption}\nSe descargó la imagen de la cotización — adjúntala aquí en WhatsApp.`,
+          )}`,
+          "_blank",
+        );
+      }
+    } catch (err) {
+      window.alert("No se pudo preparar la cotización para WhatsApp. Intenta de nuevo.");
+    } finally {
+      setSharing(false);
+    }
+  }
   return (
     <div className={"clientQuoteOverlay " + (preview ? "clientPreviewMode" : "")}>
-      <section className="clientQuotePrint">
+      <section className="clientQuotePrint" ref={printRef}>
         <div className="clientQuoteTools">
           {preview ? (
             <button className="returnFromPreview" onClick={() => setPreview(false)}>
@@ -255,21 +281,11 @@ function ClientQuote({ data, onClose, onDeleted }) {
           )}
           <button
             className="whatsappQuote"
-            onClick={() =>
-              window.open(
-                `https://wa.me/${whatsappNumber(data.phone)}?text=${encodeURIComponent(
-                  whatsappQuoteMessage(data, {
-                    total,
-                    totalUnits,
-                    totalBoxes,
-                    totalCbm,
-                  }),
-                )}`,
-                "_blank",
-              )
-            }
+            disabled={sharing}
+            onClick={shareViaWhatsApp}
           >
-            <MessageCircle /> Enviar por WhatsApp
+            <MessageCircle />
+            {sharing ? "Preparando…" : "Enviar por WhatsApp"}
           </button>
           <button className="printQuote" onClick={() => window.print()}>
             <Printer /> Imprimir / guardar PDF
