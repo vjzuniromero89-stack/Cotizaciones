@@ -47,6 +47,7 @@ const initialRates = {
   miDivisor: 166,
   minCbm: true,
   directKgPerCbm: 350,
+  exchangeRate: 36.62,
 };
 const statusLabel = {
   pending: "Pendiente",
@@ -141,7 +142,7 @@ function SaveDialog({
     selectedRoute: result.best,
   });
   const [items, setItems] = useState(
-    products.map((p) => ({ ...p, salePrice: "" })),
+    products.map((p) => ({ ...p, salePrice: p.salePrice ?? "" })),
   );
   const [busy, setBusy] = useState(false),
     [error, setError] = useState("");
@@ -508,6 +509,18 @@ function CalculatorPage({ onSaved, initialCustomer }) {
           direct: r.direct,
           onSummary: setProductSummary,
         }}
+        routeDetails={{
+          best: r.best,
+          directChargeBy: r.directChargeBy,
+          directTotal: r.direct,
+          directBasis:
+            r.directChargeBy === "weight"
+              ? Number(r.actualKg || 0)
+              : Number(r.cbm || 0),
+          rows: productRouteRows,
+        }}
+        exchangeRate={Number(rates.exchangeRate || 0)}
+        setExchangeRate={(value) => rr("exchangeRate", value)}
       />
       <section className="results">
         <div className="resultHead">
@@ -519,7 +532,11 @@ function CalculatorPage({ onSaved, initialCustomer }) {
         </div>
         <div className="routeGrid">
           <RouteOne r={r} rates={rates} />
-          <RouteTwo r={r} rates={rates} />
+          <RouteTwo
+            r={r}
+            rates={rates}
+            onCbmRateChange={(value) => rr("cbmRate", value)}
+          />
         </div>
         <div className="landedGrid">
           <div>
@@ -737,7 +754,7 @@ function RouteOne({ r, rates }) {
     </article>
   );
 }
-function RouteTwo({ r, rates }) {
+function RouteTwo({ r, rates, onCbmRateChange }) {
   return (
     <article className={"route " + (r.best === "direct" ? "winner" : "")}>
       <div className="routeIcon ship">
@@ -750,6 +767,22 @@ function RouteTwo({ r, rates }) {
         </h3>
       </div>
       {r.best === "direct" && <mark>Recomendada</mark>}
+      <label className="directRateEditor">
+        <span>Precio manual por CBM</span>
+        <div>
+          <i>$</i>
+          <input
+            type="number"
+            min="0"
+            step="any"
+            value={rates.cbmRate}
+            onChange={(event) => onCbmRateChange(event.target.value)}
+            aria-label="Precio manual por CBM para la Vía 2"
+          />
+          <em>por CBM</em>
+        </div>
+        <small>Puedes cambiar esta tarifa para cada cotización.</small>
+      </label>
       <dl className="legs">
         <div
           className={r.directChargeBy === "volume" ? "directMethodWinner" : ""}

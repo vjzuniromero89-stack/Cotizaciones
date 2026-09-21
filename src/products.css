@@ -375,6 +375,67 @@
 .addCompleteProduct:hover {
   filter: brightness(1.12);
 }
+.liveProductPricing {
+  flex: 1 1 560px;
+  min-width: 0;
+  border: 1px solid #245c47;
+  border-radius: 14px;
+  background: linear-gradient(145deg, #111a17, #191c23);
+  overflow: hidden;
+}
+.livePricingHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  border-bottom: 1px solid #27352f;
+}
+.livePricingHead small { color: var(--lime); font-size: 9px; font-weight: 900; letter-spacing: 1px; }
+.livePricingHead h3 { margin: 3px 0 0; font-size: 15px; }
+.livePricingMeta { display: flex; align-items: flex-end; gap: 12px; }
+.livePricingMeta > span { color: #9eb5aa; font-size: 10px; text-align: right; }
+.livePricingMeta label small { display: block; color: #8fa39a; font-size: 8px; margin-bottom: 3px; }
+.livePricingMeta input { width: 82px; height: 31px; border: 1px solid #3b4a43; border-radius: 7px; background: #101419; color: #fff; padding: 0 7px; font-weight: 800; }
+.livePricingRow {
+  display: grid;
+  grid-template-columns: 1.15fr .9fr 1fr 1.05fr;
+  gap: 10px;
+  padding: 13px 15px;
+  border-bottom: 1px solid #27312d;
+}
+.livePricingRow:last-child { border-bottom: 0; }
+.livePricingRow small, .livePricingRow span, .livePricingProduct b, .livePricingCost b, .livePricingProfit b, .livePricingProfit strong { display: block; }
+.livePricingRow small { color: #83958d; font-size: 9px; }
+.livePricingProduct b { font-size: 12px; margin-bottom: 3px; }
+.livePricingProduct span { color: #aab7b1; font-size: 10px; margin-bottom: 5px; }
+.livePricingCost b { color: #fff; font-size: 15px; margin: 4px 0; }
+.livePricingCost span { color: #9eb5aa; font-size: 9px; }
+.livePricingCost strong { color: var(--lime); }
+.livePricingSale > div { display: flex; align-items: center; margin-top: 5px; border: 1px solid #3b4a43; border-radius: 8px; overflow: hidden; background: #101419; }
+.livePricingSale i { min-width: 34px; padding-left: 7px; color: var(--lime); font-size: 9px; font-style: normal; font-weight: 900; }
+.livePricingSale input { width: 100%; border: 0; background: transparent; padding: 9px 7px; color: #fff; font-weight: 800; outline: none; }
+.livePricingProfit { border-radius: 9px; padding: 8px 10px; background: #12251d; }
+.livePricingProfit.negative { background: #291819; }
+.livePricingProfit b { font-size: 11px; margin: 3px 0; }
+.livePricingProfit strong { font-size: 12px; color: #39dc9a; }
+.livePricingProfit.negative strong { color: #ff7474; }
+.livePricingProfit span { margin-top: 3px; color: #aebbb5; font-size: 9px; }
+.productPanel > .addCompleteProduct + .liveProductPricing { margin-top: 14px; }
+@media (min-width: 850px) {
+  .productPanel > .liveProductPricing { width: calc(100% - 370px); display: inline-block; vertical-align: top; margin-right: 14px; }
+  .productPanel > .purchaseSummary { width: 350px; display: inline-flex; vertical-align: top; }
+}
+@media (max-width: 700px) {
+  .livePricingRow { grid-template-columns: 1fr 1fr; }
+  .livePricingHead { align-items: flex-start; }
+}
+@media (max-width: 430px) {
+  .livePricingRow { grid-template-columns: 1fr; }
+  .livePricingHead { display: block; }
+  .livePricingMeta { margin-top: 8px; justify-content: space-between; }
+  .livePricingMeta > span { text-align: left; }
+}
 .unifiedProductCard .productInfoRow {
   padding-bottom: 10px;
 }
