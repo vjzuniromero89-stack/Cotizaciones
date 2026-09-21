@@ -505,7 +505,8 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
   }
-  .clientQuoteTools .printQuote {
+  .clientQuoteTools .printQuote,
+  .clientQuoteTools .whatsappQuote {
     grid-column: 1/-1;
     justify-content: center;
   }
@@ -518,6 +519,11 @@
   border-color: #f5b7b1;
   background: #fff4f3;
 }
+.clientQuoteTools .whatsappQuote {
+  color: #128c53;
+  border-color: #bfe9d3;
+  background: #eafff3;
+}
 .clientProductTableWrap {
   overflow-x: auto;
   border-radius: 12px;
@@ -527,13 +533,11 @@
 }
 .clientProductHead.clientProductLogistics,
 .clientProductRow.clientProductLogistics {
-  grid-template-columns:
-    minmax(110px, 1.2fr)
-    54px 38px 84px 88px 66px 54px 72px 70px;
-  gap: 6px;
+  grid-template-columns: minmax(200px, 1.6fr) 92px 92px 92px 92px;
+  gap: 10px;
   align-items: center;
-  padding: 11px 10px;
-  font-size: 11px;
+  padding: 13px 14px;
+  font-size: 12.5px;
 }
 .clientProductLogistics > span:not(:first-child),
 .clientProductLogistics > b {
@@ -543,6 +547,34 @@
 .clientProductHead.clientProductLogistics > span {
   overflow-wrap: break-word;
   word-break: break-word;
+}
+.clientProductInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.clientPackNote {
+  color: #7c8a9c;
+  font-size: 10.5px;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.clientStack {
+  display: grid;
+  gap: 2px;
+  text-align: right;
+  min-width: 0;
+}
+.clientStack small {
+  color: #7c8a9c;
+  font-weight: 600;
+}
+.clientSubtotal {
+  font-size: 14px;
+  color: #0e2947;
 }
 .clientDualPrice {
   display: grid;
@@ -562,7 +594,8 @@
   gap: 9px;
   min-width: 0;
 }
-.clientProductCell > b {
+.clientProductCell b,
+.clientProductInfo b {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -613,6 +646,20 @@
   .clientQuoteSummary {
     margin-top: 18px;
   }
+  .clientProductHead.clientProductLogistics,
+  .clientProductRow.clientProductLogistics {
+    grid-template-columns: minmax(96px, 1.5fr) 56px 64px 62px;
+    gap: 6px;
+    padding: 10px 8px;
+    font-size: 10.5px;
+  }
+  .clientProductHead.clientProductLogistics > span:nth-child(3),
+  .clientProductRow.clientProductLogistics > div:nth-child(3) {
+    display: none;
+  }
+  .clientPackNote {
+    font-size: 9.5px;
+  }
 }
 @media print {
   .clientProductTableWrap {
@@ -623,18 +670,25 @@
   }
   .clientProductHead.clientProductLogistics,
   .clientProductRow.clientProductLogistics {
-    grid-template-columns:
-      minmax(90px, 1.2fr)
-      45px 32px 70px 73px 55px 45px 60px 58px;
-    gap: 5px;
-    padding: 8px;
-    font-size: 9px;
+    grid-template-columns: minmax(170px, 1.6fr) 78px 78px 78px 78px;
+    gap: 8px;
+    padding: 9px 10px;
+    font-size: 10.5px;
   }
   .clientProductPhoto,
   .clientProductNoPhoto {
     width: 34px;
     height: 34px;
     flex-basis: 34px;
+  }
+  .clientPackNote {
+    font-size: 9px;
+  }
+  .clientSubtotal {
+    font-size: 11.5px;
+  }
+  .whatsappQuote {
+    display: none;
   }
 }
 .clientGrandTotal span small {

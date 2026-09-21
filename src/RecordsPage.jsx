@@ -15,6 +15,7 @@ import {
   Plus,
   Eye,
   ArrowLeft,
+  MessageCircle,
 } from "lucide-react";
 import "./detail.css";
 import "./product-detail.css";
@@ -26,6 +27,35 @@ const money = (n) =>
   );
 const cordobas = (n) =>
   `C$${new Intl.NumberFormat("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format((n || 0) * 37)}`;
+const whatsappNumber = (phone) => {
+  const digits = (phone || "").replace(/\D/g, "");
+  if (!digits) return "";
+  return digits.length <= 8 ? "505" + digits : digits;
+};
+const whatsappQuoteMessage = (data, { total, totalUnits, totalBoxes, totalCbm }) => {
+  const lines = data.products?.length
+    ? data.products.map(
+        (p) =>
+          `• ${p.name || "Producto"} — ${Number(p.qty || 0).toLocaleString()} uds — ${money(
+            Number(p.qty || 0) * Number((p.salePrice ?? p.price) || 0),
+          )}`,
+      )
+    : [data.description || "Productos cotizados"];
+  return [
+    `*CotizacionesChina* · Compras y logística internacional`,
+    `Cotización ${data.number} para ${data.customer_name}`,
+    "",
+    ...lines,
+    "",
+    `Total de unidades: ${totalUnits.toLocaleString()}`,
+    `Total de cajas: ${totalBoxes.toLocaleString()}`,
+    `CBM total: ${totalCbm.toFixed(4)} m³`,
+    "",
+    `*Total puesto en Managua (incluyendo envío): ${money(total)}*`,
+    "",
+    "Cotización válida sujeta a confirmación de disponibilidad.",
+  ].join("\n");
+};
 const labels = {
   pending: "Pendiente",
   returned: "Archivada",
@@ -223,6 +253,24 @@ function ClientQuote({ data, onClose, onDeleted }) {
               </button>
             </>
           )}
+          <button
+            className="whatsappQuote"
+            onClick={() =>
+              window.open(
+                `https://wa.me/${whatsappNumber(data.phone)}?text=${encodeURIComponent(
+                  whatsappQuoteMessage(data, {
+                    total,
+                    totalUnits,
+                    totalBoxes,
+                    totalCbm,
+                  }),
+                )}`,
+                "_blank",
+              )
+            }
+          >
+            <MessageCircle /> Enviar por WhatsApp
+          </button>
           <button className="printQuote" onClick={() => window.print()}>
             <Printer /> Imprimir / guardar PDF
           </button>
@@ -263,11 +311,7 @@ function ClientQuote({ data, onClose, onDeleted }) {
             <div className="clientProductHead clientProductLogistics">
               <span>Producto</span>
               <span>Unidades</span>
-              <span>Cajas</span>
-              <span>Productos/caja</span>
-              <span>Tamaño de caja</span>
-              <span>CBM/unidad</span>
-              <span>CBM total</span>
+              <span>CBM</span>
               <span>Precio por unidad</span>
               <span>Subtotal</span>
             </div>
@@ -290,29 +334,38 @@ function ClientQuote({ data, onClose, onDeleted }) {
                         ) : (
                           <span className="clientProductNoPhoto">Sin foto</span>
                         )}
-                        <b title={p.name || "Producto"}>
-                          {p.name || "Producto"}
-                        </b>
+                        <div className="clientProductInfo">
+                          <b title={p.name || "Producto"}>
+                            {p.name || "Producto"}
+                          </b>
+                          <small className="clientPackNote">
+                            {logistics.unitsPerBox
+                              ? `${
+                                  Number.isInteger(logistics.unitsPerBox)
+                                    ? logistics.unitsPerBox.toLocaleString()
+                                    : logistics.unitsPerBox.toFixed(1)
+                                }/caja`
+                              : null}
+                            {logistics.unitsPerBox ? " · " : ""}
+                            {logistics.boxSize}
+                          </small>
+                        </div>
                       </div>
-                      <b>{Number(p.qty || 0).toLocaleString()}</b>
-                      <b>{logistics.boxCount.toLocaleString()}</b>
-                      <b>
-                        {logistics.unitsPerBox
-                          ? Number.isInteger(logistics.unitsPerBox)
-                            ? logistics.unitsPerBox.toLocaleString()
-                            : logistics.unitsPerBox.toFixed(1)
-                          : "—"}
-                      </b>
-                      <b className="clientBoxSize">{logistics.boxSize}</b>
-                      <b>{logistics.unitCbm.toFixed(6)}</b>
-                      <b>{logistics.totalCbm.toFixed(4)}</b>
+                      <div className="clientStack">
+                        <b>{Number(p.qty || 0).toLocaleString()}</b>
+                        <small>{logistics.boxCount.toLocaleString()} cajas</small>
+                      </div>
+                      <div className="clientStack">
+                        <b>{logistics.totalCbm.toFixed(4)} m³</b>
+                        <small>{logistics.unitCbm.toFixed(6)} m³/u</small>
+                      </div>
                       <div className="clientDualPrice">
                         <b>US{money(p.salePrice ?? p.price)}</b>
                         <small>
                           {cordobas(Number(p.salePrice ?? p.price))}
                         </small>
                       </div>
-                      <b>
+                      <b className="clientSubtotal">
                         {money(
                           Number(p.qty || 0) *
                             Number((p.salePrice ?? p.price) || 0),
