@@ -484,10 +484,21 @@
     print-color-adjust: exact;
   }
 }
-.clientQuoteTools .clientConfirmed {
-  background: #1fc979;
-  color: #07140e;
-  border-color: #1fc979;
+.clientQuoteTools .viewClientQuote {
+  background: #1a835d;
+  color: #fff;
+  border-color: #1a835d;
+}
+.clientQuoteTools .returnFromPreview {
+  color: #17304b;
+}
+.clientPreviewMode .clientQuotePrint {
+  box-shadow: 0 22px 65px rgba(0, 0, 0, 0.32);
+}
+.clientPreviewMode .clientQuoteTools {
+  padding-bottom: 14px;
+  margin-bottom: 8px;
+  border-bottom: 1px dashed #cbd5df;
 }
 @media (max-width: 620px) {
   .clientQuoteTools {

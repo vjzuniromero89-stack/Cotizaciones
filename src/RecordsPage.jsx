@@ -13,6 +13,8 @@ import {
   StickyNote,
   Printer,
   Plus,
+  Eye,
+  ArrowLeft,
 } from "lucide-react";
 import "./detail.css";
 import "./product-detail.css";
@@ -167,7 +169,8 @@ const recordProductPrices = (record, clientPrices) => {
   });
 };
 
-function ClientQuote({ data, onClose, onConfirmed, onDeleted }) {
+function ClientQuote({ data, onClose, onDeleted }) {
+  const [preview, setPreview] = useState(false);
   const total = Number(data.totals?.saleTotal ?? Number(data.total || 0) * 1.3),
     totalUnits = Number(data.totals?.totalUnits || 0),
     totalBoxes = Number(
@@ -181,17 +184,6 @@ function ClientQuote({ data, onClose, onConfirmed, onDeleted }) {
           0,
         ),
     );
-  async function confirmQuote() {
-    if (
-      !window.confirm(
-        "¿El cliente confirmó esta cotización? Se registrará en Órdenes.",
-      )
-    )
-      return;
-    await api(`/records/${data.id}/promote`, { method: "POST" });
-    onConfirmed();
-    onClose();
-  }
   async function deleteQuote() {
     if (
       !window.confirm(
@@ -204,18 +196,26 @@ function ClientQuote({ data, onClose, onConfirmed, onDeleted }) {
     onClose();
   }
   return (
-    <div className="clientQuoteOverlay">
+    <div className={"clientQuoteOverlay " + (preview ? "clientPreviewMode" : "")}>
       <section className="clientQuotePrint">
         <div className="clientQuoteTools">
-          <button onClick={onClose}>
-            <X /> Cerrar
-          </button>
-          <button className="clientDelete" onClick={deleteQuote}>
-            <Trash2 /> Eliminar
-          </button>
-          <button className="clientConfirmed" onClick={confirmQuote}>
-            <CheckCircle2 /> Cliente confirmó
-          </button>
+          {preview ? (
+            <button className="returnFromPreview" onClick={() => setPreview(false)}>
+              <ArrowLeft /> Volver
+            </button>
+          ) : (
+            <>
+              <button onClick={onClose}>
+                <X /> Cerrar
+              </button>
+              <button className="clientDelete" onClick={deleteQuote}>
+                <Trash2 /> Eliminar
+              </button>
+              <button className="viewClientQuote" onClick={() => setPreview(true)}>
+                <Eye /> Ver cotización
+              </button>
+            </>
+          )}
           <button className="printQuote" onClick={() => window.print()}>
             <Printer /> Imprimir / guardar PDF
           </button>
@@ -351,7 +351,7 @@ function ClientQuote({ data, onClose, onConfirmed, onDeleted }) {
   );
 }
 
-function ClientDetail({ id, onClose, onConfirmed, onDeleted }) {
+function ClientDetail({ id, onClose, onDeleted }) {
   const [data, setData] = useState(null);
   useEffect(() => {
     api("/records/" + id).then(setData);
@@ -368,7 +368,6 @@ function ClientDetail({ id, onClose, onConfirmed, onDeleted }) {
     <ClientQuote
       data={data}
       onClose={onClose}
-      onConfirmed={onConfirmed}
       onDeleted={onDeleted}
     />
   );
@@ -1062,10 +1061,6 @@ export default function RecordsPage({
           <ClientDetail
             id={selected}
             onClose={() => setSelected(null)}
-            onConfirmed={() => {
-              load();
-              onChange();
-            }}
             onDeleted={() => {
               load();
               onChange();
