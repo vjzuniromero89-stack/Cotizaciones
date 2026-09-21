@@ -115,7 +115,7 @@ async function restRows(env, path, options = {}) {
 
 async function listRecords(env, type) {
   const fields =
-    "id,number,record_type,customer_name,phone,description,route,total,total_boxes,status,notes,totals,created_at,updated_at";
+    "id,number,record_type,customer_name,phone,description,route,total,total_boxes,status,notes,totals,products,boxes,rates,created_at,updated_at";
   return restRows(
     env,
     `records?record_type=eq.${encodeURIComponent(type)}&select=${fields}&order=created_at.desc`,
