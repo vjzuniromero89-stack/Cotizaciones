@@ -1370,6 +1370,90 @@
   font-size: 10px;
   color: var(--muted);
 }
+.cellInput {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 5px 6px;
+  font: inherit;
+  font-size: 12px;
+  background: #fff;
+  color: inherit;
+}
+.cellInput:focus-visible {
+  outline: 2px solid var(--blue, #1677ff);
+  outline-offset: 1px;
+}
+.cellInputNum {
+  text-align: right;
+}
+.cellInputRow {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  color: var(--muted);
+}
+.cellInputRow .cellInput {
+  width: 52px;
+  flex: none;
+}
+.inlineSaleEdit {
+  gap: 4px;
+}
+.inlineSaleEdit .cellInput {
+  text-align: right;
+  font-weight: 800;
+}
+.quoteBoxInfoEdit {
+  gap: 5px;
+}
+.boxDimsEdit,
+.boxWeightEdit {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr auto;
+  gap: 4px;
+}
+.boxDimsEdit .cellInput,
+.boxWeightEdit .cellInput {
+  padding: 4px 5px;
+  font-size: 10.5px;
+}
+.rateGridInline {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  padding: 0 16px 12px;
+}
+.rateGridInline label {
+  display: grid;
+  gap: 4px;
+}
+.rateGridInline span {
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.rateGridInline input {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 8px 10px;
+  font: inherit;
+}
+.rateGridMinCbm {
+  margin: 0 16px 16px;
+}
+@media (max-width: 760px) {
+  .rateGridInline {
+    grid-template-columns: 1fr 1fr;
+  }
+  .boxDimsEdit,
+  .boxWeightEdit {
+    grid-template-columns: 1fr 1fr;
+  }
+}
 @media (max-width: 760px) {
   .internalOverview {
     grid-template-columns: 1fr;

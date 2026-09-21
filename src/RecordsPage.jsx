@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import "./detail.css";
 import "./product-detail.css";
+import { calculate } from "./calculate.js";
 import { authFetch } from "./auth.js";
 
 const money = (n) =>
@@ -116,6 +117,47 @@ const productLogistics = (data, product) => {
     boxSize: mainBox.l
       ? `${mainBox.l} × ${mainBox.w} × ${mainBox.h} ${mainBox.unit === "in" ? "in" : "cm"}`
       : "Sin medida",
+  };
+};
+
+// Recomputa el objeto "totals" exactamente igual que al crear la cotización
+// (ver POST /api/quotes en worker/index.js y ProductSection.jsx), para poder
+// editar productos/cajas/tarifas en Cotizaciones internas con números en vivo.
+const computeLiveTotals = (products, boxes, rates, route, feePercent) => {
+  const shipping = calculate(boxes, rates),
+    subtotal = products.reduce(
+      (s, p) => s + (Number(p.price) || 0) * (Number(p.qty) || 0),
+      0,
+    ),
+    feeAmount = (subtotal * feePercent) / 100,
+    merchandiseTotal = subtotal + feeAmount,
+    totalUnits = products.reduce((s, p) => s + (Number(p.qty) || 0), 0),
+    landedMiami = merchandiseTotal + shipping.viaMiami,
+    landedDirect = merchandiseTotal + shipping.direct,
+    unitMiami = totalUnits ? landedMiami / totalUnits : 0,
+    unitDirect = totalUnits ? landedDirect / totalUnits : 0,
+    internalTotal = route === "direct" ? landedDirect : landedMiami,
+    saleTotal = products.reduce(
+      (s, p) => s + (Number(p.qty) || 0) * (Number(p.salePrice) || 0),
+      0,
+    ),
+    profit = saleTotal - internalTotal,
+    profitPercent = internalTotal > 0 ? (profit / internalTotal) * 100 : 0;
+  return {
+    ...shipping,
+    productSubtotal: subtotal,
+    feePercent,
+    feeAmount,
+    merchandiseTotal,
+    totalUnits,
+    landedMiami,
+    landedDirect,
+    unitMiami,
+    unitDirect,
+    internalTotal,
+    saleTotal,
+    profit,
+    profitPercent,
   };
 };
 
@@ -476,8 +518,19 @@ function Detail({ id, type, onClose, onChanged }) {
         <div className="detailSheet loadingDetail">Cargando expediente…</div>
       </div>
     );
-  const totals = data.totals || {},
-    rates = data.rates || {},
+  const sourceProducts = edit ? form.products || [] : data.products || [],
+    sourceBoxes = edit ? form.boxes || [] : data.boxes || [],
+    rates = (edit ? form.rates : data.rates) || {},
+    feePercent = Number((edit ? form.totals : data.totals)?.feePercent ?? 0),
+    totals = edit
+      ? computeLiveTotals(
+          sourceProducts,
+          sourceBoxes,
+          rates,
+          form.route,
+          feePercent,
+        )
+      : data.totals || {},
     shownRoute = edit ? form.route : data.route,
     selectedShipping =
       shownRoute === "miami"
@@ -489,14 +542,14 @@ function Detail({ id, type, onClose, onChanged }) {
         : (totals.landedDirect ?? totals.direct),
     productSubtotal =
       Number(totals.productSubtotal) ||
-      data.products?.reduce(
+      sourceProducts.reduce(
         (sum, p) => sum + Number(p.qty || 0) * Number(p.price || 0),
         0,
       ) ||
       0,
     totalCbm = Number(totals.cbm || 0);
-  const prepared = (data.products || []).map((p) => {
-      const boxes = (data.boxes || []).filter(
+  const prepared = sourceProducts.map((p, i) => {
+      const boxes = sourceBoxes.filter(
           (b) =>
             b.productId === p.id || (!b.productId && b.productName === p.name),
         ),
@@ -504,6 +557,7 @@ function Detail({ id, type, onClose, onChanged }) {
         freight = productFreight(boxes, rates);
       return {
         p,
+        i,
         boxes,
         cbm,
         freight,
@@ -518,7 +572,7 @@ function Detail({ id, type, onClose, onChanged }) {
       0,
     );
   const productBreakdown = prepared.map((x) => {
-    const { p, boxes, cbm, freight, purchase } = x,
+    const { p, i, boxes, cbm, freight, purchase } = x,
       share =
         shownRoute === "miami"
           ? totalMiamiBasis > 0
@@ -546,6 +600,7 @@ function Detail({ id, type, onClose, onChanged }) {
       profitPercent = unitCost > 0 ? (unitProfit / unitCost) * 100 : 0;
     return {
       p,
+      i,
       boxes,
       cbm,
       freight,
@@ -562,14 +617,43 @@ function Detail({ id, type, onClose, onChanged }) {
     };
   });
   const f = (k, v) => setForm((x) => ({ ...x, [k]: v }));
+  const rr = (k, v) => setForm((x) => ({ ...x, rates: { ...x.rates, [k]: v } }));
+  const ft = (k, v) =>
+    setForm((x) => ({ ...x, totals: { ...x.totals, [k]: v } }));
+  const updateProduct = (index, k, v) =>
+    setForm((x) => ({
+      ...x,
+      products: (x.products || []).map((p, idx) =>
+        idx === index ? { ...p, [k]: v } : p,
+      ),
+    }));
+  const updateBox = (boxRef, k, v) =>
+    setForm((x) => ({
+      ...x,
+      boxes: (x.boxes || []).map((b) => (b === boxRef ? { ...b, [k]: v } : b)),
+    }));
   async function save() {
     setBusy(true);
     try {
+      const liveTotals = computeLiveTotals(
+        form.products || [],
+        form.boxes || [],
+        form.rates || {},
+        form.route,
+        Number(form.totals?.feePercent ?? 0),
+      );
+      const payload = {
+        ...form,
+        totals: liveTotals,
+        total: liveTotals.internalTotal,
+        total_boxes: liveTotals.totalBoxes,
+      };
       await api("/records/" + id, {
         method: "PATCH",
-        body: JSON.stringify({ ...form, total: routeTotal }),
+        body: JSON.stringify(payload),
       });
-      setData({ ...data, ...form, total: routeTotal });
+      setData({ ...data, ...payload });
+      setForm({ ...data, ...payload });
       setEdit(false);
       onChanged();
     } finally {
@@ -713,31 +797,32 @@ function Detail({ id, type, onClose, onChanged }) {
                   <span>Información de caja</span>
                 </div>
                 {productBreakdown.map(
-                  (
-                    {
-                      p,
-                      boxes,
-                      purchase,
-                      commission,
-                      shipping,
-                      totalCost,
-                      unitCost,
-                      saleUnit,
-                      saleTotal,
-                      profit,
-                      unitProfit,
-                      profitPercent,
-                      cbm,
-                    },
-                    i,
-                  ) => {
+                  ({
+                    p,
+                    i: productIndex,
+                    boxes,
+                    purchase,
+                    commission,
+                    shipping,
+                    totalCost,
+                    unitCost,
+                    saleUnit,
+                    saleTotal,
+                    profit,
+                    unitProfit,
+                    profitPercent,
+                    cbm,
+                  }) => {
                     const box = boxes[0] || {},
                       boxCount = boxes.reduce(
                         (s, b) => s + Number(b.qty || 0),
                         0,
                       );
                     return (
-                      <article className="combinedProductRow" key={p.id || i}>
+                      <article
+                        className="combinedProductRow"
+                        key={p.id || productIndex}
+                      >
                         <div className="quoteProductIdentity">
                           {p.imageUrl ? (
                             <img src={p.imageUrl} alt={p.name || "Producto"} />
@@ -745,11 +830,58 @@ function Detail({ id, type, onClose, onChanged }) {
                             <span className="noPhoto">Sin foto</span>
                           )}
                           <div>
-                            <b>{p.name || "Producto"}</b>
-                            <small>
-                              {Number(p.qty || 0).toLocaleString()} unidades ×{" "}
-                              {money(p.price)}
-                            </small>
+                            {edit ? (
+                              <input
+                                className="cellInput"
+                                value={p.name || ""}
+                                onChange={(e) =>
+                                  updateProduct(
+                                    productIndex,
+                                    "name",
+                                    e.target.value,
+                                  )
+                                }
+                              />
+                            ) : (
+                              <b>{p.name || "Producto"}</b>
+                            )}
+                            {edit ? (
+                              <span className="cellInputRow">
+                                <input
+                                  className="cellInput cellInputNum"
+                                  type="number"
+                                  min="0"
+                                  value={p.qty ?? ""}
+                                  onChange={(e) =>
+                                    updateProduct(
+                                      productIndex,
+                                      "qty",
+                                      e.target.value,
+                                    )
+                                  }
+                                />
+                                <span>uds ×</span>
+                                <input
+                                  className="cellInput cellInputNum"
+                                  type="number"
+                                  min="0"
+                                  step="any"
+                                  value={p.price ?? ""}
+                                  onChange={(e) =>
+                                    updateProduct(
+                                      productIndex,
+                                      "price",
+                                      e.target.value,
+                                    )
+                                  }
+                                />
+                              </span>
+                            ) : (
+                              <small>
+                                {Number(p.qty || 0).toLocaleString()} unidades
+                                × {money(p.price)}
+                              </small>
+                            )}
                           </div>
                         </div>
                         <b>{money(purchase)}</b>
@@ -759,14 +891,41 @@ function Detail({ id, type, onClose, onChanged }) {
                           {money(totalCost)}
                         </strong>
                         <b>{money(unitCost)}</b>
-                        <div className="inlineSale">
-                          <b>{saleUnit > 0 ? money(saleUnit) : "Pendiente"}</b>
-                          <small>
-                            {saleUnit > 0
-                              ? `${money(saleTotal)} total`
-                              : "Sin precio"}
-                          </small>
-                        </div>
+                        {edit ? (
+                          <div className="inlineSale inlineSaleEdit">
+                            <input
+                              className="cellInput cellInputNum"
+                              type="number"
+                              min="0"
+                              step="any"
+                              placeholder="Precio de venta"
+                              value={p.salePrice ?? ""}
+                              onChange={(e) =>
+                                updateProduct(
+                                  productIndex,
+                                  "salePrice",
+                                  e.target.value,
+                                )
+                              }
+                            />
+                            <small>
+                              {saleUnit > 0
+                                ? `${money(saleTotal)} total`
+                                : "Escribe el precio"}
+                            </small>
+                          </div>
+                        ) : (
+                          <div className="inlineSale">
+                            <b>
+                              {saleUnit > 0 ? money(saleUnit) : "Pendiente"}
+                            </b>
+                            <small>
+                              {saleUnit > 0
+                                ? `${money(saleTotal)} total`
+                                : "Sin precio"}
+                            </small>
+                          </div>
+                        )}
                         <div
                           className={
                             profit >= 0
@@ -781,19 +940,118 @@ function Detail({ id, type, onClose, onChanged }) {
                               : "—"}
                           </small>
                         </div>
-                        <b>{boxCount}</b>
+                        {edit && box.l !== undefined ? (
+                          <input
+                            className="cellInput cellInputNum"
+                            type="number"
+                            min="0"
+                            value={box.qty ?? ""}
+                            onChange={(e) =>
+                              updateBox(box, "qty", e.target.value)
+                            }
+                          />
+                        ) : (
+                          <b>{boxCount}</b>
+                        )}
                         <b>{cbm.toFixed(4)}</b>
-                        <div className="quoteBoxInfo">
-                          <b>
-                            {box.l
-                              ? `${box.l} × ${box.w} × ${box.h} ${box.unit}`
-                              : "Sin caja"}
-                          </b>
-                          <span>
-                            {box.weight || 0} {box.weightUnit || "kg"} ·{" "}
-                            {box.unitsPerBox || "—"} productos/caja
-                          </span>
-                        </div>
+                        {edit && box.l !== undefined ? (
+                          <div className="quoteBoxInfo quoteBoxInfoEdit">
+                            <div className="boxDimsEdit">
+                              <input
+                                className="cellInput cellInputNum"
+                                type="number"
+                                min="0"
+                                step="any"
+                                placeholder="L"
+                                value={box.l ?? ""}
+                                onChange={(e) =>
+                                  updateBox(box, "l", e.target.value)
+                                }
+                              />
+                              <input
+                                className="cellInput cellInputNum"
+                                type="number"
+                                min="0"
+                                step="any"
+                                placeholder="A"
+                                value={box.w ?? ""}
+                                onChange={(e) =>
+                                  updateBox(box, "w", e.target.value)
+                                }
+                              />
+                              <input
+                                className="cellInput cellInputNum"
+                                type="number"
+                                min="0"
+                                step="any"
+                                placeholder="H"
+                                value={box.h ?? ""}
+                                onChange={(e) =>
+                                  updateBox(box, "h", e.target.value)
+                                }
+                              />
+                              <select
+                                className="cellInput"
+                                value={box.unit || "cm"}
+                                onChange={(e) =>
+                                  updateBox(box, "unit", e.target.value)
+                                }
+                              >
+                                <option value="cm">cm</option>
+                                <option value="in">in</option>
+                              </select>
+                            </div>
+                            <div className="boxWeightEdit">
+                              <input
+                                className="cellInput cellInputNum"
+                                type="number"
+                                min="0"
+                                step="any"
+                                placeholder="Peso"
+                                value={box.weight ?? ""}
+                                onChange={(e) =>
+                                  updateBox(box, "weight", e.target.value)
+                                }
+                              />
+                              <select
+                                className="cellInput"
+                                value={box.weightUnit || "kg"}
+                                onChange={(e) =>
+                                  updateBox(box, "weightUnit", e.target.value)
+                                }
+                              >
+                                <option value="kg">kg</option>
+                                <option value="lb">lb</option>
+                              </select>
+                              <input
+                                className="cellInput cellInputNum"
+                                type="number"
+                                min="0"
+                                placeholder="uds/caja"
+                                value={box.unitsPerBox ?? ""}
+                                onChange={(e) =>
+                                  updateBox(
+                                    box,
+                                    "unitsPerBox",
+                                    e.target.value,
+                                  )
+                                }
+                              />
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="quoteBoxInfo">
+                            <b>
+                              {box.l
+                                ? `${box.l} × ${box.w} × ${box.h} ${box.unit}`
+                                : "Sin caja"}
+                            </b>
+                            <span>
+                              {box.weight || 0} {box.weightUnit || "kg"} ·{" "}
+                              {box.unitsPerBox || "—"} productos/caja
+                            </span>
+                          </div>
+                        )}
                       </article>
                     );
                   },
@@ -855,6 +1113,111 @@ function Detail({ id, type, onClose, onChanged }) {
               <strong>{money(edit ? routeTotal : data.total)}</strong>
             </div>
           </section>
+          {edit && (
+            <section className="internalBlock">
+              <header>
+                <div>
+                  <span>03</span>
+                  <h3>Tarifas de la cotización</h3>
+                </div>
+                <small>
+                  Cambia estas tarifas solo si necesitas recalcular el costo
+                  real de esta cotización
+                </small>
+              </header>
+              <div className="rateGridInline">
+                <label>
+                  <span>China → Miami ($/kg)</span>
+                  <input
+                    type="number"
+                    min="0"
+                    step="any"
+                    value={form.rates?.cnRate ?? ""}
+                    onChange={(e) => rr("cnRate", e.target.value)}
+                  />
+                </label>
+                <label>
+                  <span>Miami → Managua ($/lb)</span>
+                  <input
+                    type="number"
+                    min="0"
+                    step="any"
+                    value={form.rates?.miRate ?? ""}
+                    onChange={(e) => rr("miRate", e.target.value)}
+                  />
+                </label>
+                <label>
+                  <span>China → Managua ($/CBM)</span>
+                  <input
+                    type="number"
+                    min="0"
+                    step="any"
+                    value={form.rates?.cbmRate ?? ""}
+                    onChange={(e) => rr("cbmRate", e.target.value)}
+                  />
+                </label>
+                <label>
+                  <span>Divisor China</span>
+                  <input
+                    type="number"
+                    min="0"
+                    step="any"
+                    value={form.rates?.cnDivisor ?? ""}
+                    onChange={(e) => rr("cnDivisor", e.target.value)}
+                  />
+                </label>
+                <label>
+                  <span>Divisor Miami</span>
+                  <input
+                    type="number"
+                    min="0"
+                    step="any"
+                    value={form.rates?.miDivisor ?? ""}
+                    onChange={(e) => rr("miDivisor", e.target.value)}
+                  />
+                </label>
+                <label>
+                  <span>Máximo kg por CBM directo</span>
+                  <input
+                    type="number"
+                    min="0"
+                    step="any"
+                    value={form.rates?.directKgPerCbm ?? ""}
+                    onChange={(e) => rr("directKgPerCbm", e.target.value)}
+                  />
+                </label>
+                <label>
+                  <span>Tasa de cambio USD → C$</span>
+                  <input
+                    type="number"
+                    min="0"
+                    step="any"
+                    value={form.rates?.exchangeRate ?? ""}
+                    onChange={(e) => rr("exchangeRate", e.target.value)}
+                  />
+                </label>
+                <label>
+                  <span>Comisión (%)</span>
+                  <input
+                    type="number"
+                    min="0"
+                    step="any"
+                    value={form.totals?.feePercent ?? ""}
+                    onChange={(e) => ft("feePercent", e.target.value)}
+                  />
+                </label>
+              </div>
+              <label className="toggle rateGridMinCbm">
+                <input
+                  type="checkbox"
+                  checked={!!form.rates?.minCbm}
+                  onChange={(e) => rr("minCbm", e.target.checked)}
+                />
+                <span />
+                Cobrar mínimo 1 CBM en ruta directa
+              </label>
+            </section>
+          )}
           <section className="internalNotes">
             <h3>
               <StickyNote /> Notas
