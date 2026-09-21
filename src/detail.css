@@ -542,7 +542,7 @@
 }
 .clientProductHead.clientProductLogistics,
 .clientProductRow.clientProductLogistics {
-  grid-template-columns: minmax(200px, 1.6fr) 92px 92px 92px 92px;
+  grid-template-columns: minmax(190px, 1.4fr) 88px 88px 140px 92px;
   gap: 10px;
   align-items: center;
   padding: 13px 14px;
@@ -556,6 +556,15 @@
 .clientProductHead.clientProductLogistics > span {
   overflow-wrap: break-word;
   word-break: break-word;
+}
+.clientPriceHead small {
+  display: inline-block;
+  margin-top: 3px;
+  font-size: 9.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  color: rgba(255, 255, 255, 0.65);
 }
 .clientProductInfo {
   display: flex;
@@ -589,9 +598,17 @@
   display: grid;
   gap: 2px;
   text-align: right;
+  background: #c5ff35;
+  border-radius: 9px;
+  padding: 7px 10px;
+}
+.clientDualPrice b {
+  font-size: 17px;
+  font-weight: 900;
+  color: #0e2947;
 }
 .clientDualPrice small {
-  color: #168653;
+  color: #3a5a12;
   font-weight: 800;
 }
 .clientBoxSize {
@@ -657,7 +674,7 @@
   }
   .clientProductHead.clientProductLogistics,
   .clientProductRow.clientProductLogistics {
-    grid-template-columns: minmax(96px, 1.5fr) 56px 64px 62px;
+    grid-template-columns: minmax(90px, 1.5fr) 50px 80px 58px;
     gap: 6px;
     padding: 10px 8px;
     font-size: 10.5px;
@@ -669,6 +686,19 @@
   .clientPackNote {
     font-size: 9.5px;
   }
+  .clientDualPrice {
+    padding: 5px 6px;
+    border-radius: 7px;
+  }
+  .clientDualPrice b {
+    font-size: 13px;
+  }
+  .clientDualPrice small {
+    font-size: 9px;
+  }
+  .clientPriceHead small {
+    font-size: 8.5px;
+  }
 }
 @media print {
   .clientProductTableWrap {
@@ -679,7 +709,7 @@
   }
   .clientProductHead.clientProductLogistics,
   .clientProductRow.clientProductLogistics {
-    grid-template-columns: minmax(170px, 1.6fr) 78px 78px 78px 78px;
+    grid-template-columns: minmax(170px, 1.6fr) 78px 78px 108px 78px;
     gap: 8px;
     padding: 9px 10px;
     font-size: 10.5px;
@@ -692,6 +722,9 @@
   }
   .clientPackNote {
     font-size: 9px;
+  }
+  .clientDualPrice b {
+    font-size: 13.5px;
   }
   .clientSubtotal {
     font-size: 11.5px;

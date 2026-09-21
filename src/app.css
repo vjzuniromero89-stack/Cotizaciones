@@ -242,6 +242,21 @@
   color: #1fc98b;
   white-space: nowrap;
 }
+.productProfitBadge {
+  padding-left: 8px;
+  margin-left: 2px;
+  border-left: 1px solid color-mix(in srgb, var(--line) 60%, #24cc8a 15%);
+}
+.productProfitBadge.positive {
+  color: var(--lime, #22c979);
+}
+.productProfitBadge.negative {
+  color: #ff6b6b;
+}
+.productProfitBadge.pending {
+  color: var(--muted);
+  font-weight: 600;
+}
 .recordSide {
   text-align: right;
   display: grid;

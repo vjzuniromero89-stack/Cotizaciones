@@ -222,8 +222,10 @@ const recordProductPrices = (record, clientPrices) => {
                 : 0,
       shipping = selectedShipping * share,
       commission = (purchase * Number(totals.feePercent || 0)) / 100,
-      price = units ? (purchase + commission + shipping) / units : 0;
-    return { p, price, exchangeRate };
+      price = units ? (purchase + commission + shipping) / units : 0,
+      salePrice = Number(p.salePrice || 0),
+      profit = salePrice > 0 ? salePrice - price : null;
+    return { p, price, exchangeRate, profit };
   });
 };
 
@@ -370,7 +372,11 @@ function ClientQuote({ data, onClose, onDeleted }) {
               <span>Producto</span>
               <span>Unidades</span>
               <span>CBM</span>
-              <span>Precio por unidad</span>
+              <span className="clientPriceHead">
+                Precio por unidad
+                <br />
+                <small>Puesto en Nicaragua</small>
+              </span>
               <span>Subtotal</span>
             </div>
             {data.products?.length ? (
@@ -1462,16 +1468,33 @@ export default function RecordsPage({
                           (x.route === "miami" ? "Vía Miami" : "Vía directa")}
                     </p>
                     <div className="recordProductPrices">
-                      {productPrices.map(({ p, price, exchangeRate }, i) => (
-                        <div key={p.id || i}>
-                          <span>{p.name || "Producto"}</span>
-                          <b>
-                            {isClient ? "Venta" : "Costo"}: US${" "}
-                            {price.toFixed(2)} · C${" "}
-                            {(price * exchangeRate).toFixed(2)}
-                          </b>
-                        </div>
-                      ))}
+                      {productPrices.map(
+                        ({ p, price, exchangeRate, profit }, i) => (
+                          <div key={p.id || i}>
+                            <span>{p.name || "Producto"}</span>
+                            <b>
+                              {isClient ? "Venta" : "Costo"}: US${" "}
+                              {price.toFixed(2)} · C${" "}
+                              {(price * exchangeRate).toFixed(2)}
+                            </b>
+                            {!isClient &&
+                              (profit !== null ? (
+                                <b
+                                  className={
+                                    "productProfitBadge " +
+                                    (profit >= 0 ? "positive" : "negative")
+                                  }
+                                >
+                                  Ganancia: {money(profit)}
+                                </b>
+                              ) : (
+                                <b className="productProfitBadge pending">
+                                  Ganancia: pendiente
+                                </b>
+                              ))}
+                          </div>
+                        ),
+                      )}
                     </div>
                   </div>
                   <div className="recordSide">
