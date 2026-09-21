@@ -486,6 +486,12 @@ function CalculatorPage({ onSaved, initialCustomer }) {
               onChange={(v) => rr("directKgPerCbm", v)}
               suffix="kg"
             />
+            <Field
+              label="Tasa de cambio USD → C$"
+              value={rates.exchangeRate}
+              onChange={(v) => rr("exchangeRate", v)}
+              suffix="C$"
+            />
           </div>
           <label className="toggle">
             <input
@@ -520,7 +526,6 @@ function CalculatorPage({ onSaved, initialCustomer }) {
           rows: productRouteRows,
         }}
         exchangeRate={Number(rates.exchangeRate || 0)}
-        setExchangeRate={(value) => rr("exchangeRate", value)}
       />
       <section className="results">
         <div className="resultHead">

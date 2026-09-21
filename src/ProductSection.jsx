@@ -70,7 +70,6 @@ export default function ProductSection({
   shipping,
   routeDetails,
   exchangeRate,
-  setExchangeRate,
   catalogProducts = [],
 }) {
   const [selectedCatalog, setSelectedCatalog] = React.useState("");
@@ -113,20 +112,10 @@ export default function ProductSection({
     }
     const totalCost = purchase + commission + productShipping;
     const unitCost = units ? totalCost / units : 0;
-    const saleUnit = Number(p.salePrice) || 0;
-    const unitProfit = saleUnit - unitCost;
-    const totalProfit = unitProfit * units;
-    const profitPercent = unitCost ? (unitProfit / unitCost) * 100 : 0;
     return {
       p,
       units,
-      productShipping,
-      totalCost,
       unitCost,
-      saleUnit,
-      unitProfit,
-      totalProfit,
-      profitPercent,
     };
   });
   const update = (id, k, v) =>
@@ -433,40 +422,17 @@ export default function ProductSection({
       </button>
       <div className="liveProductPricing">
         <div className="livePricingHead">
-          <div>
-            <small>COSTO Y GANANCIA POR PRODUCTO</small>
-            <h3>Precio unitario puesto en Nicaragua</h3>
-          </div>
-          <div className="livePricingMeta">
-            <span>{routeDetails?.best === "miami" ? "Vía 1 · China–Miami–Managua" : "Vía 2 · China–Managua"}</span>
-            <label><small>Tasa USD → C$</small><input type="number" min="0.01" step="any" value={exchangeRate} onChange={(e) => setExchangeRate(e.target.value)} /></label>
-          </div>
+          <small>COSTO UNITARIO PUESTO EN NICARAGUA</small>
         </div>
         {pricingRows.map((row) => (
           <article className="livePricingRow" key={row.p.id}>
-            <div className="livePricingProduct">
-              <b>{row.p.name || "Producto"}</b>
-              <span>{row.units.toLocaleString()} unidades</span>
-              <small>
-                Producto + comisión + {money(row.productShipping)} / {cordobas(row.productShipping * exchangeRate)} de envío
-              </small>
+            <div className="livePricingImage">
+              {row.p.imageUrl ? <img src={row.p.imageUrl} alt="" /> : <PackagePlus />}
             </div>
-            <div className="livePricingCost">
-              <small>Costo total</small>
-              <b>{money(row.totalCost)} · {cordobas(row.totalCost * exchangeRate)}</b>
-              <span>Costo unitario: <strong>{money(row.unitCost)} · {cordobas(row.unitCost * exchangeRate)}</strong></span>
-            </div>
-            <label className="livePricingSale">
-              <small>Precio de venta por unidad</small>
-              <div><i>US$</i><input type="number" min="0" step="any" value={row.p.salePrice ?? ""} onChange={(e) => update(row.p.id, "salePrice", e.target.value)} placeholder="0.00" /></div>
-              <div><i>C$</i><input type="number" min="0" step="any" value={row.p.salePrice === "" || row.p.salePrice == null ? "" : (Number(row.p.salePrice) * exchangeRate).toFixed(2)} onChange={(e) => update(row.p.id, "salePrice", exchangeRate > 0 && e.target.value !== "" ? String(Number(e.target.value) / exchangeRate) : "")} placeholder="0.00" /></div>
-            </label>
-            <div className={"livePricingProfit " + (row.unitProfit >= 0 ? "positive" : "negative")}>
-              <small>Ganancia</small>
-              <b>{row.saleUnit ? `${money(row.unitProfit)} · ${cordobas(row.unitProfit * exchangeRate)} / unidad` : "—"}</b>
-              <strong>{row.saleUnit ? `${money(row.totalProfit)} · ${cordobas(row.totalProfit * exchangeRate)} total` : "—"}</strong>
-              <span>{row.saleUnit ? `${row.profitPercent >= 0 ? "+" : ""}${row.profitPercent.toFixed(2)}%` : "Escribe el precio de venta"}</span>
-            </div>
+            <b className="livePricingName">{row.p.name || "Producto"}</b>
+            <strong className="livePricingUnitCost">
+              {money(row.unitCost)} <span>·</span> {cordobas(row.unitCost * exchangeRate)}
+            </strong>
           </article>
         ))}
       </div>
