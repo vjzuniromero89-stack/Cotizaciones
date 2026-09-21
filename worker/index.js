@@ -751,6 +751,36 @@ async function handleApi(request, env, url) {
           route,
           total: Number(b.total) || 0,
         };
+        // Editar productos, cajas, tarifas y totales desde Cotizaciones
+        // internas (precio de venta, cantidades, medidas de caja, etc).
+        if (Array.isArray(b.products)) {
+          values.products = b.products.map((p) => ({
+            ...p,
+            qty: Number(p.qty) || 0,
+            price: Math.max(0, Number(p.price) || 0),
+            salePrice: Math.max(0, Number(p.salePrice) || 0),
+          }));
+        }
+        if (Array.isArray(b.boxes)) {
+          values.boxes = b.boxes.map((box) => ({
+            ...box,
+            qty: Number(box.qty) || 0,
+            l: Number(box.l) || 0,
+            w: Number(box.w) || 0,
+            h: Number(box.h) || 0,
+            weight: Number(box.weight) || 0,
+            unitsPerBox: Number(box.unitsPerBox) || 0,
+          }));
+        }
+        if (b.rates && typeof b.rates === "object") {
+          values.rates = b.rates;
+        }
+        if (b.totals && typeof b.totals === "object") {
+          values.totals = b.totals;
+        }
+        if (b.total_boxes !== undefined && Number.isFinite(Number(b.total_boxes))) {
+          values.total_boxes = Number(b.total_boxes) || 0;
+        }
         const row = await updateRecord(
           env,
           item[1],
