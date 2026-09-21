@@ -1115,6 +1115,24 @@
 .internalOverview svg {
   width: 14px;
 }
+.internalOverview input,
+.internalOverview select {
+  width: 100%;
+  border: 1px solid #343640;
+  border-radius: 8px;
+  padding: 8px 10px;
+  font: 800 14px Manrope;
+  background: var(--field);
+  color: #fff;
+}
+.internalOverview span input {
+  font: inherit;
+  font-size: 12px;
+  padding: 6px 9px;
+}
+.internalOverview input::placeholder {
+  color: #747b89;
+}
 .internalBlock {
   border: 1px solid var(--line);
   border-radius: 14px;
@@ -1378,13 +1396,16 @@
 .cellInput {
   width: 100%;
   min-width: 0;
-  border: 1px solid var(--line);
+  border: 1px solid #343640;
   border-radius: 6px;
   padding: 5px 6px;
   font: inherit;
   font-size: 12px;
-  background: #fff;
-  color: inherit;
+  background: var(--field);
+  color: #fff;
+}
+.cellInput::placeholder {
+  color: #747b89;
 }
 .cellInput:focus-visible {
   outline: 2px solid var(--blue, #1677ff);
@@ -1448,10 +1469,12 @@
   color: var(--muted);
 }
 .rateGridInline input {
-  border: 1px solid var(--line);
+  border: 1px solid #343640;
   border-radius: 8px;
   padding: 8px 10px;
   font: inherit;
+  background: var(--field);
+  color: #fff;
 }
 .rateGridMinCbm {
   margin: 0 16px 16px;
