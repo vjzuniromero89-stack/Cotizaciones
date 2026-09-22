@@ -156,6 +156,62 @@ async function updateRecord(env, id, values, extraFilter = "") {
   return rows[0] || null;
 }
 
+async function getSetting(env, key) {
+  const rows = await restRows(
+    env,
+    `app_settings?key=eq.${encodeURIComponent(key)}&select=value&limit=1`,
+  );
+  return rows[0]?.value ?? null;
+}
+async function setSetting(env, key, value) {
+  await rest(env, `app_settings?on_conflict=key`, {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+      Prefer: "resolution=merge-duplicates",
+    },
+    body: JSON.stringify({
+      key,
+      value,
+      updated_at: new Date().toISOString(),
+    }),
+  });
+}
+
+// Busca (o crea) el cliente que corresponde a este nombre + teléfono, y le
+// asigna un token para su enlace público "/portal/<token>" (su casillero).
+// El emparejamiento es el mismo que ya usa la página de Clientes: nombre y
+// teléfono, sin importar mayúsculas.
+async function upsertClient(env, name, phone) {
+  const cleanName = String(name || "").trim() || "Cliente sin nombre",
+    cleanPhone = String(phone || "").trim();
+  const existing = await restRows(
+    env,
+    `clients?name=ilike.${encodeURIComponent(cleanName)}&phone=eq.${encodeURIComponent(cleanPhone)}&select=*&limit=1`,
+  );
+  if (existing[0]) return existing[0];
+  const token = crypto.randomUUID().replace(/-/g, "");
+  try {
+    const rows = await restRows(env, "clients?select=*", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        Prefer: "return=representation",
+      },
+      body: JSON.stringify({ name: cleanName, phone: cleanPhone, token }),
+    });
+    return rows[0];
+  } catch (error) {
+    // Otra solicitud pudo haber creado el mismo cliente al mismo tiempo.
+    const again = await restRows(
+      env,
+      `clients?name=ilike.${encodeURIComponent(cleanName)}&phone=eq.${encodeURIComponent(cleanPhone)}&select=*&limit=1`,
+    );
+    if (again[0]) return again[0];
+    throw error;
+  }
+}
+
 async function createProductImagesBucket(env) {
   const response = await supabaseFetch(env, "/storage/v1/bucket", {
     method: "POST",
@@ -267,6 +323,27 @@ async function handleApi(request, env, url) {
         },
       });
     }
+    // Enlace público del cliente ("casillero"): no requiere iniciar sesión,
+    // solo conocer el token de su enlace.
+    const portal = url.pathname.match(/^\/api\/portal\/([^/]+)$/);
+    if (portal && request.method === "GET") {
+      const clients = await restRows(
+        env,
+        `clients?token=eq.${encodeURIComponent(portal[1])}&select=*&limit=1`,
+      );
+      const client = clients[0];
+      if (!client) return json({ error: "Enlace no válido" }, 404);
+      const quotes = await restRows(
+        env,
+        `records?record_type=eq.quote&customer_name=ilike.${encodeURIComponent(
+          client.name,
+        )}&phone=eq.${encodeURIComponent(client.phone)}&select=*&order=created_at.desc`,
+      );
+      return json({
+        client: { name: client.name, phone: client.phone },
+        quotes,
+      });
+    }
     const publicFile =
       request.method === "GET" && /^\/api\/files\//.test(url.pathname);
     const currentUser = publicFile
@@ -347,6 +424,54 @@ async function handleApi(request, env, url) {
       );
       if (!r.ok) throw new Error(await r.text());
       return json({ ok: true });
+    }
+    if (
+      url.pathname === "/api/settings/internal-pin" &&
+      request.method === "GET"
+    ) {
+      const pin = await getSetting(env, "internal_pin");
+      return json({ configured: Boolean(pin) });
+    }
+    if (
+      url.pathname === "/api/settings/internal-pin/verify" &&
+      request.method === "POST"
+    ) {
+      const b = await request.json(),
+        code = String(b.code || ""),
+        pin = await getSetting(env, "internal_pin");
+      if (!pin)
+        return json(
+          { error: "Aún no se ha configurado el código de acceso" },
+          409,
+        );
+      if (code !== pin) return json({ error: "Código incorrecto" }, 401);
+      return json({ ok: true });
+    }
+    if (
+      url.pathname === "/api/settings/internal-pin" &&
+      request.method === "PUT"
+    ) {
+      if (currentUser.app_metadata?.role !== "admin")
+        return json(
+          { error: "Solo el administrador puede cambiar el código de acceso" },
+          403,
+        );
+      const b = await request.json(),
+        code = String(b.code || "");
+      if (!/^\d{4}$/.test(code))
+        return json({ error: "El código debe ser de 4 dígitos" }, 400);
+      const existing = await getSetting(env, "internal_pin");
+      if (existing && String(b.currentCode || "") !== existing)
+        return json({ error: "El código actual no es correcto" }, 401);
+      await setSetting(env, "internal_pin", code);
+      return json({ ok: true });
+    }
+    if (url.pathname === "/api/clients/link" && request.method === "POST") {
+      const b = await request.json();
+      if (!String(b.name || "").trim())
+        return json({ error: "Falta el nombre del cliente" }, 400);
+      const client = await upsertClient(env, b.name, b.phone);
+      return json({ token: client.token });
     }
     const upload = url.pathname.match(/^\/api\/uploads\/([^/]+)$/);
     if (upload && request.method === "PUT") {
@@ -530,6 +655,14 @@ async function handleApi(request, env, url) {
           notes: b.notes || "",
         }),
       });
+      try {
+        await upsertClient(env, b.customer, b.phone);
+      } catch (error) {
+        console.warn(
+          "No se pudo registrar el cliente",
+          String(error.message || error),
+        );
+      }
       return json(
         { id, number, internalTotal, saleTotal, profit, profitPercent },
         201,
@@ -667,6 +800,14 @@ async function handleApi(request, env, url) {
           notes: b.notes || source.notes || "",
         }),
       });
+      try {
+        await upsertClient(env, b.customer, b.phone);
+      } catch (error) {
+        console.warn(
+          "No se pudo registrar el cliente",
+          String(error.message || error),
+        );
+      }
       return json({ id, number, saleTotal, internalTotal }, 201);
     }
 

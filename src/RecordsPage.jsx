@@ -229,7 +229,7 @@ const recordProductPrices = (record, clientPrices) => {
   });
 };
 
-function ClientQuote({ data, onClose, onDeleted }) {
+export function ClientQuote({ data, onClose, onDeleted, publicMode, closeLabel }) {
   const [preview, setPreview] = useState(false);
   const [sharing, setSharing] = useState(false);
   const printRef = useRef(null);
@@ -313,11 +313,13 @@ function ClientQuote({ data, onClose, onDeleted }) {
           ) : (
             <>
               <button onClick={onClose}>
-                <X /> Cerrar
+                <X /> {closeLabel || "Cerrar"}
               </button>
-              <button className="clientDelete" onClick={deleteQuote}>
-                <Trash2 /> Eliminar
-              </button>
+              {!publicMode && (
+                <button className="clientDelete" onClick={deleteQuote}>
+                  <Trash2 /> Eliminar
+                </button>
+              )}
               <button className="viewClientQuote" onClick={() => setPreview(true)}>
                 <Eye /> Ver cotización
               </button>
@@ -485,7 +487,7 @@ function ClientQuote({ data, onClose, onDeleted }) {
   );
 }
 
-function ClientDetail({ id, onClose, onDeleted }) {
+export function ClientDetail({ id, onClose, onDeleted }) {
   const [data, setData] = useState(null);
   useEffect(() => {
     api("/records/" + id).then(setData);

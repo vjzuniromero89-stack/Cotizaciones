@@ -7,23 +7,58 @@ import {
   Plus,
   X,
   CalendarDays,
+  Link2,
+  Check,
 } from "lucide-react";
 import "./clients.css";
 import { authFetch } from "./auth.js";
+import { ClientDetail as QuoteReceipt } from "./RecordsPage.jsx";
 
 const money = (n) =>
   new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(
     n || 0,
   );
-async function api(path) {
-  const r = await authFetch("/api" + path);
-  if (!r.ok) throw new Error("No se pudieron cargar los clientes");
-  return r.json();
+async function api(path, options) {
+  const r = await authFetch("/api" + path, {
+    headers: { "content-type": "application/json" },
+    ...options,
+  });
+  const data = r.status === 204 ? null : await r.json().catch(() => ({}));
+  if (!r.ok)
+    throw new Error(data?.error || "No se pudieron cargar los clientes");
+  return data;
 }
 const quoteTotal = (q) =>
   Number(q.totals?.saleTotal ?? q.sale_total ?? q.total ?? 0);
 
 function ClientDetail({ client, onClose, onCreate }) {
+  const [openQuote, setOpenQuote] = useState(null),
+    [linkBusy, setLinkBusy] = useState(false),
+    [linkCopied, setLinkCopied] = useState(false),
+    [linkError, setLinkError] = useState("");
+  async function copyLink() {
+    setLinkBusy(true);
+    setLinkError("");
+    setLinkCopied(false);
+    try {
+      const { token } = await api("/clients/link", {
+        method: "POST",
+        body: JSON.stringify({ name: client.name, phone: client.phone }),
+      });
+      const url = `${window.location.origin}/portal/${token}`;
+      try {
+        await navigator.clipboard.writeText(url);
+      } catch {
+        window.prompt("Copia el enlace del cliente:", url);
+      }
+      setLinkCopied(true);
+      setTimeout(() => setLinkCopied(false), 2500);
+    } catch (e) {
+      setLinkError(e.message || "No se pudo crear el enlace");
+    } finally {
+      setLinkBusy(false);
+    }
+  }
   return (
     <div
       className="overlay"
@@ -45,9 +80,24 @@ function ClientDetail({ client, onClose, onCreate }) {
             <X />
           </button>
         </div>
-        <button className="newClientQuote" onClick={() => onCreate(client)}>
-          <Plus /> Crear nueva cotización para este cliente
-        </button>
+        <div className="clientDetailActions">
+          <button className="newClientQuote" onClick={() => onCreate(client)}>
+            <Plus /> Crear nueva cotización para este cliente
+          </button>
+          <button
+            className="clientPortalLink"
+            disabled={linkBusy}
+            onClick={copyLink}
+          >
+            {linkCopied ? <Check /> : <Link2 />}
+            {linkBusy
+              ? "Preparando…"
+              : linkCopied
+                ? "Enlace copiado"
+                : "Copiar enlace para el cliente"}
+          </button>
+        </div>
+        {linkError && <div className="saveError">{linkError}</div>}
         <div className="clientStats">
           <div>
             <span>Cotizaciones</span>
@@ -63,7 +113,11 @@ function ClientDetail({ client, onClose, onCreate }) {
             <FileText /> Historial de cotizaciones
           </h3>
           {client.quotes.map((q) => (
-            <article key={q.id}>
+            <article
+              key={q.id}
+              className="clientHistoryRow"
+              onClick={() => setOpenQuote(q.id)}
+            >
               <div>
                 <b>{q.number || "Cotización"}</b>
                 <span>{q.description || "Sin descripción"}</span>
@@ -78,6 +132,13 @@ function ClientDetail({ client, onClose, onCreate }) {
           ))}
         </div>
       </section>
+      {openQuote && (
+        <QuoteReceipt
+          id={openQuote}
+          onClose={() => setOpenQuote(null)}
+          onDeleted={() => setOpenQuote(null)}
+        />
+      )}
     </div>
   );
 }
