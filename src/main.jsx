@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { createRoot } from "react-dom/client";
 import {
   Ship,
@@ -19,7 +19,6 @@ import {
   Users,
   LogOut,
   UserCog,
-  Lock,
 } from "lucide-react";
 import "./style.css";
 import "./route-breakdown.css";
@@ -842,117 +841,13 @@ function RouteTwo({ r, rates, onCbmRateChange }) {
     </article>
   );
 }
-function PinGate({ label, currentUser, onGoToUsers, onUnlock }) {
-  const [digits, setDigits] = useState(["", "", "", ""]),
-    [configured, setConfigured] = useState(null),
-    [error, setError] = useState(""),
-    [busy, setBusy] = useState(false);
-  const inputsRef = useRef([]);
-  useEffect(() => {
-    authFetch("/api/settings/internal-pin")
-      .then((r) => (r.ok ? r.json() : { configured: true }))
-      .then((d) => setConfigured(Boolean(d.configured)))
-      .catch(() => setConfigured(true));
-  }, []);
-  useEffect(() => {
-    if (configured) inputsRef.current[0]?.focus();
-  }, [configured]);
-  async function submit(code) {
-    setBusy(true);
-    setError("");
-    try {
-      const r = await authFetch("/api/settings/internal-pin/verify", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ code }),
-      });
-      const d = await r.json().catch(() => ({}));
-      if (!r.ok) throw new Error(d.error || "Código incorrecto");
-      onUnlock();
-    } catch (e) {
-      setError(e.message || "Código incorrecto");
-      setDigits(["", "", "", ""]);
-      inputsRef.current[0]?.focus();
-    } finally {
-      setBusy(false);
-    }
-  }
-  function setDigit(i, raw) {
-    const clean = raw.replace(/\D/g, "").slice(-1);
-    const next = [...digits];
-    next[i] = clean;
-    setDigits(next);
-    setError("");
-    if (clean && i < 3) inputsRef.current[i + 1]?.focus();
-    if (clean && next.every((d) => d !== "")) submit(next.join(""));
-  }
-  function onKeyDown(i, e) {
-    if (e.key === "Backspace" && !digits[i] && i > 0)
-      inputsRef.current[i - 1]?.focus();
-  }
-  if (configured === false)
-    return (
-      <div className="pinGateOverlay">
-        <div className="pinGateCard">
-          <div className="pinGateIcon">
-            <Lock />
-          </div>
-          <h2>Código de acceso no configurado</h2>
-          <p>
-            {currentUser?.role === "admin"
-              ? "Crea el código de 4 dígitos en Usuarios para poder entrar aquí."
-              : "Pide a un administrador que cree el código de acceso en Usuarios."}
-          </p>
-          {currentUser?.role === "admin" && (
-            <button className="pinGateGoUsers" onClick={onGoToUsers}>
-              Ir a Usuarios
-            </button>
-          )}
-        </div>
-      </div>
-    );
-  return (
-    <div className="pinGateOverlay">
-      <div className="pinGateCard">
-        <div className="pinGateIcon">
-          <Lock />
-        </div>
-        <h2>{label}</h2>
-        <p>Escribe el código de acceso de 4 dígitos</p>
-        <div className="pinDigits">
-          {digits.map((d, i) => (
-            <input
-              key={i}
-              ref={(el) => (inputsRef.current[i] = el)}
-              type="password"
-              inputMode="numeric"
-              autoComplete="off"
-              maxLength="1"
-              value={d}
-              disabled={busy || configured === null}
-              onChange={(e) => setDigit(i, e.target.value)}
-              onKeyDown={(e) => onKeyDown(i, e)}
-            />
-          ))}
-        </div>
-        {error && <div className="pinGateError">{error}</div>}
-      </div>
-    </div>
-  );
-}
 function App() {
   const [page, setPage] = useState("calculator"),
     [refresh, setRefresh] = useState(0),
     [quoteCustomer, setQuoteCustomer] = useState(null),
     [currentUser, setCurrentUser] = useState(null),
     [authLoading, setAuthLoading] = useState(true),
-    [needsSetup, setNeedsSetup] = useState(false),
-    [pinUnlocked, setPinUnlocked] = useState(false);
-  // "Cotizaciones internas" y "Órdenes" muestran costos y ganancias, así
-  // que piden el código de acceso cada vez que se entra a esa sección.
-  useEffect(() => {
-    setPinUnlocked(false);
-  }, [page]);
+    [needsSetup, setNeedsSetup] = useState(false);
   useEffect(() => {
     const session = getSession();
     Promise.all([
@@ -1041,13 +936,6 @@ function App() {
           <ProfitPage refreshKey={refresh} />
         ) : page === "users" && currentUser.role === "admin" ? (
           <UsersPage />
-        ) : (page === "quotes" || page === "orders") && !pinUnlocked ? (
-          <PinGate
-            label={page === "quotes" ? "Cotizaciones internas" : "Órdenes"}
-            currentUser={currentUser}
-            onGoToUsers={() => navigate("users")}
-            onUnlock={() => setPinUnlocked(true)}
-          />
         ) : (
           <RecordsPage
             type={recordType}
