@@ -156,28 +156,6 @@ async function updateRecord(env, id, values, extraFilter = "") {
   return rows[0] || null;
 }
 
-async function getSetting(env, key) {
-  const rows = await restRows(
-    env,
-    `app_settings?key=eq.${encodeURIComponent(key)}&select=value&limit=1`,
-  );
-  return rows[0]?.value ?? null;
-}
-async function setSetting(env, key, value) {
-  await rest(env, `app_settings?on_conflict=key`, {
-    method: "POST",
-    headers: {
-      "content-type": "application/json",
-      Prefer: "resolution=merge-duplicates",
-    },
-    body: JSON.stringify({
-      key,
-      value,
-      updated_at: new Date().toISOString(),
-    }),
-  });
-}
-
 // Busca (o crea) el cliente que corresponde a este nombre + teléfono, y le
 // asigna un token para su enlace público "/portal/<token>" (su casillero).
 // El emparejamiento es el mismo que ya usa la página de Clientes: nombre y
@@ -423,47 +401,6 @@ async function handleApi(request, env, url) {
         },
       );
       if (!r.ok) throw new Error(await r.text());
-      return json({ ok: true });
-    }
-    if (
-      url.pathname === "/api/settings/internal-pin" &&
-      request.method === "GET"
-    ) {
-      const pin = await getSetting(env, "internal_pin");
-      return json({ configured: Boolean(pin) });
-    }
-    if (
-      url.pathname === "/api/settings/internal-pin/verify" &&
-      request.method === "POST"
-    ) {
-      const b = await request.json(),
-        code = String(b.code || ""),
-        pin = await getSetting(env, "internal_pin");
-      if (!pin)
-        return json(
-          { error: "Aún no se ha configurado el código de acceso" },
-          409,
-        );
-      if (code !== pin) return json({ error: "Código incorrecto" }, 401);
-      return json({ ok: true });
-    }
-    if (
-      url.pathname === "/api/settings/internal-pin" &&
-      request.method === "PUT"
-    ) {
-      if (currentUser.app_metadata?.role !== "admin")
-        return json(
-          { error: "Solo el administrador puede cambiar el código de acceso" },
-          403,
-        );
-      const b = await request.json(),
-        code = String(b.code || "");
-      if (!/^\d{4}$/.test(code))
-        return json({ error: "El código debe ser de 4 dígitos" }, 400);
-      const existing = await getSetting(env, "internal_pin");
-      if (existing && String(b.currentCode || "") !== existing)
-        return json({ error: "El código actual no es correcto" }, 401);
-      await setSetting(env, "internal_pin", code);
       return json({ ok: true });
     }
     if (url.pathname === "/api/clients/link" && request.method === "POST") {
