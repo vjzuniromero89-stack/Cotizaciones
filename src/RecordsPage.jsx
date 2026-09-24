@@ -1472,7 +1472,26 @@ export default function RecordsPage({
                     <div className="recordProductPrices">
                       {productPrices.map(
                         ({ p, price, exchangeRate, profit }, i) => (
-                          <div key={p.id || i}>
+                          <div
+                            key={p.id || i}
+                            className={isClient ? undefined : "withPhoto"}
+                          >
+                            {!isClient &&
+                              (p.imageUrl ? (
+                                <img
+                                  className="recordProductThumb"
+                                  src={p.imageUrl}
+                                  alt={p.name || "Producto"}
+                                  loading="lazy"
+                                />
+                              ) : (
+                                <i
+                                  className="recordProductThumb noPhoto"
+                                  title="Sin foto"
+                                >
+                                  <Package size={18} />
+                                </i>
+                              ))}
                             <span>{p.name || "Producto"}</span>
                             <b>
                               {isClient ? "Venta" : "Costo"}: US${" "}
