@@ -299,17 +299,18 @@ function SaveDialog({
                       onChange={(e) => updateSale(p.id, e.target.value)}
                     />
                   </div>
-                  {saleUnit > 0 ? (
-                    <>
-                      <em>{cordobas(saleUnit)} por unidad</em>
-                      <span>
-                        Venta total: {money(saleTotal)} · {cordobas(saleTotal)}
-                      </span>
-                    </>
-                  ) : (
-                    <span>Escribe el precio de venta</span>
-                  )}
+                  <span>Escribe el precio de venta</span>
                 </label>
+                <div className="pricingCost pricingSaleShown">
+                  <small>Precio de venta</small>
+                  <strong>{saleUnit > 0 ? money(saleUnit) : "—"}</strong>
+                  <em>{saleUnit > 0 ? cordobas(saleUnit) : "—"}</em>
+                  <span>
+                    {saleUnit > 0
+                      ? `Venta total: ${money(saleTotal)} · ${cordobas(saleTotal)}`
+                      : "por unidad"}
+                  </span>
+                </div>
                 <div
                   className={
                     unitProfit >= 0

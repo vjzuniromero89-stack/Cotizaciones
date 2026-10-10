@@ -134,6 +134,10 @@ export default function ProductSection({
       p,
       units,
       unitCost,
+      purchase,
+      commission,
+      productShipping,
+      totalCost,
     };
   });
   const update = (id, k, v) =>
@@ -463,7 +467,14 @@ export default function ProductSection({
             <div className="livePricingImage">
               {row.p.imageUrl ? <img src={row.p.imageUrl} alt="" /> : <PackagePlus />}
             </div>
-            <b className="livePricingName">{row.p.name || "Producto"}</b>
+            <div className="livePricingName">
+              <b>{row.p.name || "Producto"}</b>
+              <small>
+                Producto {money(row.purchase)} + Comisión{" "}
+                {money(row.commission)} + Flete {money(row.productShipping)} ={" "}
+                {money(row.totalCost)} ÷ {row.units.toLocaleString()} unidades
+              </small>
+            </div>
             <strong className="livePricingUnitCost">
               {unitDollars(row.unitCost)} <span>·</span> {cordobas(row.unitCost * exchangeRate)}
             </strong>
