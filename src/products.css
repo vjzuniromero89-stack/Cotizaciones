@@ -298,7 +298,7 @@
 }
 .quotationCbmTotals {
   display: grid;
-  grid-template-columns: 1.2fr 1fr 1fr;
+  grid-template-columns: 1.2fr 1fr 1fr 1fr;
   gap: 10px;
   margin-top: 18px;
   padding: 12px;
@@ -442,8 +442,14 @@
   grid-template-columns: repeat(8, minmax(0, 1fr));
   margin: 0;
 }
+.productResultRow {
+  grid-column: 1/-1;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 9px;
+}
 .singleBoxInfo .productCbmResult {
-  grid-column: span 4;
+  grid-column: auto;
   min-width: 0;
 }
 .singleBoxInfo .productBoxEditor label:first-child {
@@ -568,9 +574,6 @@
   .singleBoxInfo .productBoxEditor {
     grid-template-columns: repeat(4, 1fr);
   }
-  .singleBoxInfo .productCbmResult {
-    grid-column: span 2;
-  }
 }
 @media (max-width: 560px) {
   .singleBoxInfo {
@@ -579,8 +582,8 @@
   .singleBoxInfo .productBoxEditor {
     grid-template-columns: repeat(2, 1fr);
   }
-  .singleBoxInfo .productCbmResult {
-    grid-column: span 1;
+  .productResultRow {
+    grid-template-columns: 1fr;
   }
   .singleBoxInfo .productBoxEditor label:first-child {
     grid-column: auto;

@@ -20,7 +20,7 @@ import {
 } from "lucide-react";
 import "./detail.css";
 import "./product-detail.css";
-import { calculate } from "./calculate.js";
+import { calculate, exchangeRateOf } from "./calculate.js";
 import { authFetch } from "./auth.js";
 
 const money = (n) =>
@@ -166,7 +166,7 @@ const recordProductPrices = (record, clientPrices) => {
     totals = record.totals || {},
     rates = record.rates || {},
     boxes = record.boxes || [],
-    exchangeRate = Number(rates.exchangeRate || 36.62),
+    exchangeRate = exchangeRateOf(rates),
     selectedShipping =
       record.route === "miami"
         ? Number(totals.viaMiami || 0)

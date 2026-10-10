@@ -580,3 +580,6 @@ option {
 .productLandedTotal {
   color: #fff;
 }
+.calculatorProductPricing em {
+  color: #3be090;
+}

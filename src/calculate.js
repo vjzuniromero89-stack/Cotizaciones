@@ -1,5 +1,12 @@
 export const KG_TO_LB = 2.2046226218,
   IN3_TO_M3 = 0.000016387064;
+// Tasa de la casa: C$37 por dólar. Las cotizaciones guardadas con la tasa
+// anterior (36.62) se muestran también a 37.
+export const DEFAULT_EXCHANGE_RATE = 37;
+export const exchangeRateOf = (rates) => {
+  const rate = Number(rates?.exchangeRate);
+  return !rate || rate === 36.62 ? DEFAULT_EXCHANGE_RATE : rate;
+};
 const num = (v, f = 0) => (Number.isFinite(+v) ? +v : f);
 export function calculate(boxes, rates) {
   let actualKg = 0,

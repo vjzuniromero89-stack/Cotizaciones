@@ -1,5 +1,6 @@
 import React from "react";
 import { authFetch } from "./auth.js";
+import { shrinkImage } from "./image.js";
 import { Plus, Trash2, ImagePlus, PackagePlus } from "lucide-react";
 import "./products.css";
 const money = (n) =>
@@ -66,6 +67,15 @@ const boxWeightCbm = (box) => {
   const totalKg = box.weightUnit === "lb" ? totalWeight / 2.2046226218 : totalWeight;
   return totalKg / 350;
 };
+const boxWeightKg = (box) => {
+  const totalWeight = (Number(box.weight) || 0) * (Number(box.qty) || 0);
+  return box.weightUnit === "lb" ? totalWeight / 2.2046226218 : totalWeight;
+};
+const weightNumber = (n) =>
+  new Intl.NumberFormat("en-US", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(n || 0);
 export default function ProductSection({
   products,
   setProducts,
@@ -95,6 +105,10 @@ export default function ProductSection({
     ),
     totalWeightCbm = products.reduce(
       (sum, p) => sum + (p.boxes || []).reduce((n, b) => n + boxWeightCbm(b), 0),
+      0,
+    ),
+    totalWeightKg = products.reduce(
+      (sum, p) => sum + (p.boxes || []).reduce((n, b) => n + boxWeightKg(b), 0),
       0,
     );
   const pricingRows = products.map((p) => {
@@ -169,8 +183,9 @@ export default function ProductSection({
     );
     setSelectedCatalog("");
   };
-  async function upload(id, file) {
-    if (!file) return;
+  async function upload(id, original) {
+    if (!original) return;
+    const file = await shrinkImage(original);
     if (file.size > 5 * 1024 * 1024) {
       alert("La foto debe pesar menos de 5 MB");
       return;
@@ -382,15 +397,25 @@ export default function ProductSection({
                       <option value="lb">Libras</option>
                     </select>
                   </label>
-                  <div className="productCbmResult volume">
-                    <span>CBM por volumen</span>
-                    <strong>{volumeCbm.toFixed(4)} CBM</strong>
-                    <small>Medidas × cajas</small>
-                  </div>
-                  <div className="productCbmResult weight">
-                    <span>CBM por peso</span>
-                    <strong>{weightCbm.toFixed(4)} CBM</strong>
-                    <small>Peso total kg ÷ 350</small>
+                  <div className="productResultRow">
+                    <div className="productCbmResult volume">
+                      <span>CBM por volumen</span>
+                      <strong>{volumeCbm.toFixed(4)} CBM</strong>
+                      <small>Medidas × cajas</small>
+                    </div>
+                    <div className="productCbmResult weight">
+                      <span>CBM por peso</span>
+                      <strong>{weightCbm.toFixed(4)} CBM</strong>
+                      <small>Peso total kg ÷ 350</small>
+                    </div>
+                    <div className="productCbmResult weight">
+                      <span>Peso total</span>
+                      <strong>{weightNumber(boxWeightKg(b))} kg</strong>
+                      <small>
+                        {weightNumber(boxWeightKg(b) * 2.2046226218)} lb ·
+                        peso/caja × cajas
+                      </small>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -416,6 +441,11 @@ export default function ProductSection({
           <span>CBM total por peso</span>
           <strong>{totalWeightCbm.toFixed(4)} CBM</strong>
           <small>Peso total en kg ÷ 350</small>
+        </div>
+        <div className="quotationCbmTotal weight">
+          <span>Peso total</span>
+          <strong>{weightNumber(totalWeightKg)} kg</strong>
+          <small>{weightNumber(totalWeightKg * 2.2046226218)} lb en total</small>
         </div>
       </div>
       <button

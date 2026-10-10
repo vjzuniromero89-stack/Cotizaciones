@@ -23,7 +23,7 @@ import {
 import "./style.css";
 import "./route-breakdown.css";
 import "./app.css";
-import { calculate } from "./calculate.js";
+import { calculate, exchangeRateOf } from "./calculate.js";
 import RecordsPage from "./RecordsPage.jsx";
 import WeightBreakdown from "./WeightBreakdown.jsx";
 import ProductSection, { blankProduct } from "./ProductSection.jsx";
@@ -48,7 +48,7 @@ const initialRates = {
   miDivisor: 166,
   minCbm: true,
   directKgPerCbm: 350,
-  exchangeRate: 36.62,
+  exchangeRate: 37,
 };
 const statusLabel = {
   pending: "Pendiente",
@@ -148,6 +148,12 @@ function SaveDialog({
   const [busy, setBusy] = useState(false),
     [error, setError] = useState("");
   const change = (k, v) => setForm((x) => ({ ...x, [k]: v }));
+  const exchangeRate = exchangeRateOf(rates),
+    cordobas = (n) =>
+      `C$ ${new Intl.NumberFormat("en-US", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      }).format((n || 0) * exchangeRate)}`;
   const internalTotal =
     form.selectedRoute === "miami" ? result.landedMiami : result.landedDirect;
   const totalCbm = Number(result.cbm || 0),
@@ -275,6 +281,7 @@ function SaveDialog({
                 <div className="pricingCost">
                   <small>Costo real por unidad</small>
                   <strong>{money(unitCost)}</strong>
+                  <em>{cordobas(unitCost)}</em>
                   <span>
                     {money(totalCost)} ÷ {Number(p.qty || 0).toLocaleString()}
                   </span>
@@ -292,11 +299,16 @@ function SaveDialog({
                       onChange={(e) => updateSale(p.id, e.target.value)}
                     />
                   </div>
-                  <span>
-                    {saleUnit > 0
-                      ? `${money(saleTotal)} venta total`
-                      : "Escribe el precio de venta"}
-                  </span>
+                  {saleUnit > 0 ? (
+                    <>
+                      <em>{cordobas(saleUnit)} por unidad</em>
+                      <span>
+                        Venta total: {money(saleTotal)} · {cordobas(saleTotal)}
+                      </span>
+                    </>
+                  ) : (
+                    <span>Escribe el precio de venta</span>
+                  )}
                 </label>
                 <div
                   className={
@@ -307,6 +319,7 @@ function SaveDialog({
                 >
                   <small>Ganancia por unidad</small>
                   <strong>{saleUnit > 0 ? money(unitProfit) : "—"}</strong>
+                  {saleUnit > 0 && <em>{cordobas(unitProfit)}</em>}
                   <span>
                     {saleUnit > 0
                       ? `${profitPercent >= 0 ? "+" : ""}${profitPercent.toFixed(2)}%`
@@ -320,15 +333,21 @@ function SaveDialog({
         <div className="quoteTotals">
           <div>
             <span>Costo interno</span>
-            <b>{money(internalTotal)}</b>
+            <b>
+              {money(internalTotal)} · {cordobas(internalTotal)}
+            </b>
           </div>
           <div>
             <span>Venta al cliente · envío incluido</span>
-            <b>{money(saleTotal)}</b>
+            <b>
+              {money(saleTotal)} · {cordobas(saleTotal)}
+            </b>
           </div>
           <div className={profit >= 0 ? "profitPositive" : "profitNegative"}>
             <span>Ganancia estimada</span>
-            <strong>{money(profit)}</strong>
+            <strong>
+              {money(profit)} · {cordobas(profit)}
+            </strong>
           </div>
           <div
             className={
@@ -526,7 +545,7 @@ function CalculatorPage({ onSaved, initialCustomer }) {
               : Number(r.cbm || 0),
           rows: productRouteRows,
         }}
-        exchangeRate={Number(rates.exchangeRate || 0)}
+        exchangeRate={exchangeRateOf(rates)}
       />
       <section className="results">
         <div className="resultHead">

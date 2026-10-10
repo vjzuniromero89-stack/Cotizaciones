@@ -1285,6 +1285,14 @@
 .pricingProfit strong {
   font: 900 20px Manrope;
 }
+.calculatorProductPricing em {
+  font-style: normal;
+  font: 800 13px Manrope;
+  color: #148d58;
+}
+.calculatorProductPricing .pricingProfit.negative em {
+  color: #c4352b;
+}
 .pricingSale {
   background: #e7f9ef;
   border-radius: 9px;

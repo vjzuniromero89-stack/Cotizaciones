@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import "./products-page.css";
 import { authFetch } from "./auth.js";
+import { shrinkImage } from "./image.js";
 
 const money = (n) =>
   new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(
@@ -458,10 +459,12 @@ function RegisterProductDialog({ onClose, onSaved, product = null }) {
       ...x,
       boxes: x.boxes.map((b) => (b.id === id ? { ...b, [k]: v } : b)),
     }));
-  async function upload(file) {
-    if (!file) return;
+  async function upload(original) {
+    if (!original) return;
     setBusy(true);
+    setError("");
     try {
+      const file = await shrinkImage(original);
       const key =
         crypto.randomUUID() + "-" + file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
       const r = await authFetch("/api/uploads/" + key, {
@@ -469,11 +472,14 @@ function RegisterProductDialog({ onClose, onSaved, product = null }) {
         headers: { "content-type": file.type || "application/octet-stream" },
         body: file,
       });
-      const data = await r.json();
-      if (!r.ok) throw new Error(data.error || data.detail);
+      const data = await r.json().catch(() => ({}));
+      if (!r.ok)
+        throw new Error(
+          data.error || data.detail || "No se pudo subir la foto",
+        );
       update("imageUrl", data.url);
     } catch (e) {
-      setError(e.message);
+      setError(e.message || "No se pudo subir la foto");
     } finally {
       setBusy(false);
     }
