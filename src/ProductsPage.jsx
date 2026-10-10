@@ -682,7 +682,6 @@ function CatalogSection({ refreshKey, onCatalogChanged }) {
     <section className="catalogSection">
       <div className="catalogTitle">
         <div>
-          <small>CATÁLOGO PERMANENTE</small>
           <h2>Mis productos</h2>
           <p>Cada producto conserva su foto, precio y sus propias cajas.</p>
         </div>
@@ -872,7 +871,7 @@ export default function ProductsPage({ refreshKey, onChange }) {
           <h1>Productos</h1>
           <p>
             Registra y administra tus productos. Los cálculos se realizan
-            únicamente en la pestaña Calcular.
+            únicamente en la pestaña Crear cotización.
           </p>
         </div>
         <button className="newProduct" onClick={() => setRegistering(true)}>

@@ -849,7 +849,7 @@ function Detail({ id, type, onClose, onChanged }) {
                           )}
                           <div>
                             {edit ? (
-                              <input
+                              <label className="boxField"><span>Nombre del producto</span><input
                                 className="cellInput"
                                 value={p.name || ""}
                                 onChange={(e) =>
@@ -859,13 +859,13 @@ function Detail({ id, type, onClose, onChanged }) {
                                     e.target.value,
                                   )
                                 }
-                              />
+                              /></label>
                             ) : (
                               <b>{p.name || "Producto"}</b>
                             )}
                             {edit ? (
                               <span className="cellInputRow">
-                                <input
+                                <label className="boxField"><span>Unidades</span><input
                                   className="cellInput cellInputNum"
                                   type="number"
                                   min="0"
@@ -877,9 +877,9 @@ function Detail({ id, type, onClose, onChanged }) {
                                       e.target.value,
                                     )
                                   }
-                                />
-                                <span>uds ×</span>
-                                <input
+                                /></label>
+                                
+                                <label className="boxField"><span>Precio de compra</span><input
                                   className="cellInput cellInputNum"
                                   type="number"
                                   min="0"
@@ -892,7 +892,7 @@ function Detail({ id, type, onClose, onChanged }) {
                                       e.target.value,
                                     )
                                   }
-                                />
+                                /></label>
                               </span>
                             ) : (
                               <small>
@@ -1002,40 +1002,40 @@ function Detail({ id, type, onClose, onChanged }) {
                           <div className="quoteBoxInfo quoteBoxInfoEdit">
                             <small>Información de caja</small>
                             <div className="boxDimsEdit">
-                              <input
+                              <label className="boxField"><span>Largo</span><input
                                 className="cellInput cellInputNum"
                                 type="number"
                                 min="0"
                                 step="any"
-                                placeholder="L"
+                                placeholder="0"
                                 value={box.l ?? ""}
                                 onChange={(e) =>
                                   updateBox(box, "l", e.target.value)
                                 }
-                              />
-                              <input
+                              /></label>
+                              <label className="boxField"><span>Ancho</span><input
                                 className="cellInput cellInputNum"
                                 type="number"
                                 min="0"
                                 step="any"
-                                placeholder="A"
+                                placeholder="0"
                                 value={box.w ?? ""}
                                 onChange={(e) =>
                                   updateBox(box, "w", e.target.value)
                                 }
-                              />
-                              <input
+                              /></label>
+                              <label className="boxField"><span>Alto</span><input
                                 className="cellInput cellInputNum"
                                 type="number"
                                 min="0"
                                 step="any"
-                                placeholder="H"
+                                placeholder="0"
                                 value={box.h ?? ""}
                                 onChange={(e) =>
                                   updateBox(box, "h", e.target.value)
                                 }
-                              />
-                              <select
+                              /></label>
+                              <label className="boxField"><span>Medida</span><select
                                 className="cellInput"
                                 value={box.unit || "cm"}
                                 onChange={(e) =>
@@ -1044,21 +1044,21 @@ function Detail({ id, type, onClose, onChanged }) {
                               >
                                 <option value="cm">cm</option>
                                 <option value="in">in</option>
-                              </select>
+                              </select></label>
                             </div>
                             <div className="boxWeightEdit">
-                              <input
+                              <label className="boxField"><span>Peso por caja</span><input
                                 className="cellInput cellInputNum"
                                 type="number"
                                 min="0"
                                 step="any"
-                                placeholder="Peso"
+                                placeholder="0"
                                 value={box.weight ?? ""}
                                 onChange={(e) =>
                                   updateBox(box, "weight", e.target.value)
                                 }
-                              />
-                              <select
+                              /></label>
+                              <label className="boxField"><span>Unidad peso</span><select
                                 className="cellInput"
                                 value={box.weightUnit || "kg"}
                                 onChange={(e) =>
@@ -1067,12 +1067,12 @@ function Detail({ id, type, onClose, onChanged }) {
                               >
                                 <option value="kg">kg</option>
                                 <option value="lb">lb</option>
-                              </select>
-                              <input
+                              </select></label>
+                              <label className="boxField"><span>Productos/caja</span><input
                                 className="cellInput cellInputNum"
                                 type="number"
                                 min="0"
-                                placeholder="uds/caja"
+                                placeholder="0"
                                 value={box.unitsPerBox ?? ""}
                                 onChange={(e) =>
                                   updateBox(
@@ -1081,7 +1081,7 @@ function Detail({ id, type, onClose, onChanged }) {
                                     e.target.value,
                                   )
                                 }
-                              />
+                              /></label>
                             </div>
                           </div>
                         ) : (
@@ -1460,7 +1460,7 @@ export default function RecordsPage({
             <p>
               {type === "order"
                 ? "Las cotizaciones confirmadas aparecerán aquí."
-                : "Crea una cotización desde la sección Calcular."}
+                : "Crea una cotización desde la pestaña Crear cotización."}
             </p>
           </div>
         ) : (

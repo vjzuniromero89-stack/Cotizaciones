@@ -776,3 +776,91 @@ img.clientProductPhoto,
   min-width: 0;
   width: 100%;
 }
+/* Campos de edición con su nombre encima. */
+.boxField {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+.boxField > span {
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 800;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.boxField .cellInput {
+  width: 100%;
+  padding: 7px 8px;
+  font-size: 13px;
+}
+.quoteBoxInfoEdit .boxDimsEdit {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+.quoteBoxInfoEdit .boxWeightEdit {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+.quoteProductIdentity .cellInputRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 6px;
+}
+/* Menú superior: nunca se sale de la pantalla. */
+html,
+body {
+  overflow-x: hidden;
+}
+@media (min-width: 701px) {
+  #root > header {
+    height: auto;
+    min-height: 76px;
+    gap: 12px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+  }
+  .mainNav {
+    flex: 1;
+    min-width: 0;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 4px;
+  }
+  .mainNav button {
+    padding: 9px 11px;
+    font-size: 13px;
+    white-space: nowrap;
+  }
+}
+/* Encabezados de página: el botón no se estira. */
+.pageHead {
+  gap: 16px;
+  align-items: center;
+}
+.pageHead > div:first-child {
+  min-width: 0;
+}
+.pageHead > button {
+  flex: 0 0 auto;
+  width: auto;
+}
+/* Botón eliminar igual en todas las listas. */
+.clientRowDelete {
+  border: 1px solid #6b2a26 !important;
+  background: #2a1513 !important;
+  color: #ff8a80 !important;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 9px;
+  padding: 9px 12px;
+  font-weight: 800;
+  cursor: pointer;
+}
+/* Producto sin foto: mismo tamaño que la foto. */
+.catalogProductTop > .catalogNoPhoto {
+  border: 1px dashed var(--line);
+}
