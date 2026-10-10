@@ -1474,10 +1474,9 @@ export default function RecordsPage({
                         ({ p, price, exchangeRate, profit }, i) => (
                           <div
                             key={p.id || i}
-                            className={isClient ? undefined : "withPhoto"}
+                            className="withPhoto"
                           >
-                            {!isClient &&
-                              (p.imageUrl ? (
+                            {(p.imageUrl ? (
                                 <img
                                   className="recordProductThumb"
                                   src={p.imageUrl}

@@ -583,3 +583,60 @@ option {
 .calculatorProductPricing em {
   color: #3be090;
 }
+/* Fotos de producto: siempre completas, sin recortar, sobre fondo blanco. */
+.photoPicker img,
+.catalogPhotoPicker img,
+.livePricingImage img,
+img.recordProductThumb,
+img.clientProductPhoto,
+.savedProducts img,
+.quoteProductIdentity img,
+.internalProductIdentity img,
+.allocationProduct img,
+.economicsProduct img,
+.unitProduct img,
+.catalogCard > img,
+.catalogProductTop > img,
+.catalogDetailHero > img,
+.productCbmRow img {
+  object-fit: contain;
+  background: #fff;
+}
+@media (min-width: 761px) {
+  .recordProductThumb {
+    width: 72px;
+    height: 72px;
+  }
+  .clientProductPhoto,
+  .clientProductNoPhoto {
+    width: 64px;
+    height: 64px;
+    flex: 0 0 64px;
+  }
+  .quoteProductIdentity img,
+  .quoteProductIdentity .noPhoto,
+  .economicsProduct img,
+  .economicsProduct .noPhoto,
+  .internalProductIdentity img,
+  .internalProductIdentity .noPhoto {
+    width: 64px;
+    height: 64px;
+    flex: 0 0 64px;
+  }
+  .catalogProductTop {
+    grid-template-columns: 110px 1fr auto;
+  }
+  .catalogDetailHero {
+    grid-template-columns: 180px 1fr;
+  }
+  .catalogProductTop > img,
+  .catalogProductTop > .catalogNoPhoto {
+    width: 110px;
+    height: 110px;
+  }
+  .catalogDetailHero > img,
+  .catalogDetailHero > .catalogNoPhoto {
+    width: 180px;
+    height: 180px;
+  }
+}

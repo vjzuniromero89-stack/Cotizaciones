@@ -132,6 +132,39 @@ async function countRecords(env, type) {
   return Number(total) || 0;
 }
 
+// Las cotizaciones guardadas sin foto toman la del catálogo (mismo nombre de
+// producto), así una foto agregada después aparece también en las anteriores.
+async function withCatalogPhotos(env, rows) {
+  const missing = rows.some((row) =>
+    (row?.products || []).some((p) => !p.imageUrl && p.name),
+  );
+  if (!missing) return rows;
+  let catalog = [];
+  try {
+    catalog = await restRows(
+      env,
+      "catalog_products?select=name,image_url&image_url=neq.",
+    );
+  } catch {
+    return rows;
+  }
+  const photos = new Map(
+    catalog.map((p) => [String(p.name).trim().toLowerCase(), p.image_url]),
+  );
+  if (!photos.size) return rows;
+  return rows.map((row) => ({
+    ...row,
+    products: (row.products || []).map((p) =>
+      p.imageUrl
+        ? p
+        : {
+            ...p,
+            imageUrl:
+              photos.get(String(p.name || "").trim().toLowerCase()) || "",
+          },
+    ),
+  }));
+}
 async function getRecord(env, id) {
   const rows = await restRows(
     env,
@@ -319,7 +352,7 @@ async function handleApi(request, env, url) {
       );
       return json({
         client: { name: client.name, phone: client.phone },
-        quotes,
+        quotes: await withCatalogPhotos(env, quotes),
       });
     }
     const publicFile =
@@ -459,7 +492,7 @@ async function handleApi(request, env, url) {
           : requested === "product"
             ? "product"
             : "quote";
-      return json(await listRecords(env, type));
+      return json(await withCatalogPhotos(env, await listRecords(env, type)));
     }
 
     if (url.pathname === "/api/catalog-products" && request.method === "GET") {
@@ -798,7 +831,7 @@ async function handleApi(request, env, url) {
     if (item && request.method === "GET") {
       const row = await getRecord(env, item[1]);
       if (!row) return json({ error: "Registro no encontrado" }, 404);
-      return json(row);
+      return json((await withCatalogPhotos(env, [row]))[0]);
     }
     if (item && request.method === "PATCH") {
       const b = await request.json();
