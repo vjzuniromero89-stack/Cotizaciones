@@ -808,19 +808,6 @@ function Detail({ id, type, onClose, onChanged }) {
             </header>
             <div className="combinedProductTableWrap">
               <div className="combinedProductTable">
-                <div className="combinedProductHead">
-                  <span>Producto</span>
-                  <span>Compra</span>
-                  <span>Comisión</span>
-                  <span>Envío asignado</span>
-                  <span>Total puesto</span>
-                  <span>Costo/unidad</span>
-                  <span>Venta/unidad</span>
-                  <span>Ganancia/unidad</span>
-                  <span>Cajas</span>
-                  <span>CBM</span>
-                  <span>Información de caja</span>
-                </div>
                 {productBreakdown.map(
                   ({
                     p,
@@ -842,7 +829,13 @@ function Detail({ id, type, onClose, onChanged }) {
                       boxCount = boxes.reduce(
                         (s, b) => s + Number(b.qty || 0),
                         0,
-                      );
+                      ),
+                      cs = (n) =>
+                        "C$ " +
+                        ((n || 0) * exchangeRateOf(rates)).toLocaleString(
+                          "en-US",
+                          { minimumFractionDigits: 2, maximumFractionDigits: 2 },
+                        );
                     return (
                       <article
                         className="combinedProductRow"
@@ -909,15 +902,30 @@ function Detail({ id, type, onClose, onChanged }) {
                             )}
                           </div>
                         </div>
-                        <b>{money(purchase)}</b>
-                        <b>{money(commission)}</b>
-                        <b>{money(shipping)}</b>
-                        <strong className="productLandedTotal">
-                          {money(totalCost)}
-                        </strong>
-                        <b>{money(unitCost)}</b>
+                        <div className="productStat">
+                          <small>Compra</small>
+                          <b>{money(purchase)}</b>
+                        </div>
+                        <div className="productStat">
+                          <small>Comisión</small>
+                          <b>{money(commission)}</b>
+                        </div>
+                        <div className="productStat">
+                          <small>Envío asignado</small>
+                          <b>{money(shipping)}</b>
+                        </div>
+                        <div className="productStat productLandedTotal">
+                          <small>Total puesto</small>
+                          <b>{money(totalCost)}</b>
+                        </div>
+                        <div className="inlineCost">
+                          <small>Costo por unidad</small>
+                          <b>{money(unitCost)}</b>
+                          <em>{cs(unitCost)}</em>
+                        </div>
                         {edit ? (
                           <div className="inlineSale inlineSaleEdit">
+                            <small>Venta por unidad</small>
                             <input
                               className="cellInput cellInputNum"
                               type="number"
@@ -933,22 +941,25 @@ function Detail({ id, type, onClose, onChanged }) {
                                 )
                               }
                             />
-                            <small>
+                            {saleUnit > 0 && <em>{cs(saleUnit)}</em>}
+                            <span>
                               {saleUnit > 0
                                 ? `${money(saleTotal)} total`
                                 : "Escribe el precio"}
-                            </small>
+                            </span>
                           </div>
                         ) : (
                           <div className="inlineSale">
+                            <small>Venta por unidad</small>
                             <b>
                               {saleUnit > 0 ? money(saleUnit) : "Pendiente"}
                             </b>
-                            <small>
+                            {saleUnit > 0 && <em>{cs(saleUnit)}</em>}
+                            <span>
                               {saleUnit > 0
-                                ? `${money(saleTotal)} total`
+                                ? `${money(saleTotal)} · ${cs(saleTotal)} total`
                                 : "Sin precio"}
-                            </small>
+                            </span>
                           </div>
                         )}
                         <div
@@ -958,13 +969,17 @@ function Detail({ id, type, onClose, onChanged }) {
                               : "inlineProfit negative"
                           }
                         >
+                          <small>Ganancia por unidad</small>
                           <b>{saleUnit > 0 ? money(unitProfit) : "—"}</b>
-                          <small>
+                          {saleUnit > 0 && <em>{cs(unitProfit)}</em>}
+                          <span>
                             {saleUnit > 0
-                              ? `${profitPercent >= 0 ? "+" : ""}${profitPercent.toFixed(2)}% · ${money(profit)}`
+                              ? `${profitPercent >= 0 ? "+" : ""}${profitPercent.toFixed(2)}% · ${money(profit)} total`
                               : "—"}
-                          </small>
+                          </span>
                         </div>
+                        <div className="productStat">
+                          <small>Cajas</small>
                         {edit && box.l !== undefined ? (
                           <input
                             className="cellInput cellInputNum"
@@ -978,9 +993,14 @@ function Detail({ id, type, onClose, onChanged }) {
                         ) : (
                           <b>{boxCount}</b>
                         )}
-                        <b>{cbm.toFixed(4)}</b>
+                        </div>
+                        <div className="productStat">
+                          <small>CBM</small>
+                          <b>{cbm.toFixed(4)}</b>
+                        </div>
                         {edit && box.l !== undefined ? (
                           <div className="quoteBoxInfo quoteBoxInfoEdit">
+                            <small>Información de caja</small>
                             <div className="boxDimsEdit">
                               <input
                                 className="cellInput cellInputNum"
@@ -1066,6 +1086,7 @@ function Detail({ id, type, onClose, onChanged }) {
                           </div>
                         ) : (
                           <div className="quoteBoxInfo">
+                            <small>Información de caja</small>
                             <b>
                               {box.l
                                 ? `${box.l} × ${box.w} × ${box.h} ${box.unit}`

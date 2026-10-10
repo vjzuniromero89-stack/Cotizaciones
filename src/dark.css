@@ -657,3 +657,122 @@ img.clientProductPhoto,
   font-size: 11px;
   line-height: 1.4;
 }
+/* Expediente de cotización: cada producto como ficha ordenada. */
+.combinedProductTable {
+  min-width: 0;
+}
+.combinedProductRow {
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 10px;
+  align-items: stretch;
+  padding: 16px;
+}
+.combinedProductRow > .quoteProductIdentity {
+  grid-column: span 4;
+  order: 1;
+}
+.combinedProductRow > .quoteBoxInfo {
+  grid-column: span 2;
+  order: 2;
+  align-content: center;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+.combinedProductRow > .productStat {
+  order: 3;
+  display: grid;
+  gap: 4px;
+  align-content: center;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--surface-2);
+  min-width: 0;
+}
+.combinedProductRow > .productStat b {
+  font: 800 15px Manrope;
+  text-align: left;
+}
+.combinedProductRow > .productStat > small,
+.combinedProductRow > .quoteBoxInfo > small,
+.inlineCost > small,
+.inlineSale > small,
+.inlineProfit > small {
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.35px;
+}
+.combinedProductRow > .inlineCost,
+.combinedProductRow > .inlineSale,
+.combinedProductRow > .inlineProfit {
+  grid-column: span 2;
+  order: 4;
+  display: grid;
+  gap: 3px;
+  align-content: center;
+  padding: 14px;
+  border-radius: 12px;
+}
+.inlineCost b,
+.inlineSale b,
+.inlineProfit b {
+  font: 900 24px Manrope;
+}
+.inlineCost em,
+.inlineSale em,
+.inlineProfit em {
+  font-style: normal;
+  font: 800 15px Manrope;
+}
+.inlineCost span,
+.inlineSale span,
+.inlineProfit span {
+  font-size: 11px;
+  color: var(--muted);
+}
+.inlineCost {
+  background: #3a2410;
+  border: 1px solid #b8641a;
+}
+.inlineCost small,
+.inlineCost b,
+.inlineCost em {
+  color: #ff9a3c;
+}
+.inlineSale {
+  border: 1px solid #2d7c55;
+}
+.inlineSale small,
+.inlineSale em {
+  color: #3be090;
+}
+.inlineProfit.positive em {
+  color: #3be090;
+}
+.inlineProfit.negative em {
+  color: #ff6b5e;
+}
+@media (max-width: 900px) {
+  .combinedProductRow {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .combinedProductRow > .quoteProductIdentity,
+  .combinedProductRow > .quoteBoxInfo,
+  .combinedProductRow > .inlineCost,
+  .combinedProductRow > .inlineSale,
+  .combinedProductRow > .inlineProfit {
+    grid-column: 1/-1;
+  }
+}
+.inlineProfit.positive b {
+  color: #3be090;
+}
+.inlineProfit.negative b {
+  color: #ff6b5e;
+}
+.combinedProductRow > .productStat .cellInput {
+  min-width: 0;
+  width: 100%;
+}
