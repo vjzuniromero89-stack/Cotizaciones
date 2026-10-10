@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import "./detail.css";
 import "./product-detail.css";
+import "./client-quote.css";
 import { calculate, exchangeRateOf } from "./calculate.js";
 import { authFetch } from "./auth.js";
 
@@ -246,6 +247,12 @@ export function ClientQuote({ data, onClose, onDeleted, publicMode, closeLabel }
           0,
         ),
     );
+  const cs = (n) =>
+    "C$ " +
+    ((n || 0) * exchangeRateOf(data.rates)).toLocaleString("en-US", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
   async function deleteQuote() {
     if (
       !window.confirm(
@@ -337,151 +344,126 @@ export function ClientQuote({ data, onClose, onDeleted, publicMode, closeLabel }
             <Printer /> Imprimir / guardar PDF
           </button>
         </div>
-        <header className="clientQuoteHeader">
-          <div className="quoteBrand">
-            <span>CC</span>
+        <div className="qe">
+          <aside className="qeSide">
+            <h2>
+              Cotizaciones
+              <br />
+              China
+            </h2>
             <div>
-              <b>CotizacionesChina</b>
-              <small>Compras y logística internacional</small>
+              <small>COTIZACIÓN</small>
+              <b>{data.number}</b>
             </div>
-          </div>
-          <div className="quoteTitle">
-            <small>COTIZACIÓN PARA CLIENTE</small>
-            <strong>{data.number}</strong>
-          </div>
-        </header>
-        <div className="clientQuoteMeta">
-          <div>
-            <small>PREPARADA PARA</small>
-            <strong>{data.customer_name}</strong>
-            {data.phone && <span>{data.phone}</span>}
-          </div>
-          <div>
-            <small>FECHA</small>
-            <strong>
-              {new Date(data.created_at).toLocaleDateString("es-NI", {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              })}
-            </strong>
-            <span>Entrega en Managua, Nicaragua</span>
-          </div>
-        </div>
-        <div className="clientProductTableWrap">
-          <div className="clientProductTable">
-            <div className="clientProductHead clientProductLogistics">
-              <span>Producto</span>
-              <span>Unidades</span>
-              <span>CBM</span>
-              <span className="clientPriceHead">
-                Precio por unidad
-                <br />
-                <small>Puesto en Nicaragua</small>
-              </span>
-              <span>Subtotal</span>
+            <div>
+              <small>CLIENTE</small>
+              <b>{data.customer_name}</b>
+              {data.phone && <span>{data.phone}</span>}
             </div>
-            {data.products?.length ? (
-              <>
-                {data.products.map((p, i) => {
-                  const logistics = productLogistics(data, p);
-                  return (
-                    <div
-                      className="clientProductRow clientProductLogistics"
-                      key={p.id || i}
-                    >
-                      <div className="clientProductCell">
-                        {p.imageUrl ? (
-                          <img
-                            className="clientProductPhoto"
-                            src={p.imageUrl}
-                            alt={p.name || "Producto"}
-                          />
-                        ) : (
-                          <span className="clientProductNoPhoto">Sin foto</span>
-                        )}
-                        <div className="clientProductInfo">
-                          <b title={p.name || "Producto"}>
-                            {p.name || "Producto"}
-                          </b>
-                          <small className="clientPackNote">
-                            {logistics.unitsPerBox
-                              ? `${
-                                  Number.isInteger(logistics.unitsPerBox)
-                                    ? logistics.unitsPerBox.toLocaleString()
-                                    : logistics.unitsPerBox.toFixed(1)
-                                }/caja`
-                              : null}
-                            {logistics.unitsPerBox ? " · " : ""}
-                            {logistics.boxSize}
-                          </small>
-                        </div>
-                      </div>
-                      <div className="clientStack">
-                        <b>{Number(p.qty || 0).toLocaleString()}</b>
-                        <small>{logistics.boxCount.toLocaleString()} cajas</small>
-                      </div>
-                      <div className="clientStack">
-                        <b>{logistics.totalCbm.toFixed(4)} m³</b>
-                        <small>{logistics.unitCbm.toFixed(6)} m³/u</small>
-                      </div>
-                      <div className="clientDualPrice">
-                        <b>US{money(p.salePrice ?? p.price)}</b>
-                        <small>
-                          {cordobas(Number(p.salePrice ?? p.price))}
-                        </small>
-                      </div>
-                      <b className="clientSubtotal">
-                        {money(
-                          Number(p.qty || 0) *
-                            Number((p.salePrice ?? p.price) || 0),
-                        )}
-                      </b>
-                    </div>
-                  );
+            <div>
+              <small>FECHA</small>
+              <b>
+                {new Date(data.created_at).toLocaleDateString("es-NI", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
                 })}
-              </>
-            ) : (
-              <div className="clientProductRow">
-                <span>{data.description || "Productos cotizados"}</span>
+              </b>
+            </div>
+            <div>
+              <small>ENTREGA</small>
+              <b>Managua, Nicaragua</b>
+            </div>
+            <div className="qeFigures">
+              <div>
+                <small>PRODUCTOS</small>
+                <b>{(data.products?.length || 1).toLocaleString()}</b>
+              </div>
+              <div>
+                <small>UNIDADES</small>
                 <b>{totalUnits.toLocaleString()}</b>
               </div>
+              <div>
+                <small>CAJAS</small>
+                <b>{totalBoxes.toLocaleString()}</b>
+              </div>
+              <div>
+                <small>CBM TOTAL</small>
+                <b>{totalCbm.toFixed(4)} m³</b>
+              </div>
+            </div>
+            <div className="qeTotal">
+              <small>TOTAL CON ENVÍO</small>
+              <b>{money(total)}</b>
+              <em>{cs(total)}</em>
+            </div>
+          </aside>
+          <div className="qeMain">
+            <h3>PRODUCTOS COTIZADOS</h3>
+            {data.products?.length ? (
+              data.products.map((p, i) => {
+                const logistics = productLogistics(data, p),
+                  price = Number((p.salePrice ?? p.price) || 0),
+                  units = Number(p.qty || 0);
+                return (
+                  <div className="qeItem" key={p.id || i}>
+                    {p.imageUrl ? (
+                      <img src={p.imageUrl} alt={p.name || "Producto"} />
+                    ) : (
+                      <span className="qeNoPhoto">Sin foto</span>
+                    )}
+                    <div>
+                      <h4>{p.name || "Producto"}</h4>
+                      <p>
+                        {logistics.boxCount.toLocaleString()} cajas
+                        {logistics.unitsPerBox
+                          ? ` de ${
+                              Number.isInteger(logistics.unitsPerBox)
+                                ? logistics.unitsPerBox.toLocaleString()
+                                : logistics.unitsPerBox.toFixed(1)
+                            }`
+                          : ""}
+                        {" · caja de "}
+                        {logistics.boxSize}
+                      </p>
+                      <div className="qeLine qeUnit">
+                        <span>Precio por unidad</span>
+                        <b>
+                          US{money(price)} · {cs(price)}
+                        </b>
+                      </div>
+                      <div className="qeLine">
+                        <span>Unidades</span>
+                        <b>{units.toLocaleString()}</b>
+                      </div>
+                      <div className="qeLine">
+                        <span>Subtotal</span>
+                        <b>
+                          {money(units * price)} · {cs(units * price)}
+                        </b>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })
+            ) : (
+              <div className="qeItem qeItemPlain">
+                <div>
+                  <h4>{data.description || "Productos cotizados"}</h4>
+                  <div className="qeLine">
+                    <span>Unidades</span>
+                    <b>{totalUnits.toLocaleString()}</b>
+                  </div>
+                </div>
+              </div>
             )}
+            <p className="qeNote">
+              <b>Servicio incluido:</b> compra, gestión logística y envío de
+              los productos hasta Managua, Nicaragua. Cotización válida sujeta
+              a confirmación de disponibilidad.
+            </p>
           </div>
         </div>
-        <div className="clientQuoteSummary">
-          <div>
-            <span>Total de unidades</span>
-            <b>{totalUnits.toLocaleString()}</b>
-          </div>
-          <div>
-            <span>Total de cajas</span>
-            <b>{totalBoxes.toLocaleString()}</b>
-          </div>
-          <div>
-            <span>CBM total</span>
-            <b>{totalCbm.toFixed(4)} m³</b>
-          </div>
-          <div className="clientGrandTotal">
-            <span>
-              Total puesto en Managua
-              <br />
-              <small>Incluyendo envío</small>
-            </span>
-            <strong>{money(total)}</strong>
-          </div>
-        </div>
-        <div className="clientQuoteNotes">
-          <b>Servicio incluido</b>
-          <p>
-            Compra, gestión logística y envío de los productos hasta Managua,
-            Nicaragua.
-          </p>
-        </div>
-        <footer>
-          <span>Gracias por confiar en CotizacionesChina.</span>
-          <b>Cotización válida sujeta a confirmación de disponibilidad.</b>
-        </footer>
       </section>
     </div>
   );

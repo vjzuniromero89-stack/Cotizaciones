@@ -1,0 +1,190 @@
+/* Hoja de cotización para el cliente: banda lateral azul y productos a la derecha. */
+.clientQuotePrint {
+  padding: 22px;
+}
+.clientQuoteTools {
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+.qe {
+  display: grid;
+  grid-template-columns: 230px 1fr;
+  border: 1px solid #e3e8ed;
+  border-radius: 14px;
+  overflow: hidden;
+  background: #fff;
+  color: #14202b;
+  font-family: "DM Sans", sans-serif;
+  font-variant-numeric: tabular-nums;
+}
+.qeSide {
+  background: #1d2b4f;
+  color: #fff;
+  padding: 28px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+.qeSide h2 {
+  margin: 0;
+  font: 800 20px Manrope;
+  line-height: 1.2;
+}
+.qeSide small {
+  display: block;
+  color: #a9b8dc;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 1.3px;
+}
+.qeSide b {
+  display: block;
+  margin-top: 3px;
+  font: 700 15px Manrope;
+  overflow-wrap: anywhere;
+}
+.qeSide span {
+  display: block;
+  margin-top: 2px;
+  color: #cfd8ee;
+  font-size: 12.5px;
+}
+.qeFigures {
+  display: grid;
+  gap: 14px;
+  padding-top: 20px;
+  border-top: 1px solid #36466f;
+}
+.qeTotal {
+  margin-top: auto;
+  background: #ffb629;
+  color: #1d2b4f;
+  border-radius: 12px;
+  padding: 15px;
+}
+.qeTotal small {
+  color: #5b4208;
+}
+.qeTotal b {
+  font: 800 25px Manrope;
+}
+.qeTotal em {
+  font-style: normal;
+  font: 700 13px Manrope;
+}
+.qeMain {
+  padding: 28px 26px;
+  min-width: 0;
+}
+.qeMain h3 {
+  margin: 0 0 4px;
+  color: #6a7785;
+  font: 800 13px Manrope;
+  letter-spacing: 1.4px;
+}
+.qeItem {
+  display: grid;
+  grid-template-columns: 110px 1fr;
+  gap: 16px;
+  padding: 16px 0;
+  border-bottom: 1px solid #e3e8ed;
+}
+.qeItemPlain {
+  grid-template-columns: 1fr;
+}
+.qeItem img,
+.qeNoPhoto {
+  width: 110px;
+  height: 110px;
+  border-radius: 10px;
+  border: 1px solid #e3e8ed;
+  object-fit: contain;
+  background: #fff;
+}
+.qeNoPhoto {
+  display: grid;
+  place-items: center;
+  background: #f3f6f8;
+  border-style: dashed;
+  color: #8a96a3;
+  font-size: 12px;
+}
+.qeItem h4 {
+  margin: 0;
+  font: 800 17px Manrope;
+  color: #14202b;
+  overflow-wrap: anywhere;
+}
+.qeItem p {
+  margin: 3px 0 8px;
+  color: #6a7785;
+  font-size: 12.5px;
+}
+.qeLine {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 4px 0;
+  font-size: 13px;
+  color: #14202b;
+}
+.qeLine b {
+  font: 700 14px Manrope;
+  text-align: right;
+}
+.qeUnit b {
+  color: #b36b00;
+  font-size: 17px;
+}
+.qeNote {
+  margin: 18px 0 0;
+  color: #55616d;
+  font-size: 12.5px;
+  line-height: 1.55;
+}
+@media (max-width: 640px) {
+  .clientQuotePrint {
+    padding: 12px;
+  }
+  .qe {
+    grid-template-columns: 1fr;
+  }
+  .qeSide {
+    padding: 20px 18px;
+    gap: 14px;
+  }
+  .qeFigures {
+    grid-template-columns: 1fr 1fr;
+  }
+  .qeMain {
+    padding: 18px 16px;
+  }
+  .qeItem {
+    grid-template-columns: 84px 1fr;
+    gap: 12px;
+  }
+  .qeItem img,
+  .qeNoPhoto {
+    width: 84px;
+    height: 84px;
+  }
+}
+@media print {
+  .clientQuotePrint {
+    padding: 0;
+  }
+  .qe {
+    grid-template-columns: 230px 1fr;
+    border: 0;
+    border-radius: 0;
+    min-height: 100vh;
+  }
+  .qe,
+  .qe * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .qeItem {
+    break-inside: avoid;
+  }
+}
