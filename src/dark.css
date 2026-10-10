@@ -657,21 +657,3 @@ img.clientProductPhoto,
   font-size: 11px;
   line-height: 1.4;
 }
-/* Diálogo de venta: nombre arriba y cuatro cuadros debajo. */
-.calculatorProductPricing article {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-}
-.calculatorProductPricing .pricingProduct {
-  grid-column: 1/-1;
-}
-.pricingSaleShown strong {
-  color: #3be090;
-}
-@media (max-width: 720px) {
-  .calculatorProductPricing article {
-    grid-template-columns: 1fr 1fr;
-  }
-  .calculatorProductPricing .pricingProfit {
-    grid-column: auto;
-  }
-}
