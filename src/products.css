@@ -602,3 +602,24 @@
   font-weight: 700;
   white-space: nowrap;
 }
+/* Foto del producto: cuadro grande y la foto completa, sin recortar. */
+.unifiedProductCard .productInfoRow {
+  grid-template-columns: 120px 2fr 1fr 1fr 1fr;
+}
+.unifiedProductCard .photoPicker {
+  height: 120px;
+}
+.photoPicker img {
+  object-fit: contain;
+}
+@media (max-width: 900px) {
+  .unifiedProductCard .productInfoRow {
+    grid-template-columns: 96px 1fr 1fr;
+  }
+  .unifiedProductCard .photoPicker {
+    height: 96px;
+  }
+}
+.photoPicker img {
+  background: #fff;
+}

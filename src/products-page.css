@@ -688,3 +688,22 @@
   color: #119663;
   white-space: nowrap;
 }
+/* Foto completa, sin recortar, al registrar o editar un producto. */
+.registerProductMain {
+  grid-template-columns: 170px 1fr;
+}
+.catalogPhotoPicker {
+  height: 170px;
+}
+.catalogPhotoPicker img {
+  object-fit: contain;
+  background: #fff;
+}
+@media (max-width: 620px) {
+  .registerProductMain {
+    grid-template-columns: 110px 1fr;
+  }
+  .catalogPhotoPicker {
+    height: 110px;
+  }
+}
