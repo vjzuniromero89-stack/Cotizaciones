@@ -21,7 +21,10 @@ import {
 import "./detail.css";
 import "./product-detail.css";
 import "./client-quote.css";
-import { calculate, exchangeRateOf } from "./calculate.js";
+import { calculate, exchangeRateOf, autoBoxes } from "./calculate.js";
+import { isRealProduct } from "./suppliers.js";
+import { publicSpecs } from "./specs.js";
+import "./suppliers.css";
 import { authFetch } from "./auth.js";
 
 const money = (n) =>
@@ -538,7 +541,20 @@ function Detail({ id, type, onClose, onChanged, startEditing = false }) {
     [edit, setEdit] = useState(startEditing),
     [form, setForm] = useState(null),
     [busy, setBusy] = useState(false),
-    [saveError, setSaveError] = useState("");
+    [saveError, setSaveError] = useState(""),
+    [catalog, setCatalog] = useState(null),
+    [pickerOpen, setPickerOpen] = useState(false),
+    [pickerSearch, setPickerSearch] = useState("");
+  // El catálogo se carga la primera vez que se abre para agregar productos.
+  async function openPicker() {
+    setPickerOpen(true);
+    if (catalog) return;
+    try {
+      setCatalog((await api("/catalog-products")).filter(isRealProduct));
+    } catch {
+      setCatalog([]);
+    }
+  }
   useEffect(() => {
     api("/records/" + id).then((x) => {
       setData(x);
@@ -654,12 +670,70 @@ function Detail({ id, type, onClose, onChanged, startEditing = false }) {
   const ft = (k, v) =>
     setForm((x) => ({ ...x, totals: { ...x.totals, [k]: v } }));
   const updateProduct = (index, k, v) =>
-    setForm((x) => ({
-      ...x,
-      products: (x.products || []).map((p, idx) =>
-        idx === index ? { ...p, [k]: v } : p,
-      ),
-    }));
+    setForm((x) => {
+      const target = (x.products || [])[index];
+      const next = {
+        ...x,
+        products: (x.products || []).map((p, idx) =>
+          idx === index ? { ...p, [k]: v } : p,
+        ),
+      };
+      // Al cambiar las unidades, las cajas se recalculan (unidades ÷ por caja)
+      // salvo que el usuario las haya escrito a mano.
+      if (k === "qty" && target) {
+        let done = false;
+        next.boxes = (x.boxes || []).map((b) => {
+          const mine =
+            b.productId === target.id ||
+            (!b.productId && b.productName === target.name);
+          if (!mine || done || b.qtyManual) return b;
+          done = true;
+          const auto = autoBoxes(v, b.unitsPerBox);
+          return Number(b.unitsPerBox) > 0 ? { ...b, qty: auto } : b;
+        });
+      }
+      return next;
+    });
+  // Agrega un producto del catálogo con su foto, precio, caja y descripción.
+  const addFromCatalog = (saved) =>
+    setForm((x) => {
+      const id = crypto.randomUUID();
+      const { info, ...box } = saved.boxes?.[0] || {};
+      return {
+        ...x,
+        products: [
+          ...(x.products || []),
+          {
+            id,
+            catalogId: saved.id,
+            name: saved.name || "",
+            qty: "",
+            price: saved.unit_price ?? "",
+            salePrice: info?.salePrice ?? "",
+            imageUrl: saved.image_url || "",
+            specs: publicSpecs(info),
+          },
+        ],
+        boxes: [
+          ...(x.boxes || []),
+          {
+            unit: "cm",
+            weightUnit: "kg",
+            l: "",
+            w: "",
+            h: "",
+            weight: "",
+            unitsPerBox: "",
+            ...box,
+            id: crypto.randomUUID(),
+            productId: id,
+            productName: saved.name || "",
+            qty: "",
+            qtyManual: false,
+          },
+        ],
+      };
+    });
   // Quita un producto de la cotización junto con sus cajas.
   const removeProduct = (index) =>
     setForm((x) => {
@@ -707,7 +781,11 @@ function Detail({ id, type, onClose, onChanged, startEditing = false }) {
   const updateBox = (boxRef, k, v) =>
     setForm((x) => ({
       ...x,
-      boxes: (x.boxes || []).map((b) => (b === boxRef ? { ...b, [k]: v } : b)),
+      boxes: (x.boxes || []).map((b) =>
+        b === boxRef
+          ? { ...b, [k]: v, ...(k === "qty" ? { qtyManual: v !== "" } : {}) }
+          : b,
+      ),
     }));
   async function save() {
     setBusy(true);
@@ -1219,9 +1297,75 @@ function Detail({ id, type, onClose, onChanged, startEditing = false }) {
               </div>
             </div>
             {edit && (
-              <button type="button" className="addQuoteProduct" onClick={addProduct}>
-                <Plus /> Agregar otro producto
-              </button>
+              <div className="addQuoteBar">
+                <b>Agregar otro producto a esta cotización</b>
+                <button
+                  type="button"
+                  className="addQuoteProduct"
+                  onClick={() => (pickerOpen ? setPickerOpen(false) : openPicker())}
+                >
+                  <Plus />{" "}
+                  {pickerOpen ? "Cerrar catálogo" : "Elegir del catálogo con foto"}
+                </button>
+                <button
+                  type="button"
+                  className="addQuoteProduct plain"
+                  onClick={addProduct}
+                >
+                  <Plus /> Producto nuevo en blanco
+                </button>
+              </div>
+            )}
+            {edit && pickerOpen && (
+              <div className="catalogPanel quoteEditPicker">
+                <input
+                  autoFocus
+                  value={pickerSearch}
+                  placeholder="Buscar por nombre o proveedor…"
+                  onChange={(e) => setPickerSearch(e.target.value)}
+                />
+                {!catalog ? (
+                  <p>Cargando catálogo…</p>
+                ) : catalog.length ? (
+                  <div className="catalogPanelGrid">
+                    {catalog
+                      .filter((c) =>
+                        (c.name + " " + (c.boxes?.[0]?.info?.supplier || ""))
+                          .toLowerCase()
+                          .includes(pickerSearch.trim().toLowerCase()),
+                      )
+                      .map((c) => {
+                        const times = sourceProducts.filter(
+                          (p) => p.catalogId === c.id || p.name === c.name,
+                        ).length;
+                        return (
+                          <button
+                            type="button"
+                            key={c.id}
+                            className={times ? "added" : ""}
+                            onClick={() => addFromCatalog(c)}
+                          >
+                            {c.image_url ? (
+                              <img src={c.image_url} alt="" loading="lazy" />
+                            ) : (
+                              <span className="catalogPanelNoPhoto">Sin foto</span>
+                            )}
+                            <b>{c.name}</b>
+                            <small>
+                              {c.boxes?.[0]?.info?.supplier || "Sin proveedor"} ·{" "}
+                              {money(c.unit_price)}
+                            </small>
+                            {times > 0 && (
+                              <em>✓ En la cotización{times > 1 ? " ×" + times : ""}</em>
+                            )}
+                          </button>
+                        );
+                      })}
+                  </div>
+                ) : (
+                  <p>No hay productos guardados en el catálogo.</p>
+                )}
+              </div>
             )}
             <p className="allocationMethod">
               {shownRoute === "miami"

@@ -1631,3 +1631,39 @@ textarea.quoteDetailInput {
   border-color: #1d2b4f;
   color: #fff;
 }
+/* Barra para agregar productos al editar una cotización. */
+.addQuoteBar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin: 6px 16px 14px;
+  padding: 14px 16px;
+  border: 2px dashed #2d7c55;
+  border-radius: 13px;
+  background: #121816;
+}
+.addQuoteBar b {
+  font: 800 16px Manrope;
+  margin-right: auto;
+}
+.addQuoteBar .addQuoteProduct {
+  margin: 0;
+  font-size: 15px;
+  padding: 12px 16px;
+  background: #3be090;
+  border-color: #3be090;
+  color: #07140e;
+}
+.addQuoteBar .addQuoteProduct.plain {
+  background: transparent;
+  border-color: #343640;
+  color: #eef2f5;
+}
+.quoteEditPicker {
+  margin: 0 16px 14px;
+}
+.quoteEditPicker p {
+  color: var(--muted);
+  margin: 4px 0;
+}
