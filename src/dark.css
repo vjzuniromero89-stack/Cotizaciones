@@ -1506,3 +1506,80 @@ textarea.quoteDetailInput {
   resize: vertical;
   line-height: 1.4;
 }
+/* Costo, venta y ganancia por unidad en el desglose de la cotización. */
+.livePricingFigures {
+  display: flex;
+  gap: 10px;
+  align-items: stretch;
+}
+.livePricingFigures > div {
+  min-width: 132px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.livePricingFigures small {
+  display: block;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+.livePricingFigures b {
+  display: block;
+  font: 800 17px Manrope;
+}
+.livePricingFigures span {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  color: #c5ced8;
+}
+.lpCost {
+  background: #3a2410;
+  border-color: #b8641a !important;
+}
+.lpCost b,
+.lpCost small {
+  color: #ff9a3c;
+}
+.lpSale {
+  background: #173629;
+  border-color: #2d7c55 !important;
+}
+.lpSale b,
+.lpSale small,
+.lpGain b {
+  color: #3be090;
+}
+.lpLoss b {
+  color: #ff6b5e;
+}
+@media (min-width: 850px) {
+  .productPanel > .liveProductPricing,
+  .productPanel > .purchaseSummary {
+    width: 100%;
+    display: block;
+    margin-right: 0;
+  }
+  .productPanel > .purchaseSummary {
+    max-width: 420px;
+    margin: 14px 0 0 auto;
+  }
+}
+@media (max-width: 900px) {
+  .livePricingRow {
+    grid-template-columns: 42px minmax(0, 1fr);
+  }
+  .livePricingFigures {
+    grid-column: 1/-1;
+    flex-wrap: wrap;
+  }
+  .livePricingFigures > div {
+    flex: 1;
+    text-align: left;
+  }
+}

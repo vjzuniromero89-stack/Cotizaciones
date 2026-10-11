@@ -596,9 +596,48 @@ export default function ProductSection({
                 {money(row.totalCost)} ÷ {row.units.toLocaleString()} unidades
               </small>
             </div>
-            <strong className="livePricingUnitCost">
-              {unitDollars(row.unitCost)} <span>·</span> {cordobas(row.unitCost * exchangeRate)}
-            </strong>
+            <div className="livePricingFigures">
+              <div className="lpCost">
+                <small>Costo por unidad</small>
+                <b>{unitDollars(row.unitCost)}</b>
+                <span>{cordobas(row.unitCost * exchangeRate)}</span>
+              </div>
+              <div className="lpSale">
+                <small>Precio de venta</small>
+                {Number(row.p.salePrice) > 0 ? (
+                  <>
+                    <b>{unitDollars(Number(row.p.salePrice))}</b>
+                    <span>{cordobas(Number(row.p.salePrice) * exchangeRate)}</span>
+                  </>
+                ) : (
+                  <>
+                    <b>—</b>
+                    <span>sin precio en el producto</span>
+                  </>
+                )}
+              </div>
+              {Number(row.p.salePrice) > 0 && row.unitCost > 0 && (
+                <div
+                  className={
+                    Number(row.p.salePrice) >= row.unitCost ? "lpGain" : "lpLoss"
+                  }
+                >
+                  <small>Ganancia por unidad</small>
+                  <b>{unitDollars(Number(row.p.salePrice) - row.unitCost)}</b>
+                  <span>
+                    {cordobas(
+                      (Number(row.p.salePrice) - row.unitCost) * exchangeRate,
+                    )}{" "}
+                    ·{" "}
+                    {(
+                      ((Number(row.p.salePrice) - row.unitCost) / row.unitCost) *
+                      100
+                    ).toFixed(1)}
+                    %
+                  </span>
+                </div>
+              )}
+            </div>
           </article>
         ))}
       </div>
