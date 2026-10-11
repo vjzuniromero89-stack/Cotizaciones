@@ -320,7 +320,7 @@ function ProductDetail({ id, onClose, onChanged }) {
                         {b.weight} {b.weightUnit}
                       </span>
                       <span>{cbm.toFixed(4)}</span>
-                      <b>{(cbm * qty).toFixed(4)}</b>
+                      <b>{(cbm * qty).toFixed(2)}</b>
                     </div>
                   );
                 })}
@@ -338,7 +338,7 @@ function ProductDetail({ id, onClose, onChanged }) {
             <div className="productLogisticsSummary">
               <div>
                 <span>CBM total</span>
-                <b>{Number(totals.cbm || 0).toFixed(4)} m³</b>
+                <b>{Number(totals.cbm || 0).toFixed(2)} m³</b>
               </div>
               <div>
                 <span>Peso crudo total</span>
@@ -371,7 +371,7 @@ function ProductDetail({ id, onClose, onChanged }) {
               ) : (
                 <div>
                   <span>Ruta directa</span>
-                  <b>{Number(totals.cbm || 0).toFixed(4)} CBM</b>
+                  <b>{Number(totals.cbm || 0).toFixed(2)} CBM</b>
                   <small>Cobro por espacio</small>
                 </div>
               )}

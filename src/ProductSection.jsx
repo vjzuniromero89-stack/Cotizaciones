@@ -468,8 +468,8 @@ export default function ProductSection({
               </div>
               <div className="qtCell qtCalc">
                 <span className="qtLabel">CBM</span>
-                <b>{boxVolumeCbm(b).toFixed(4)}</b>
-                <small>por peso {boxWeightCbm(b).toFixed(4)}</small>
+                <b>{boxVolumeCbm(b).toFixed(2)}</b>
+                <small>por peso {boxWeightCbm(b).toFixed(2)}</small>
               </div>
               <div className="qtCell qtCalc">
                 <span className="qtLabel">Peso total</span>
@@ -506,8 +506,8 @@ export default function ProductSection({
           <span />
           <span />
           <div className="qtCalc">
-            <b>{totalVolumeCbm.toFixed(4)}</b>
-            <small>por peso {totalWeightCbm.toFixed(4)}</small>
+            <b>{totalVolumeCbm.toFixed(2)}</b>
+            <small>por peso {totalWeightCbm.toFixed(2)}</small>
           </div>
           <div className="qtCalc">
             <b>{weightNumber(totalWeightKg)} kg</b>

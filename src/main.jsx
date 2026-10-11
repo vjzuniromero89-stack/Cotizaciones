@@ -614,12 +614,12 @@ function CalculatorPage({ onSaved, initialCustomer }) {
             <Info />{" "}
             {r.cbm < 1 ? (
               <>
-                Quedan <b>{r.space.toFixed(3)} CBM</b>. Puedes agregar
+                Quedan <b>{r.space.toFixed(2)} CBM</b>. Puedes agregar
                 aproximadamente <b>{r.more} cajas similares</b>.
               </>
             ) : (
               <>
-                La carga ocupa <b>{r.cbm.toFixed(3)} CBM</b>.
+                La carga ocupa <b>{r.cbm.toFixed(2)} CBM</b>.
               </>
             )}
           </p>
@@ -666,7 +666,7 @@ function CalculatorPage({ onSaved, initialCustomer }) {
                         <b>{p.name || `Producto ${i + 1}`}</b>
                       </div>
                       <span>{p.boxCount.toLocaleString()}</span>
-                      <b>{p.cbm.toFixed(4)}</b>
+                      <b>{p.cbm.toFixed(2)}</b>
                       <span>
                         {p.cnBillKg.toFixed(2)} kg · {money(p.cnCost)}
                       </span>
@@ -705,7 +705,7 @@ function CalculatorPage({ onSaved, initialCustomer }) {
                           <b>{p.name || `Producto ${i + 1}`}</b>
                         </div>
                         <span>{p.boxCount.toLocaleString()}</span>
-                        <b>{p.cbm.toFixed(4)}</b>
+                        <b>{p.cbm.toFixed(2)}</b>
                         <span>{p.unitCbm.toFixed(6)}</span>
                         <span>{(share * 100).toFixed(1)}%</span>
                         <strong>{money(cost)}</strong>
@@ -819,7 +819,7 @@ function RouteTwo({ r, rates, onCbmRateChange }) {
             </b>
             <span>Calculado únicamente con las medidas de las cajas</span>
           </dt>
-          <dd>{r.cbm.toFixed(3)} CBM</dd>
+          <dd>{r.cbm.toFixed(2)} CBM</dd>
         </div>
         <div
           className={r.directChargeBy === "weight" ? "directMethodWinner" : ""}
@@ -834,7 +834,7 @@ function RouteTwo({ r, rates, onCbmRateChange }) {
               {Number(r.kgPerCbm || 350).toFixed(0)} kg
             </span>
           </dt>
-          <dd>{r.weightCbm.toFixed(3)} CBM</dd>
+          <dd>{r.weightCbm.toFixed(2)} CBM</dd>
         </div>
         <div className="directChargeFinal">
           <dt>
@@ -847,7 +847,7 @@ function RouteTwo({ r, rates, onCbmRateChange }) {
                   : "Por volumen"}
             </b>
             <span>
-              {r.billCbm.toFixed(3)} CBM × {money(rates.cbmRate)}
+              {r.billCbm.toFixed(2)} CBM × {money(rates.cbmRate)}
             </span>
           </dt>
           <dd>{money(r.direct)}</dd>

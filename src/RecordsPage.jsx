@@ -389,7 +389,7 @@ export function ClientQuote({ data, onClose, onDeleted, publicMode, closeLabel }
               </div>
               <div>
                 <small>CBM TOTAL</small>
-                <b>{totalCbm.toFixed(4)} m³</b>
+                <b>{totalCbm.toFixed(2)} m³</b>
               </div>
             </div>
             <div className="qeTotal">
@@ -978,7 +978,7 @@ function Detail({ id, type, onClose, onChanged }) {
                         </div>
                         <div className="productStat">
                           <small>CBM</small>
-                          <b>{cbm.toFixed(4)}</b>
+                          <b>{cbm.toFixed(2)}</b>
                         </div>
                         {edit && box.l !== undefined ? (
                           <div className="quoteBoxInfo quoteBoxInfoEdit">
@@ -1111,7 +1111,7 @@ function Detail({ id, type, onClose, onChanged }) {
                 <span>
                   {shownRoute === "miami"
                     ? `${money(totals.cnCost)} + ${money(totals.miCost)}`
-                    : `${Number(totals.billCbm || totals.cbm || 0).toFixed(3)} CBM cobrados por ${totals.directChargeBy === "weight" ? "peso" : totals.directChargeBy === "minimum" ? "mínimo" : "volumen"}`}
+                    : `${Number(totals.billCbm || totals.cbm || 0).toFixed(2)} CBM cobrados por ${totals.directChargeBy === "weight" ? "peso" : totals.directChargeBy === "minimum" ? "mínimo" : "volumen"}`}
                 </span>
               </div>
               <div>
@@ -1121,10 +1121,10 @@ function Detail({ id, type, onClose, onChanged }) {
               </div>
               <div>
                 <small>CBM total</small>
-                <b>{Number(totals.cbm || 0).toFixed(4)}</b>
+                <b>{Number(totals.cbm || 0).toFixed(2)}</b>
                 {shownRoute === "direct" && (
                   <span>
-                    Por peso: {Number(totals.weightCbm || 0).toFixed(4)}
+                    Por peso: {Number(totals.weightCbm || 0).toFixed(2)}
                   </span>
                 )}
               </div>
