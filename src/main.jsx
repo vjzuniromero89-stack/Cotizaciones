@@ -154,6 +154,26 @@ function SaveDialog({
   );
   const [busy, setBusy] = useState(false),
     [error, setError] = useState("");
+  // Clientes ya usados en cotizaciones y órdenes, para elegirlos de una lista.
+  const [clients, setClients] = useState([]);
+  useEffect(() => {
+    Promise.all([
+      api("/records?type=quote").catch(() => []),
+      api("/records?type=order").catch(() => []),
+    ]).then((lists) => {
+      const found = new Map();
+      for (const record of lists.flat()) {
+        const name = String(record.customer_name || "").trim(),
+          phone = String(record.phone || "").trim();
+        if (!name) continue;
+        const id = (name + "|" + phone).toLowerCase();
+        if (!found.has(id)) found.set(id, { name, phone });
+      }
+      setClients(
+        [...found.values()].sort((a, b) => a.name.localeCompare(b.name, "es")),
+      );
+    });
+  }, []);
   const change = (k, v) => setForm((x) => ({ ...x, [k]: v }));
   const exchangeRate = exchangeRateOf(rates),
     cordobas = (n) =>
@@ -236,6 +256,34 @@ function SaveDialog({
             <X />
           </button>
         </div>
+        <label className="field clientPickField">
+          <span>Elegir un cliente de mi lista</span>
+          <select
+            value=""
+            onChange={(e) => {
+              const picked = clients[Number(e.target.value)];
+              if (!picked) return;
+              setForm((x) => ({
+                ...x,
+                customer: picked.name,
+                phone: picked.phone,
+              }));
+            }}
+          >
+            <option value="">
+              {clients.length
+                ? "Selecciona un cliente…"
+                : "Todavía no hay clientes guardados"}
+            </option>
+            {clients.map((c, i) => (
+              <option key={c.name + "|" + c.phone} value={i}>
+                {c.name}
+                {c.phone ? " · " + c.phone : ""}
+              </option>
+            ))}
+          </select>
+          <small>O escribe un cliente nuevo abajo.</small>
+        </label>
         <div className="quoteClientGrid">
           <Field
             label="Nombre del cliente *"
