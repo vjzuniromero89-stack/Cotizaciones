@@ -1361,3 +1361,39 @@ main:has(.qtTable) {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+/* Descripción del producto y nombres de columna del proveedor. */
+.rpField > span i {
+  font-style: normal;
+  font-weight: 700;
+  color: #6f7a86;
+  margin-left: 4px;
+}
+.rpDescription {
+  margin-bottom: 16px;
+}
+.rpDescription textarea {
+  width: 100%;
+  min-height: 104px;
+  resize: vertical;
+  border: 1px solid #343640;
+  border-radius: 8px;
+  background: var(--field);
+  color: #fff;
+  font: inherit;
+  line-height: 1.5;
+  padding: 10px;
+}
+.catalogDescription {
+  margin: 0;
+  padding: 12px 14px;
+  border-top: 1px solid var(--line);
+  color: #c5ced8;
+  font-size: 13.5px;
+  line-height: 1.55;
+  white-space: pre-line;
+}
+.catalogDetail .catalogDescription {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  margin-bottom: 14px;
+}

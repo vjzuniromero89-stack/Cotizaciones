@@ -460,6 +460,7 @@ function RegisterProductDialog({ onClose, onSaved, product = null }) {
       imageUrl: product?.image_url || "",
       price: product?.unit_price ?? "",
       salePrice: infoOf(product).salePrice ?? "",
+      description: infoOf(product).description || "",
       category: infoOf(product).category || "",
       supplier: infoOf(product).supplier || "",
       url: infoOf(product).url || "",
@@ -527,6 +528,7 @@ function RegisterProductDialog({ onClose, onSaved, product = null }) {
               info: {
                 salePrice:
                   Number(form.salePrice) > 0 ? Number(form.salePrice) : "",
+                description: form.description.trim(),
                 category: form.category.trim(),
                 supplier: form.supplier.trim(),
                 url: form.url.trim(),
@@ -585,7 +587,9 @@ function RegisterProductDialog({ onClose, onSaved, product = null }) {
               />
             </label>
             <label className="rpField">
-              <span>Precio de compra por unidad (US$)</span>
+              <span>
+                Precio de compra por unidad (US$) <i>EXW unit price</i>
+              </span>
               <input
                 type="number"
                 min="0"
@@ -646,23 +650,37 @@ function RegisterProductDialog({ onClose, onSaved, product = null }) {
             </label>
           </div>
         </div>
+        <label className="rpField rpDescription">
+          <span>
+            Descripción <i>Description</i>
+          </span>
+          <textarea
+            rows={4}
+            value={form.description}
+            placeholder={"Material: …\nCapacidad: …\nPeso: …\nMedidas del producto: …\nColores: …"}
+            onChange={(e) => update("description", e.target.value)}
+          />
+        </label>
         <div className="rpBox">
           <h3>
             <Package /> Caja del proveedor
           </h3>
           <p>
-            Cómo viene empacado. La cantidad de unidades y de cajas se escribe
-            al crear la cotización.
+            Copia estos datos de la cotización del proveedor; en gris va el
+            nombre de la columna que él usa. La cantidad de unidades y de cajas
+            se escribe al crear la cotización.
           </p>
           <div className="rpBoxGrid">
             {[
-              ["Productos por caja", "unitsPerBox"],
-              ["Largo", "l"],
-              ["Ancho", "w"],
-              ["Alto", "h"],
-            ].map(([label, key]) => (
+              ["Productos por caja", "unitsPerBox", "PCS/CTN"],
+              ["Largo", "l", "L"],
+              ["Ancho", "w", "W"],
+              ["Alto", "h", "H"],
+            ].map(([label, key, supplier]) => (
               <label className="rpField" key={key}>
-                <span>{label}</span>
+                <span>
+                  {label} <i>{supplier}</i>
+                </span>
                 <input
                   type="number"
                   min="0"
@@ -683,7 +701,9 @@ function RegisterProductDialog({ onClose, onSaved, product = null }) {
               </select>
             </label>
             <label className="rpField">
-              <span>Peso por caja</span>
+              <span>
+                Peso por caja <i>G.W.</i>
+              </span>
               <input
                 type="number"
                 min="0"
@@ -821,6 +841,9 @@ function CatalogSection({ refreshKey, onCatalogChanged }) {
                   <div className="cbmSummary"><span>CBM por caja</span><strong>{oneBoxCbm(box).toFixed(4)}</strong></div>
                   <div className="cbmSummary"><span>CBM por unidad</span><strong>{perBox ? (oneBoxCbm(box) / perBox).toFixed(6) : "—"}</strong></div>
                 </div>
+                {info.description && (
+                  <p className="catalogDescription">{info.description}</p>
+                )}
                 {(info.url || info.notes) && (
                   <div className="catalogInfoLine">
                     {info.url && (
@@ -912,6 +935,9 @@ function CatalogProductDetail({ product, onClose, onSaved }) {
             </small>
           </div>
         </div>
+        {infoOf(product).description && (
+          <p className="catalogDescription">{infoOf(product).description}</p>
+        )}
         <h3>
           <Package /> Información de la caja
         </h3>
