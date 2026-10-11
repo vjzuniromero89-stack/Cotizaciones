@@ -16,6 +16,7 @@ import {
 import "./products-page.css";
 import { authFetch } from "./auth.js";
 import { shrinkImage } from "./image.js";
+import { DEFAULT_EXCHANGE_RATE } from "./calculate.js";
 
 const money = (n) =>
   new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(
@@ -441,6 +442,12 @@ const oneBoxKg = (b) =>
   b?.weightUnit === "lb"
     ? Number(b?.weight || 0) / 2.2046226218
     : Number(b?.weight || 0);
+const cordobas = (n) =>
+  "C$ " +
+  ((Number(n) || 0) * DEFAULT_EXCHANGE_RATE).toLocaleString("en-US", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
 const safeLink = (url) => {
   const text = String(url || "").trim();
   if (!text) return "";
@@ -452,6 +459,7 @@ function RegisterProductDialog({ onClose, onSaved, product = null }) {
       name: product?.name || "",
       imageUrl: product?.image_url || "",
       price: product?.unit_price ?? "",
+      salePrice: infoOf(product).salePrice ?? "",
       category: infoOf(product).category || "",
       supplier: infoOf(product).supplier || "",
       url: infoOf(product).url || "",
@@ -517,6 +525,8 @@ function RegisterProductDialog({ onClose, onSaved, product = null }) {
               ...form.box,
               qty: "",
               info: {
+                salePrice:
+                  Number(form.salePrice) > 0 ? Number(form.salePrice) : "",
                 category: form.category.trim(),
                 supplier: form.supplier.trim(),
                 url: form.url.trim(),
@@ -583,7 +593,25 @@ function RegisterProductDialog({ onClose, onSaved, product = null }) {
                 value={form.price}
                 onChange={(e) => update("price", e.target.value)}
               />
+              <em>{Number(form.price) > 0 ? cordobas(form.price) : "C$ —"}</em>
             </label>
+            <label className="rpField rpSale">
+              <span>Precio de venta por unidad (US$)</span>
+              <input
+                type="number"
+                min="0"
+                step="any"
+                value={form.salePrice}
+                onChange={(e) => update("salePrice", e.target.value)}
+              />
+              <em>
+                {Number(form.salePrice) > 0
+                  ? cordobas(form.salePrice) + " por unidad"
+                  : "C$ —"}
+              </em>
+            </label>
+          </div>
+          <div className="rpCol">
             <label className="rpField">
               <span>Categoría</span>
               <input
@@ -592,8 +620,6 @@ function RegisterProductDialog({ onClose, onSaved, product = null }) {
                 onChange={(e) => update("category", e.target.value)}
               />
             </label>
-          </div>
-          <div className="rpCol">
             <label className="rpField">
               <span>Proveedor</span>
               <input
@@ -787,7 +813,8 @@ function CatalogSection({ refreshKey, onCatalogChanged }) {
                 </div>
 
                 <div className="catalogProductSummary">
-                  <div><span>Precio por unidad</span><strong>{money(p.unit_price)}</strong></div>
+                  <div><span>Precio de compra</span><strong>{money(p.unit_price)}</strong><small>{cordobas(p.unit_price)}</small></div>
+                  <div className="saleSummary"><span>Precio de venta</span><strong>{Number(info.salePrice) > 0 ? money(info.salePrice) : "—"}</strong><small>{Number(info.salePrice) > 0 ? cordobas(info.salePrice) : "Sin precio"}</small></div>
                   <div><span>Productos por caja</span><strong>{perBox ? perBox.toLocaleString() : "—"}</strong></div>
                   <div><span>Medidas de la caja</span><strong>{box?.l ? `${box.l} × ${box.w} × ${box.h} ${box.unit === "in" ? "in" : "cm"}` : "—"}</strong></div>
                   <div><span>Peso por caja</span><strong>{box?.weight ? `${box.weight} ${box.weightUnit || "kg"}` : "—"}</strong></div>
@@ -872,6 +899,12 @@ function CatalogProductDetail({ product, onClose, onSaved }) {
           <div>
             <span>Precio de compra por unidad</span>
             <strong>{money(product.unit_price)}</strong>
+            <span>
+              Precio de venta:{" "}
+              {Number(infoOf(product).salePrice) > 0
+                ? `${money(infoOf(product).salePrice)} · ${cordobas(infoOf(product).salePrice)}`
+                : "sin definir"}
+            </span>
             <small>
               {[infoOf(product).category, infoOf(product).supplier]
                 .filter(Boolean)
