@@ -292,16 +292,30 @@ export default function ProductSection({
       <div className="qtTable">
         <div className="qtRow qtHead">
           <span />
-          <span>Producto</span>
-          <span>Precio</span>
+          <span className="qtLeft">Producto</span>
+          <span>Precio US$</span>
           <span>Unidades</span>
           <span>Cajas</span>
-          <span>Por caja</span>
-          <span>Medidas de la caja</span>
-          <span>Peso por caja</span>
-          <span>CBM</span>
-          <span>Peso total</span>
-          <span>Costo/unidad</span>
+          <span>Unidades por caja</span>
+          <span className="qtHeadGroup">
+            <em>Medidas de la caja</em>
+            <i>
+              <b>Largo</b>
+              <b>Ancho</b>
+              <b>Alto</b>
+              <b>Medida</b>
+            </i>
+          </span>
+          <span className="qtHeadGroup">
+            <em>Peso por caja</em>
+            <i className="qtTwo">
+              <b>Peso</b>
+              <b>Unidad</b>
+            </i>
+          </span>
+          <span className="qtRight">CBM</span>
+          <span className="qtRight">Peso total</span>
+          <span className="qtRight">Costo por unidad</span>
           <span />
         </div>
         {products.map((p, i) => {
@@ -328,6 +342,7 @@ export default function ProductSection({
                 <span className="qtLabel">Producto</span>
                 <input
                   value={p.name}
+                  title={p.name}
                   onChange={(e) => update(p.id, "name", e.target.value)}
                   placeholder={"Producto " + (i + 1)}
                 />
@@ -376,7 +391,7 @@ export default function ProductSection({
                   )}
                 </label>
                 <label className="qtCell">
-                  <span className="qtLabel">Por caja</span>
+                  <span className="qtLabel">Unidades por caja</span>
                   <input
                     type="number"
                     min="0"

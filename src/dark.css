@@ -1206,3 +1206,127 @@ body {
     grid-template-columns: 1fr;
   }
 }
+/* Tabla rápida: encabezados grandes y alineados con su columna. */
+main:has(.qtTable) {
+  max-width: 1500px;
+}
+@media (min-width: 1240px) {
+  .qtRow {
+    grid-template-columns:
+      52px minmax(130px, 1.7fr) minmax(62px, 0.7fr) minmax(72px, 0.8fr)
+      minmax(52px, 0.6fr) minmax(60px, 0.7fr) minmax(190px, 2fr)
+      minmax(96px, 1fr) minmax(84px, 0.8fr) minmax(92px, 0.9fr)
+      minmax(96px, 0.95fr) 30px;
+    gap: 8px;
+    padding: 10px 12px;
+  }
+  .qtHead {
+    align-items: end;
+    padding-top: 12px;
+    padding-bottom: 10px;
+    color: #c5ced8;
+    font-size: 12.5px;
+    font-weight: 800;
+    letter-spacing: 0;
+    text-transform: none;
+    line-height: 1.25;
+  }
+  .qtHead > span {
+    text-align: center;
+  }
+  .qtHead > .qtLeft {
+    text-align: left;
+  }
+  .qtHead > .qtRight {
+    text-align: right;
+  }
+  .qtHeadGroup em {
+    display: block;
+    font-style: normal;
+    padding-bottom: 4px;
+    margin-bottom: 4px;
+    border-bottom: 1px solid #3a3e49;
+  }
+  .qtHeadGroup i {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 54px;
+    gap: 4px;
+    font-style: normal;
+  }
+  .qtHeadGroup i.qtTwo {
+    grid-template-columns: 1fr 52px;
+  }
+  .qtHeadGroup b {
+    font-size: 11.5px;
+    font-weight: 700;
+    color: #9aa5b1;
+  }
+  .qtRow input,
+  .qtRow select {
+    height: 40px;
+    font-size: 14px;
+  }
+  .qtRow input[type="number"] {
+    text-align: center;
+  }
+  .qtDims > div {
+    grid-template-columns: 1fr 1fr 1fr 54px;
+    gap: 4px;
+  }
+  .qtWeight > div {
+    grid-template-columns: 1fr 52px;
+    gap: 4px;
+  }
+  .qtRow .qtPhoto {
+    width: 52px;
+    height: 52px;
+  }
+  .qtCalc b {
+    font-size: 14.5px;
+  }
+  .qtCalc small {
+    font-size: 11.5px;
+  }
+  .qtFoot > b {
+    font-size: 14.5px;
+    text-align: center;
+  }
+  .qtFoot > b:nth-child(2) {
+    text-align: left;
+  }
+}
+@media (max-width: 1239px) {
+  .qtLabel {
+    font-size: 12px;
+  }
+  .qtRow input,
+  .qtRow select {
+    height: 42px;
+    font-size: 15px;
+  }
+}
+/* Desglose del costo unitario: letra legible. */
+.livePricingHead small {
+  font-size: 11.5px;
+}
+.livePricingRow {
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+.livePricingName b {
+  font-size: 14px;
+}
+.livePricingName small {
+  font-size: 12.5px;
+}
+.livePricingUnitCost {
+  font-size: 14px;
+}
+.livePricingImage {
+  width: 42px;
+  height: 42px;
+}
+.livePricingRow {
+  grid-template-columns: 42px minmax(0, 1fr) auto;
+  gap: 12px;
+}
