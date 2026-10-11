@@ -396,7 +396,7 @@ function SaveDialog({
     </div>
   );
 }
-function CalculatorPage({ onSaved, initialCustomer }) {
+function CalculatorPage({ onSaved, initialCustomer, initialCatalogIds }) {
   const [products, setProducts] = useState([blankProduct()]);
   const [catalogProducts, setCatalogProducts] = useState([]);
   const [fee, setFee] = useState(3);
@@ -537,6 +537,7 @@ function CalculatorPage({ onSaved, initialCustomer }) {
         fee={fee}
         setFee={setFee}
         catalogProducts={catalogProducts}
+        initialCatalogIds={initialCatalogIds}
         shipping={{
           viaMiami: r.viaMiami,
           direct: r.direct,
@@ -871,6 +872,7 @@ function App() {
   const [page, setPage] = useState("calculator"),
     [refresh, setRefresh] = useState(0),
     [quoteCustomer, setQuoteCustomer] = useState(null),
+    [quoteProducts, setQuoteProducts] = useState([]),
     [currentUser, setCurrentUser] = useState(null),
     [authLoading, setAuthLoading] = useState(true),
     [needsSetup, setNeedsSetup] = useState(false);
@@ -892,10 +894,20 @@ function App() {
   }, []);
   function createQuote(customer = null) {
     setQuoteCustomer(customer);
+    setQuoteProducts([]);
+    setPage("calculator");
+  }
+  // Abre una cotización nueva con productos del catálogo ya cargados.
+  function quoteWithProducts(ids) {
+    setQuoteCustomer(null);
+    setQuoteProducts(ids);
     setPage("calculator");
   }
   function navigate(next) {
-    if (next === "calculator") setQuoteCustomer(null);
+    if (next === "calculator") {
+      setQuoteCustomer(null);
+      setQuoteProducts([]);
+    }
     setPage(next);
   }
   function saved() {
@@ -949,7 +961,12 @@ function App() {
       </header>
       <main className="appMain">
         {page === "calculator" ? (
-          <CalculatorPage onSaved={saved} initialCustomer={quoteCustomer} />
+          <CalculatorPage
+            key={quoteProducts.join(",")}
+            onSaved={saved}
+            initialCustomer={quoteCustomer}
+            initialCatalogIds={quoteProducts}
+          />
         ) : page === "products" ? (
           <ProductsPage
             refreshKey={refresh}
@@ -959,7 +976,11 @@ function App() {
         ) : page === "photos" ? (
           <PhotosPage refreshKey={refresh} />
         ) : page === "suppliers" ? (
-          <SuppliersPage refreshKey={refresh} onChange={changed} />
+          <SuppliersPage
+            refreshKey={refresh}
+            onChange={changed}
+            onQuote={quoteWithProducts}
+          />
         ) : page === "customers" ? (
           <ClientsPage refreshKey={refresh} onCreateQuote={createQuote} />
         ) : page === "profits" ? (

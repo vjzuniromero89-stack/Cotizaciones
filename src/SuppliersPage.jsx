@@ -257,7 +257,7 @@ function Comparison({ group }) {
   );
 }
 
-export default function SuppliersPage({ refreshKey, onChange }) {
+export default function SuppliersPage({ refreshKey, onChange, onQuote }) {
   const [catalog, setCatalog] = useState({
       products: [],
       suppliers: [],
@@ -267,7 +267,10 @@ export default function SuppliersPage({ refreshKey, onChange }) {
     [editing, setEditing] = useState(null),
     [adding, setAdding] = useState(false),
     [productFor, setProductFor] = useState(null),
-    [productEdit, setProductEdit] = useState(null);
+    [productEdit, setProductEdit] = useState(null),
+    [picked, setPicked] = useState([]);
+  const togglePick = (id) =>
+    setPicked((x) => (x.includes(id) ? x.filter((v) => v !== id) : [...x, id]));
   async function load() {
     try {
       setCatalog(splitCatalog(await api("/catalog-products")));
@@ -453,12 +456,24 @@ export default function SuppliersPage({ refreshKey, onChange }) {
                     {items.map((p) => {
                       const info = infoOf(p);
                       return (
-                        <button
-                          className="supplierProduct"
+                        <div
+                          className={
+                            "supplierProduct" +
+                            (picked.includes(p.id) ? " picked" : "")
+                          }
                           key={p.id}
-                          onClick={() => setProductEdit(p)}
-                          title="Editar producto"
+                          role="button"
+                          tabIndex={0}
+                          onClick={() => togglePick(p.id)}
+                          onKeyDown={(e) =>
+                            (e.key === "Enter" || e.key === " ") &&
+                            togglePick(p.id)
+                          }
+                          title="Tocar para seleccionar"
                         >
+                          <span className="supplierCheck">
+                            {picked.includes(p.id) ? "✓" : ""}
+                          </span>
                           {p.image_url ? (
                             <img src={p.image_url} alt="" />
                           ) : (
@@ -477,8 +492,18 @@ export default function SuppliersPage({ refreshKey, onChange }) {
                           <span className="supplierPrice">
                             <b>{money(p.unit_price)}</b>
                             <small>{cordobas(p.unit_price)}</small>
+                            <button
+                              type="button"
+                              className="supplierEdit"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setProductEdit(p);
+                              }}
+                            >
+                              <Pencil /> Editar
+                            </button>
                           </span>
-                        </button>
+                        </div>
                       );
                     })}
                   </div>
@@ -499,6 +524,23 @@ export default function SuppliersPage({ refreshKey, onChange }) {
         )}
       </section>
 
+      {picked.length > 0 && (
+        <div className="pickBar">
+          <b>
+            {picked.length}{" "}
+            {picked.length === 1
+              ? "producto seleccionado"
+              : "productos seleccionados"}
+          </b>
+          <button className="pickClear" onClick={() => setPicked([])}>
+            Quitar selección
+          </button>
+          <button className="pickGo" onClick={() => onQuote?.(picked)}>
+            <Plus /> Crear cotización con{" "}
+            {picked.length === 1 ? "este producto" : "estos productos"}
+          </button>
+        </div>
+      )}
       {(adding || editing) && (
         <SupplierDialog
           supplier={editing}

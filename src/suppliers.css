@@ -584,3 +584,188 @@
     height: 84px;
   }
 }
+
+/* Selección de productos en Proveedores para mandarlos a una cotización. */
+.supplierProduct {
+  grid-template-columns: 26px 110px 1fr auto;
+  cursor: pointer;
+  user-select: none;
+}
+.supplierProduct.picked {
+  border-color: #3be090;
+  background: #15201b;
+}
+.supplierCheck {
+  width: 26px;
+  height: 26px;
+  border: 2px solid #4a5160;
+  border-radius: 7px;
+  display: grid;
+  place-items: center;
+  font-weight: 900;
+  color: #07140e;
+}
+.supplierProduct.picked .supplierCheck {
+  background: #3be090;
+  border-color: #3be090;
+}
+.supplierEdit {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 6px;
+  border: 1px solid #343640;
+  border-radius: 8px;
+  background: transparent;
+  color: #eef2f5;
+  font-weight: 800;
+  font-size: 12.5px;
+  padding: 5px 9px;
+  cursor: pointer;
+}
+.supplierEdit svg {
+  width: 13px;
+  height: 13px;
+}
+.pickBar {
+  position: sticky;
+  bottom: 14px;
+  z-index: 4;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-top: 16px;
+  padding: 12px 16px;
+  border: 1px solid #3be090;
+  border-radius: 14px;
+  background: #101a15;
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.55);
+}
+.pickBar b {
+  font: 800 16px Manrope;
+  margin-right: auto;
+}
+.pickBar button {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border-radius: 10px;
+  padding: 11px 15px;
+  font-weight: 900;
+  cursor: pointer;
+}
+.pickBar svg {
+  width: 16px;
+}
+.pickClear {
+  border: 1px solid #343640;
+  background: transparent;
+  color: #eef2f5;
+}
+.pickGo {
+  border: 0;
+  background: #3be090;
+  color: #07140e;
+}
+@media (max-width: 520px) {
+  .supplierProduct {
+    grid-template-columns: 26px 84px 1fr;
+  }
+  .supplierPrice {
+    grid-column: 2 / -1;
+    text-align: left;
+  }
+}
+
+/* Catálogo con fotos al crear una cotización. */
+.catalogOpen {
+  border: 1px solid #2d7c55;
+  border-radius: 10px;
+  background: #173629;
+  color: #3be090;
+  font: inherit;
+  font-weight: 900;
+  font-size: 15px;
+  padding: 12px 16px;
+  cursor: pointer;
+}
+.catalogPanel {
+  border: 1px solid #2d7c55;
+  border-radius: 13px;
+  padding: 12px;
+  margin-bottom: 14px;
+  background: #121816;
+}
+.catalogPanel > input {
+  width: 100%;
+  height: 42px;
+  border: 1px solid #343640;
+  border-radius: 9px;
+  background: var(--field);
+  color: #fff;
+  font: inherit;
+  font-size: 15px;
+  padding: 0 12px;
+  margin-bottom: 12px;
+}
+.catalogPanelGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 10px;
+  max-height: 460px;
+  overflow: auto;
+}
+.catalogPanelGrid button {
+  position: relative;
+  display: grid;
+  gap: 4px;
+  text-align: left;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+  color: inherit;
+  font: inherit;
+  padding: 8px;
+  cursor: pointer;
+}
+.catalogPanelGrid button:hover,
+.catalogPanelGrid button.added {
+  border-color: #3be090;
+}
+.catalogPanelGrid img,
+.catalogPanelNoPhoto {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: contain;
+  background: #fff;
+  border-radius: 8px;
+  display: block;
+}
+.catalogPanelNoPhoto {
+  display: grid;
+  place-items: center;
+  background: var(--surface-2);
+  color: var(--muted);
+  font-size: 12px;
+}
+.catalogPanelGrid b {
+  font: 800 14.5px Manrope;
+  overflow-wrap: anywhere;
+}
+.catalogPanelGrid small {
+  color: var(--muted);
+  font-size: 12.5px;
+}
+.catalogPanelGrid em {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  font-style: normal;
+  font-weight: 900;
+  font-size: 12px;
+  color: #07140e;
+  background: #3be090;
+  border-radius: 99px;
+  padding: 3px 9px;
+}

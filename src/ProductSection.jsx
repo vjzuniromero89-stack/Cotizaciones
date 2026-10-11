@@ -4,6 +4,7 @@ import { shrinkImage } from "./image.js";
 import { autoBoxes, syncBoxes } from "./calculate.js";
 import { Plus, Trash2, ImagePlus, PackagePlus } from "lucide-react";
 import "./products.css";
+import "./suppliers.css";
 const money = (n) =>
   new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(
     n || 0,
@@ -86,8 +87,11 @@ export default function ProductSection({
   routeDetails,
   exchangeRate,
   catalogProducts = [],
+  initialCatalogIds = [],
 }) {
   const [selectedCatalog, setSelectedCatalog] = React.useState("");
+  const [pickerOpen, setPickerOpen] = React.useState(false);
+  const [pickerSearch, setPickerSearch] = React.useState("");
   const subtotal = products.reduce(
       (s, p) => s + (Number(p.price) || 0) * (Number(p.qty) || 0),
       0,
@@ -171,6 +175,7 @@ export default function ProductSection({
     if (!saved) return;
     const product = {
       id: crypto.randomUUID(),
+      catalogId: saved.id,
       name: saved.name || "",
       price: saved.unit_price ?? "",
       qty: "",
@@ -200,6 +205,13 @@ export default function ProductSection({
     );
     setSelectedCatalog("");
   };
+  const preloaded = React.useRef(false);
+  React.useEffect(() => {
+    if (preloaded.current || !initialCatalogIds?.length) return;
+    if (!catalogProducts.length) return;
+    preloaded.current = true;
+    initialCatalogIds.forEach((id) => addCatalogProduct(id));
+  }, [catalogProducts, initialCatalogIds]);
   async function upload(id, original) {
     if (!original) return;
     const file = await shrinkImage(original);
@@ -269,22 +281,57 @@ export default function ProductSection({
             <small>CATÁLOGO</small>
             <b>Elegir producto guardado</b>
           </div>
-          <select
-            value={selectedCatalog}
-            onChange={(e) => {
-              const id = e.target.value;
-              setSelectedCatalog(id);
-              if (id) addCatalogProduct(id);
-            }}
+          <button
+            type="button"
+            className="catalogOpen"
+            onClick={() => setPickerOpen((x) => !x)}
           >
-            <option value="">Selecciona un producto…</option>
-            {catalogProducts.map((p) => (
-              <option key={p.id} value={p.id}>
-                {p.name}
-              </option>
-            ))}
-          </select>
-          <span className="autoLoadHint">Se carga automáticamente</span>
+            {pickerOpen ? "Cerrar catálogo" : "Ver productos con foto"}
+          </button>
+          <span className="autoLoadHint">Toca un producto para agregarlo</span>
+        </div>
+      )}
+      {pickerOpen && catalogProducts.length > 0 && (
+        <div className="catalogPanel">
+          <input
+            autoFocus
+            value={pickerSearch}
+            placeholder="Buscar por nombre o proveedor…"
+            onChange={(e) => setPickerSearch(e.target.value)}
+          />
+          <div className="catalogPanelGrid">
+            {catalogProducts
+              .filter((p) =>
+                (p.name + " " + (p.boxes?.[0]?.info?.supplier || ""))
+                  .toLowerCase()
+                  .includes(pickerSearch.trim().toLowerCase()),
+              )
+              .map((p) => {
+                const times = products.filter((x) => x.catalogId === p.id).length;
+                return (
+                  <button
+                    type="button"
+                    key={p.id}
+                    className={times ? "added" : ""}
+                    onClick={() => addCatalogProduct(p.id)}
+                  >
+                    {p.image_url ? (
+                      <img src={p.image_url} alt="" loading="lazy" />
+                    ) : (
+                      <span className="catalogPanelNoPhoto">Sin foto</span>
+                    )}
+                    <b>{p.name}</b>
+                    <small>
+                      {p.boxes?.[0]?.info?.supplier || "Sin proveedor"} ·{" "}
+                      {money(p.unit_price)}
+                    </small>
+                    {times > 0 && (
+                      <em>✓ Agregado{times > 1 ? " ×" + times : ""}</em>
+                    )}
+                  </button>
+                );
+              })}
+          </div>
         </div>
       )}
       <div className="manualDivider">
