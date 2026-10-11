@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { calculate } from "./calculate.js";
+import { calculate, autoBoxes, syncBoxes } from "./calculate.js";
 describe("shipping calculator", () => {
   it("compares raw and dimensional weight on both legs", () => {
     const b = [
@@ -74,5 +74,39 @@ describe("shipping calculator", () => {
     expect(r.weightCbm).toBeCloseTo(600 / 350);
     expect(r.directChargeBy).toBe("volume");
     expect(r.billCbm).toBeCloseTo(2);
+  });
+});
+describe("cajas según las unidades", () => {
+  it("divide las unidades entre los productos por caja", () => {
+    expect(autoBoxes(10000, 50)).toBe(200);
+    expect(autoBoxes("1000", "25")).toBe(40);
+  });
+  it("una caja a medias cuenta como caja completa", () => {
+    expect(autoBoxes(1010, 25)).toBe(41);
+    expect(autoBoxes(1, 50)).toBe(1);
+  });
+  it("no inventa cajas si falta un dato", () => {
+    expect(autoBoxes("", 50)).toBe("");
+    expect(autoBoxes(1000, "")).toBe("");
+    expect(autoBoxes(1000, 0)).toBe("");
+  });
+  it("actualiza las cajas al cambiar las unidades", () => {
+    const p = { qty: "2000", boxes: [{ qty: 1, unitsPerBox: "25" }] };
+    expect(syncBoxes(p).boxes[0].qty).toBe(80);
+  });
+  it("respeta las cajas escritas a mano", () => {
+    const p = {
+      qty: "2000",
+      boxes: [{ qty: "75", unitsPerBox: "25", qtyManual: true }],
+    };
+    expect(syncBoxes(p).boxes[0].qty).toBe("75");
+  });
+  it("no toca las cajas si no se sabe cuántos van por caja", () => {
+    const p = { qty: "2000", boxes: [{ qty: "12", unitsPerBox: "" }] };
+    expect(syncBoxes(p).boxes[0].qty).toBe("12");
+  });
+  it("vacía las cajas automáticas si se borran las unidades", () => {
+    const p = { qty: "", boxes: [{ qty: 80, unitsPerBox: "25" }] };
+    expect(syncBoxes(p).boxes[0].qty).toBe("");
   });
 });

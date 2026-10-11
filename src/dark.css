@@ -1075,3 +1075,14 @@ body {
     grid-template-columns: 1fr 1fr;
   }
 }
+.qtAuto {
+  border: 0;
+  background: none;
+  padding: 0;
+  color: #ff9a3c;
+  font-size: 10.5px;
+  font-weight: 800;
+  text-align: right;
+  cursor: pointer;
+  white-space: nowrap;
+}

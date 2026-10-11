@@ -1,6 +1,7 @@
 import React from "react";
 import { authFetch } from "./auth.js";
 import { shrinkImage } from "./image.js";
+import { autoBoxes, syncBoxes } from "./calculate.js";
 import { Plus, Trash2, ImagePlus, PackagePlus } from "lucide-react";
 import "./products.css";
 const money = (n) =>
@@ -141,17 +142,27 @@ export default function ProductSection({
     };
   });
   const update = (id, k, v) =>
-    setProducts((x) => x.map((p) => (p.id === id ? { ...p, [k]: v } : p)));
+    setProducts((x) =>
+      x.map((p) => (p.id === id ? syncBoxes({ ...p, [k]: v }) : p)),
+    );
   const updateBox = (productId, boxId, k, v) =>
     setProducts((x) =>
       x.map((p) =>
         p.id === productId
-          ? {
+          ? syncBoxes({
               ...p,
               boxes: p.boxes.map((b) =>
-                b.id === boxId ? { ...b, [k]: v } : b,
+                b.id === boxId
+                  ? {
+                      ...b,
+                      [k]: v,
+                      // Escribir las cajas las deja fijas; borrarlas o pulsar
+                      // "auto" vuelve al cálculo por unidades.
+                      ...(k === "qty" ? { qtyManual: v !== "" } : {}),
+                    }
+                  : b,
               ),
-            }
+            })
           : p,
       ),
     );
@@ -170,7 +181,9 @@ export default function ProductSection({
         .map((b) => ({
           ...b,
           id: crypto.randomUUID(),
-          qty: b.qty ?? "",
+          qty:
+            autoBoxes(saved.default_quantity, b.unitsPerBox) || (b.qty ?? ""),
+          qtyManual: false,
           unitsPerBox: b.unitsPerBox ?? "",
           l: b.l ?? "",
           w: b.w ?? "",
@@ -349,6 +362,19 @@ export default function ProductSection({
                     value={b.qty}
                     onChange={(e) => updateBox(p.id, b.id, "qty", e.target.value)}
                   />
+                  {b.qtyManual && autoBoxes(p.qty, b.unitsPerBox) !== "" && (
+                    <button
+                      type="button"
+                      className="qtAuto"
+                      title="Volver al cálculo automático: unidades ÷ productos por caja"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        updateBox(p.id, b.id, "qty", "");
+                      }}
+                    >
+                      ↺ auto {autoBoxes(p.qty, b.unitsPerBox)}
+                    </button>
+                  )}
                 </label>
                 <label className="qtCell">
                   <span className="qtLabel">Por caja</span>

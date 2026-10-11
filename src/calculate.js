@@ -7,6 +7,23 @@ export const exchangeRateOf = (rates) => {
   const rate = Number(rates?.exchangeRate);
   return !rate || rate === 36.62 ? DEFAULT_EXCHANGE_RATE : rate;
 };
+// Cajas necesarias para una cantidad de unidades. Una caja a medias cuenta
+// como caja completa, porque igual ocupa su espacio en el envío.
+export const autoBoxes = (units, perBox) => {
+  const u = Number(units),
+    n = Number(perBox);
+  if (!(u > 0) || !(n > 0)) return "";
+  return Math.ceil(u / n - 1e-9);
+};
+// Mantiene las cajas de un producto al día con sus unidades. No toca nada si
+// el usuario escribió las cajas a mano o si no se sabe cuántos van por caja.
+export const syncBoxes = (product) => {
+  const [box, ...rest] = product.boxes || [];
+  if (!box || box.qtyManual || !(Number(box.unitsPerBox) > 0)) return product;
+  const qty = autoBoxes(product.qty, box.unitsPerBox);
+  if (String(box.qty ?? "") === String(qty)) return product;
+  return { ...product, boxes: [{ ...box, qty }, ...rest] };
+};
 const num = (v, f = 0) => (Number.isFinite(+v) ? +v : f);
 export function calculate(boxes, rates) {
   let actualKg = 0,
