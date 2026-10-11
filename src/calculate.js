@@ -24,6 +24,28 @@ export const syncBoxes = (product) => {
   if (String(box.qty ?? "") === String(qty)) return product;
   return { ...product, boxes: [{ ...box, qty }, ...rest] };
 };
+// Costo estimado de una unidad puesta en Nicaragua por la ruta directa, para
+// comparar proveedores: compra + comisión + flete según lo que ocupa o pesa.
+// No aplica el mínimo de 1 CBM, porque eso depende del pedido completo.
+export const estimateLandedUnit = (
+  { price, box },
+  { cbmRate = 550, directKgPerCbm = 350, feePercent = 3 } = {},
+) => {
+  const perBox = Number(box?.unitsPerBox) || 0;
+  const purchase = Number(price) || 0;
+  if (!(perBox > 0) || !(purchase > 0)) return null;
+  const boxCbm =
+    (Number(box.l) || 0) *
+    (Number(box.w) || 0) *
+    (Number(box.h) || 0) *
+    (box.unit === "in" ? IN3_TO_M3 : 1e-6);
+  const boxKg =
+    (Number(box.weight) || 0) * (box.weightUnit === "lb" ? 1 / KG_TO_LB : 1);
+  const billCbm = Math.max(boxCbm, boxKg / directKgPerCbm) / perBox;
+  const freight = billCbm * cbmRate;
+  const fee = (purchase * feePercent) / 100;
+  return { purchase, fee, freight, total: purchase + fee + freight };
+};
 const num = (v, f = 0) => (Number.isFinite(+v) ? +v : f);
 export function calculate(boxes, rates) {
   let actualKg = 0,

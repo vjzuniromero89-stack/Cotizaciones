@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { calculate, autoBoxes, syncBoxes } from "./calculate.js";
+import { calculate, autoBoxes, syncBoxes, estimateLandedUnit } from "./calculate.js";
 describe("shipping calculator", () => {
   it("compares raw and dimensional weight on both legs", () => {
     const b = [
@@ -108,5 +108,23 @@ describe("cajas según las unidades", () => {
   it("vacía las cajas automáticas si se borran las unidades", () => {
     const p = { qty: "", boxes: [{ qty: 80, unitsPerBox: "25" }] };
     expect(syncBoxes(p).boxes[0].qty).toBe("");
+  });
+});
+describe("costo estimado para comparar proveedores", () => {
+  const box = { unitsPerBox: 50, l: 37, w: 37, h: 49, unit: "cm", weight: 6, weightUnit: "kg" };
+  it("suma compra, comisión y flete por unidad", () => {
+    const r = estimateLandedUnit({ price: 0.6, box });
+    expect(r.fee).toBeCloseTo(0.018, 5);
+    expect(r.freight).toBeCloseTo((0.067081 / 50) * 550, 5);
+    expect(r.total).toBeCloseTo(1.3559, 3);
+  });
+  it("cobra por peso cuando la caja es pesada", () => {
+    const heavy = { ...box, weight: 70 };
+    const r = estimateLandedUnit({ price: 0.6, box: heavy });
+    expect(r.freight).toBeCloseTo((70 / 350 / 50) * 550, 5);
+  });
+  it("no estima si falta el precio o los productos por caja", () => {
+    expect(estimateLandedUnit({ price: 0, box })).toBe(null);
+    expect(estimateLandedUnit({ price: 1, box: { ...box, unitsPerBox: "" } })).toBe(null);
   });
 });

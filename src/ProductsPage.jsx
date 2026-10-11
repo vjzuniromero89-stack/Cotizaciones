@@ -14,9 +14,16 @@ import {
   Pencil,
 } from "lucide-react";
 import "./products-page.css";
+import "./suppliers.css";
 import { authFetch } from "./auth.js";
-import { shrinkImage } from "./image.js";
+import { shrinkImage, imagesFromPaste } from "./image.js";
 import { DEFAULT_EXCHANGE_RATE } from "./calculate.js";
+import {
+  isRealProduct,
+  splitCatalog,
+  comparisonGroups,
+  galleryOf,
+} from "./suppliers.js";
 
 const money = (n) =>
   new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(
@@ -512,7 +519,13 @@ const safeLink = (url) => {
   return /^https?:\/\//i.test(text) ? text : "https://" + text;
 };
 
-function RegisterProductDialog({ onClose, onSaved, product = null }) {
+export function RegisterProductDialog({
+  onClose,
+  onSaved,
+  product = null,
+  defaults = {},
+  options = {},
+}) {
   const [form, setForm] = useState({
       name: product?.name || "",
       imageUrl: product?.image_url || "",
@@ -521,7 +534,8 @@ function RegisterProductDialog({ onClose, onSaved, product = null }) {
       specs: specsOf(product).specs,
       description: specsOf(product).rest,
       category: infoOf(product).category || "",
-      supplier: infoOf(product).supplier || "",
+      supplier: infoOf(product).supplier || defaults.supplier || "",
+      group: infoOf(product).group || defaults.group || "",
       url: infoOf(product).url || "",
       notes: infoOf(product).notes || "",
       box: {
@@ -567,6 +581,25 @@ function RegisterProductDialog({ onClose, onSaved, product = null }) {
       setBusy(false);
     }
   }
+  // Pegar con Ctrl+V un recorte de pantalla lo pone como foto del producto.
+  useEffect(() => {
+    const onPaste = (event) => {
+      const [file] = imagesFromPaste(event);
+      if (!file) return;
+      event.preventDefault();
+      upload(file);
+    };
+    document.addEventListener("paste", onPaste);
+    return () => document.removeEventListener("paste", onPaste);
+  }, []);
+  const [gallery, setGallery] = useState(null);
+  async function openGallery() {
+    try {
+      setGallery(galleryOf(await api("/catalog-products")).photos);
+    } catch {
+      setGallery([]);
+    }
+  }
   async function submit(e) {
     e.preventDefault();
     setBusy(true);
@@ -596,6 +629,7 @@ function RegisterProductDialog({ onClose, onSaved, product = null }) {
                 description: form.description.trim(),
                 category: form.category.trim(),
                 supplier: form.supplier.trim(),
+                group: form.group.trim(),
                 url: form.url.trim(),
                 notes: form.notes.trim(),
               },
@@ -627,21 +661,29 @@ function RegisterProductDialog({ onClose, onSaved, product = null }) {
           </button>
         </div>
         <div className="rpTop">
-          <label className="catalogPhotoPicker">
-            {form.imageUrl ? (
-              <img src={form.imageUrl} alt="" />
-            ) : (
-              <>
-                <ImagePlus />
-                <span>Agregar foto</span>
-              </>
-            )}
-            <input
-              type="file"
-              accept="image/*"
-              onChange={(e) => upload(e.target.files[0])}
-            />
-          </label>
+          <div className="rpPhoto">
+            <label className="catalogPhotoPicker">
+              {form.imageUrl ? (
+                <img src={form.imageUrl} alt="" />
+              ) : (
+                <>
+                  <ImagePlus />
+                  <span>{busy ? "Subiendo…" : "Agregar foto"}</span>
+                </>
+              )}
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => upload(e.target.files[0])}
+              />
+            </label>
+            <small>
+              También puedes pegarla con <b>Ctrl + V</b>
+            </small>
+            <button type="button" className="rpGalleryButton" onClick={openGallery}>
+              Elegir de la galería
+            </button>
+          </div>
           <div className="rpCol">
             <label className="rpField">
               <span>Nombre del producto *</span>
@@ -692,10 +734,30 @@ function RegisterProductDialog({ onClose, onSaved, product = null }) {
             <label className="rpField">
               <span>Proveedor</span>
               <input
+                list="rpSuppliers"
                 value={form.supplier}
                 placeholder="Nombre de la fábrica o tienda"
                 onChange={(e) => update("supplier", e.target.value)}
               />
+              <datalist id="rpSuppliers">
+                {(options.suppliers || []).map((name) => (
+                  <option key={name} value={name} />
+                ))}
+              </datalist>
+            </label>
+            <label className="rpField">
+              <span>Comparar como</span>
+              <input
+                list="rpGroups"
+                value={form.group}
+                placeholder="Ej. Botella 700ml (igual en cada proveedor)"
+                onChange={(e) => update("group", e.target.value)}
+              />
+              <datalist id="rpGroups">
+                {(options.groups || []).map((name) => (
+                  <option key={name} value={name} />
+                ))}
+              </datalist>
             </label>
             <label className="rpField">
               <span>Enlace del producto</span>
@@ -824,6 +886,35 @@ function RegisterProductDialog({ onClose, onSaved, product = null }) {
             </div>
           </div>
         </div>
+        {gallery && (
+          <div className="rpGallery">
+            <div>
+              <b>Elige una foto de la galería</b>
+              <button type="button" onClick={() => setGallery(null)}>
+                Cerrar
+              </button>
+            </div>
+            {gallery.length ? (
+              <div className="rpGalleryGrid">
+                {gallery.map((photo) => (
+                  <button
+                    type="button"
+                    key={photo.id}
+                    title={photo.name || photo.product || "Foto"}
+                    onClick={() => {
+                      update("imageUrl", photo.url);
+                      setGallery(null);
+                    }}
+                  >
+                    <img src={photo.url} alt="" loading="lazy" />
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <p>La galería está vacía. Agrega fotos en la pestaña Fotos.</p>
+            )}
+          </div>
+        )}
         {error && (
           <div className="saveError">
             <b>No se pudo guardar</b>
@@ -839,14 +930,24 @@ function RegisterProductDialog({ onClose, onSaved, product = null }) {
   );
 }
 
-function CatalogSection({ refreshKey, onCatalogChanged }) {
+function CatalogSection({ refreshKey, onCatalogChanged, onOptions }) {
   const [items, setItems] = useState([]),
     [loading, setLoading] = useState(true),
-    [selected, setSelected] = useState(null);
+    [selected, setSelected] = useState(null),
+    [options, setOptions] = useState({ suppliers: [], groups: [] });
+  useEffect(() => {
+    onOptions?.(options);
+  }, [options]);
   async function load() {
     setLoading(true);
     try {
-      setItems(await api("/catalog-products"));
+      const rows = await api("/catalog-products");
+      setItems(rows.filter(isRealProduct));
+      const { products, suppliers } = splitCatalog(rows);
+      setOptions({
+        suppliers: suppliers.map((s) => s.name),
+        groups: comparisonGroups(products).map((g) => g.name),
+      });
     } catch {
       setItems([]);
     } finally {
@@ -954,6 +1055,7 @@ function CatalogSection({ refreshKey, onCatalogChanged }) {
       )}
       {selected && (
         <CatalogProductDetail
+          options={options}
           product={selected}
           onClose={() => setSelected(null)}
           onSaved={() => {
@@ -967,7 +1069,7 @@ function CatalogSection({ refreshKey, onCatalogChanged }) {
   );
 }
 
-function CatalogProductDetail({ product, onClose, onSaved }) {
+function CatalogProductDetail({ product, onClose, onSaved, options }) {
   const boxes = product.boxes || [];
   const [editing, setEditing] = useState(false);
   const cbm = (b) =>
@@ -1042,6 +1144,7 @@ function CatalogProductDetail({ product, onClose, onSaved }) {
       </section>
       {editing && (
         <RegisterProductDialog
+          options={options}
           product={product}
           onClose={() => setEditing(false)}
           onSaved={onSaved}
@@ -1053,7 +1156,8 @@ function CatalogProductDetail({ product, onClose, onSaved }) {
 
 export default function ProductsPage({ refreshKey, onChange }) {
   const [registering, setRegistering] = useState(false),
-    [catalogRefresh, setCatalogRefresh] = useState(0);
+    [catalogRefresh, setCatalogRefresh] = useState(0),
+    [options, setOptions] = useState({ suppliers: [], groups: [] });
   function saved() {
     setCatalogRefresh((x) => x + 1);
     onChange();
@@ -1076,9 +1180,11 @@ export default function ProductsPage({ refreshKey, onChange }) {
       <CatalogSection
         refreshKey={refreshKey + catalogRefresh}
         onCatalogChanged={saved}
+        onOptions={setOptions}
       />
       {registering && (
         <RegisterProductDialog
+          options={options}
           onClose={() => setRegistering(false)}
           onSaved={saved}
         />

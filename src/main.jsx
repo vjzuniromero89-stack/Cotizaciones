@@ -19,6 +19,8 @@ import {
   Users,
   LogOut,
   UserCog,
+  Factory,
+  Images,
 } from "lucide-react";
 import "./style.css";
 import "./route-breakdown.css";
@@ -30,6 +32,9 @@ import ProductSection, { blankProduct } from "./ProductSection.jsx";
 import ProfitPage from "./ProfitPage.jsx";
 import ProductsPage from "./ProductsPage.jsx";
 import ClientsPage from "./ClientsPage.jsx";
+import SuppliersPage from "./SuppliersPage.jsx";
+import PhotosPage from "./PhotosPage.jsx";
+import { isRealProduct } from "./suppliers.js";
 import UsersPage from "./UsersPage.jsx";
 import AuthPage from "./AuthPage.jsx";
 import PortalPage from "./PortalPage.jsx";
@@ -96,6 +101,8 @@ function Nav({ page, setPage, currentUser }) {
       {[
         ["calculator", Calculator, "Crear cotización", "Crear"],
         ["products", PackageSearch, "Productos", "Productos"],
+        ["suppliers", Factory, "Proveedores", "Proveed."],
+        ["photos", Images, "Fotos", "Fotos"],
         ["customers", Users, "Clientes", "Clientes"],
         ["quotes", FileText, "Cotizaciones internas", "Internas"],
         [
@@ -409,7 +416,7 @@ function CalculatorPage({ onSaved, initialCustomer }) {
   const [dialog, setDialog] = useState(false);
   useEffect(() => {
     api("/catalog-products")
-      .then(setCatalogProducts)
+      .then((rows) => setCatalogProducts(rows.filter(isRealProduct)))
       .catch(() => setCatalogProducts([]));
   }, []);
   const boxes = useMemo(
@@ -949,6 +956,10 @@ function App() {
             onChange={changed}
             setPage={navigate}
           />
+        ) : page === "photos" ? (
+          <PhotosPage refreshKey={refresh} />
+        ) : page === "suppliers" ? (
+          <SuppliersPage refreshKey={refresh} onChange={changed} />
         ) : page === "customers" ? (
           <ClientsPage refreshKey={refresh} onCreateQuote={createQuote} />
         ) : page === "profits" ? (

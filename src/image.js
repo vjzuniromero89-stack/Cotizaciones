@@ -26,3 +26,36 @@ export async function shrinkImage(file) {
     return file;
   }
 }
+
+// Sube una foto (ya reducida) y devuelve su dirección dentro de la aplicación.
+export async function uploadImage(original, authFetch) {
+  const file = await shrinkImage(original);
+  if (file.size > 5 * 1024 * 1024)
+    throw new Error("La foto debe pesar menos de 5 MB");
+  const name = (file.name || "foto.png").replace(/[^a-zA-Z0-9._-]/g, "_");
+  const key = crypto.randomUUID() + "-" + name;
+  const r = await authFetch("/api/uploads/" + key, {
+    method: "PUT",
+    headers: { "content-type": file.type || "application/octet-stream" },
+    body: file,
+  });
+  const data = await r.json().catch(() => ({}));
+  if (!r.ok)
+    throw new Error(data.error || data.detail || "No se pudo subir la foto");
+  return data.url || "/api/files/" + key;
+}
+
+// Fotos que vienen en un "pegar" (Ctrl+V), por ejemplo un recorte de pantalla.
+export function imagesFromPaste(event) {
+  const items = [...(event.clipboardData?.items || [])];
+  return items
+    .filter((item) => item.kind === "file" && item.type.startsWith("image/"))
+    .map((item) => item.getAsFile())
+    .filter(Boolean)
+    .map(
+      (file) =>
+        new File([file], file.name && file.name !== "image.png" ? file.name : `recorte-${Date.now()}.png`, {
+          type: file.type,
+        }),
+    );
+}
