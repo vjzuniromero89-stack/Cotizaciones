@@ -471,6 +471,34 @@ async function handleApi(request, env, url) {
       if (!r.ok) throw new Error(await r.text());
       return json({ ok: true });
     }
+    // Lista de clientes guardados: quedan aunque se borren sus cotizaciones.
+    if (url.pathname === "/api/clients" && request.method === "GET") {
+      return json(
+        await restRows(
+          env,
+          "clients?select=id,name,phone,created_at&order=name.asc",
+        ),
+      );
+    }
+    if (url.pathname === "/api/clients" && request.method === "POST") {
+      const b = await request.json();
+      if (!String(b.name || "").trim())
+        return json({ error: "Falta el nombre del cliente" }, 400);
+      const client = await upsertClient(env, b.name, b.phone);
+      return json(
+        { id: client.id, name: client.name, phone: client.phone },
+        201,
+      );
+    }
+    const clientItem = url.pathname.match(/^\/api\/clients\/([0-9a-f-]{36})$/);
+    if (clientItem && request.method === "DELETE") {
+      await restRows(
+        env,
+        `clients?id=eq.${encodeURIComponent(clientItem[1])}&select=id`,
+        { method: "DELETE", headers: { Prefer: "return=representation" } },
+      );
+      return new Response(null, { status: 204 });
+    }
     if (url.pathname === "/api/clients/link" && request.method === "POST") {
       const b = await request.json();
       if (!String(b.name || "").trim())

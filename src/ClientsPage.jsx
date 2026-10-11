@@ -147,12 +147,40 @@ export default function ClientsPage({ refreshKey, onCreateQuote }) {
   const [records, setRecords] = useState([]),
     [search, setSearch] = useState(""),
     [selected, setSelected] = useState(null),
-    [error, setError] = useState("");
+    [error, setError] = useState(""),
+    [saved, setSaved] = useState([]),
+    [adding, setAdding] = useState(false),
+    [draft, setDraft] = useState({ name: "", phone: "" }),
+    [addError, setAddError] = useState("");
+  const loadSaved = () =>
+    api("/clients")
+      .then(setSaved)
+      .catch(() => setSaved([]));
   useEffect(() => {
     api("/records?type=quote")
       .then(setRecords)
       .catch((e) => setError(e.message));
+    loadSaved();
   }, [refreshKey]);
+  async function addClient(e) {
+    e.preventDefault();
+    setAddError("");
+    try {
+      await api("/clients", { method: "POST", body: JSON.stringify(draft) });
+      setDraft({ name: "", phone: "" });
+      setAdding(false);
+      loadSaved();
+    } catch (err) {
+      setAddError(err.message || "No se pudo guardar el cliente");
+    }
+  }
+  async function removeClient(e, client) {
+    e.stopPropagation();
+    if (!window.confirm(`¿Quitar a ${client.name} de tu lista de clientes?`))
+      return;
+    await api("/clients/" + client.id, { method: "DELETE" });
+    loadSaved();
+  }
   const clients = useMemo(() => {
     const groups = new Map();
     for (const q of records) {
@@ -176,10 +204,27 @@ export default function ClientsPage({ refreshKey, onCreateQuote }) {
       c.total += quoteTotal(q);
       if (new Date(q.created_at) > new Date(c.last)) c.last = q.created_at;
     }
+    // Clientes guardados que todavía no tienen cotizaciones.
+    for (const s of saved) {
+      const name = String(s.name || "").trim(),
+        phone = String(s.phone || "").trim(),
+        key = (name + "|" + phone).toLowerCase();
+      if (!name) continue;
+      if (groups.has(key)) groups.get(key).id = s.id;
+      else
+        groups.set(key, {
+          id: s.id,
+          name,
+          phone,
+          quotes: [],
+          total: 0,
+          last: s.created_at,
+        });
+    }
     return [...groups.values()].sort(
       (a, b) => new Date(b.last) - new Date(a.last),
     );
-  }, [records]);
+  }, [records, saved]);
   const shown = clients.filter((c) =>
     (c.name + " " + c.phone).toLowerCase().includes(search.toLowerCase()),
   );
@@ -190,13 +235,46 @@ export default function ClientsPage({ refreshKey, onCreateQuote }) {
           <small>DIRECTORIO COMERCIAL</small>
           <h1>Clientes</h1>
           <p>
-            Cada cliente conserva automáticamente su historial de cotizaciones.
+            Cada cliente conserva su historial de cotizaciones y se queda en
+            tu lista aunque borres sus cotizaciones.
           </p>
         </div>
-        <button className="newProduct" onClick={() => onCreateQuote(null)}>
-          <Plus /> Crear cotización
-        </button>
+        <div className="clientHeadActions">
+          <button className="addClientButton" onClick={() => setAdding(true)}>
+            <Plus /> Agregar cliente
+          </button>
+          <button className="newProduct" onClick={() => onCreateQuote(null)}>
+            <Plus /> Crear cotización
+          </button>
+        </div>
       </div>
+      {adding && (
+        <form className="addClientForm" onSubmit={addClient}>
+          <label>
+            <span>Nombre del cliente *</span>
+            <input
+              autoFocus
+              required
+              value={draft.name}
+              onChange={(e) => setDraft({ ...draft, name: e.target.value })}
+            />
+          </label>
+          <label>
+            <span>Teléfono / WhatsApp</span>
+            <input
+              value={draft.phone}
+              onChange={(e) => setDraft({ ...draft, phone: e.target.value })}
+            />
+          </label>
+          <button className="newProduct" disabled={!draft.name.trim()}>
+            Guardar cliente
+          </button>
+          <button type="button" onClick={() => setAdding(false)}>
+            Cancelar
+          </button>
+          {addError && <p>{addError}</p>}
+        </form>
+      )}
       <div className="clientSummary">
         <div>
           <Users />
@@ -240,12 +318,28 @@ export default function ClientsPage({ refreshKey, onCreateQuote }) {
                   <Phone /> {c.phone || "Sin teléfono"}
                 </p>
                 <small>
-                  {c.quotes.length}{" "}
-                  {c.quotes.length === 1 ? "cotización" : "cotizaciones"} ·
-                  Última {new Date(c.last).toLocaleDateString()}
+                  {c.quotes.length
+                    ? `${c.quotes.length} ${
+                        c.quotes.length === 1 ? "cotización" : "cotizaciones"
+                      } · Última ${new Date(c.last).toLocaleDateString()}`
+                    : "Sin cotizaciones todavía"}
                 </small>
               </div>
-              <strong>{money(c.total)}</strong>
+              {c.quotes.length ? (
+                <strong>{money(c.total)}</strong>
+              ) : (
+                c.id && (
+                  <span
+                    className="clientRemove"
+                    role="button"
+                    tabIndex={0}
+                    title="Quitar de mi lista"
+                    onClick={(e) => removeClient(e, c)}
+                  >
+                    Quitar
+                  </span>
+                )
+              )}
             </button>
           ))}
         </div>

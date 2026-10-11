@@ -220,3 +220,55 @@
   color: #14202b;
   font-weight: 700;
 }
+/* Foto ampliada al tocarla en la cotización. */
+.qeItem img {
+  cursor: zoom-in;
+}
+.qeZoom {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: grid;
+  grid-template-rows: 1fr auto;
+  justify-items: center;
+  align-items: center;
+  gap: 12px;
+  padding: 56px 16px 24px;
+  background: rgba(8, 12, 20, 0.92);
+  cursor: zoom-out;
+}
+.qeZoom img {
+  max-width: min(100%, 1100px);
+  max-height: calc(100vh - 150px);
+  object-fit: contain;
+  background: #fff;
+  border-radius: 12px;
+}
+.qeZoom span {
+  color: #fff;
+  font: 800 17px Manrope;
+  text-align: center;
+}
+.qeZoom button {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: #fff;
+  color: #14202b;
+  cursor: pointer;
+}
+@media print {
+  .qeZoom {
+    display: none !important;
+  }
+}
+.qeZoom img {
+  width: min(92vw, 900px);
+  height: min(calc(100vh - 150px), 900px);
+}

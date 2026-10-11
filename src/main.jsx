@@ -158,12 +158,13 @@ function SaveDialog({
   const [clients, setClients] = useState([]);
   useEffect(() => {
     Promise.all([
+      api("/clients").catch(() => []),
       api("/records?type=quote").catch(() => []),
       api("/records?type=order").catch(() => []),
     ]).then((lists) => {
       const found = new Map();
       for (const record of lists.flat()) {
-        const name = String(record.customer_name || "").trim(),
+        const name = String(record.customer_name || record.name || "").trim(),
           phone = String(record.phone || "").trim();
         if (!name) continue;
         const id = (name + "|" + phone).toLowerCase();

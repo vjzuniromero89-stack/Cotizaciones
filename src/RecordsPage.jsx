@@ -243,6 +243,8 @@ export function ClientQuote({
 }) {
   const [preview, setPreview] = useState(false);
   const [sharing, setSharing] = useState(false);
+  // Foto ampliada al tocarla.
+  const [zoom, setZoom] = useState(null);
   const printRef = useRef(null);
   const total = Number(data.totals?.saleTotal ?? Number(data.total || 0) * 1.3),
     totalUnits = Number(data.totals?.totalUnits || 0),
@@ -423,7 +425,14 @@ export function ClientQuote({
                 return (
                   <div className="qeItem" key={p.id || i}>
                     {p.imageUrl ? (
-                      <img src={p.imageUrl} alt={p.name || "Producto"} />
+                      <img
+                        src={p.imageUrl}
+                        alt={p.name || "Producto"}
+                        title="Tocar para ver la foto más grande"
+                        onClick={() =>
+                          setZoom({ url: p.imageUrl, name: p.name || "Producto" })
+                        }
+                      />
                     ) : (
                       <span className="qeNoPhoto">Sin foto</span>
                     )}
@@ -491,6 +500,15 @@ export function ClientQuote({
           </div>
         </div>
       </section>
+      {zoom && (
+        <div className="qeZoom" onClick={() => setZoom(null)}>
+          <button type="button" aria-label="Cerrar foto">
+            <X />
+          </button>
+          <img src={zoom.url} alt={zoom.name} />
+          <span>{zoom.name}</span>
+        </div>
+      )}
     </div>
   );
 }
