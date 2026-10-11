@@ -448,6 +448,64 @@ const cordobas = (n) =>
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   });
+// Ficha del producto: cada dato con su nombre, como en la cotización del
+// proveedor (Material, Capacity, Weight, Product dimensions, Quantity).
+const SPEC_FIELDS = [
+  ["material", "Material", "Material", /^(product\s+)?material|^cup body material/i],
+  ["capacity", "Capacidad", "Capacity", /capacity|capacidad/i],
+  ["weight", "Peso del producto", "Weight", /weight|peso/i],
+  ["size", "Medidas del producto", "Product dimensions", /dimension|specification|medida|size/i],
+  ["colors", "Colores y cantidad por color", "Quantity", /quantity|colou?r|cantidad/i],
+];
+// Convierte un texto libre en la ficha: reconoce "Material: PS" y, si las
+// líneas no traen nombre, las reparte en el orden de la ficha.
+const specsFromText = (text) => {
+  const specs = {},
+    rest = [];
+  const lines = String(text || "")
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean);
+  const labelled = lines.some((line) => line.includes(":"));
+  lines.forEach((line, index) => {
+    if (labelled) {
+      const cut = line.indexOf(":");
+      const label = cut > 0 ? line.slice(0, cut) : "";
+      const field = SPEC_FIELDS.find(
+        ([key, , , pattern]) => label && pattern.test(label) && !specs[key],
+      );
+      if (field) specs[field[0]] = line.slice(cut + 1).trim();
+      else rest.push(line);
+    } else if (index < SPEC_FIELDS.length) {
+      specs[SPEC_FIELDS[index][0]] = line;
+    } else rest.push(line);
+  });
+  return { specs, rest: rest.join("\n") };
+};
+const specsOf = (product) => {
+  const info = infoOf(product);
+  if (info.specs) return { specs: info.specs, rest: info.description || "" };
+  return specsFromText(info.description);
+};
+function ProductSpecs({ product }) {
+  const { specs, rest } = specsOf(product);
+  const rows = SPEC_FIELDS.filter(([key]) => specs[key]);
+  if (!rows.length && !rest) return null;
+  return (
+    <div className="catalogSpecs">
+      <b>Descripción</b>
+      <dl>
+        {rows.map(([key, label]) => (
+          <div key={key}>
+            <dt>{label}:</dt>
+            <dd>{specs[key]}</dd>
+          </div>
+        ))}
+      </dl>
+      {rest && <p>{rest}</p>}
+    </div>
+  );
+}
 const safeLink = (url) => {
   const text = String(url || "").trim();
   if (!text) return "";
@@ -460,7 +518,8 @@ function RegisterProductDialog({ onClose, onSaved, product = null }) {
       imageUrl: product?.image_url || "",
       price: product?.unit_price ?? "",
       salePrice: infoOf(product).salePrice ?? "",
-      description: infoOf(product).description || "",
+      specs: specsOf(product).specs,
+      description: specsOf(product).rest,
       category: infoOf(product).category || "",
       supplier: infoOf(product).supplier || "",
       url: infoOf(product).url || "",
@@ -528,6 +587,12 @@ function RegisterProductDialog({ onClose, onSaved, product = null }) {
               info: {
                 salePrice:
                   Number(form.salePrice) > 0 ? Number(form.salePrice) : "",
+                specs: Object.fromEntries(
+                  SPEC_FIELDS.map(([key]) => [
+                    key,
+                    String(form.specs[key] || "").trim(),
+                  ]),
+                ),
                 description: form.description.trim(),
                 category: form.category.trim(),
                 supplier: form.supplier.trim(),
@@ -650,17 +715,34 @@ function RegisterProductDialog({ onClose, onSaved, product = null }) {
             </label>
           </div>
         </div>
-        <label className="rpField rpDescription">
-          <span>
+        <div className="rpSpecs">
+          <h3>
             Descripción <i>Description</i>
-          </span>
-          <textarea
-            rows={4}
-            value={form.description}
-            placeholder={"Material: …\nCapacidad: …\nPeso: …\nMedidas del producto: …\nColores: …"}
-            onChange={(e) => update("description", e.target.value)}
-          />
-        </label>
+          </h3>
+          <div className="rpSpecsGrid">
+            {SPEC_FIELDS.map(([key, label, supplier]) => (
+              <label className="rpField" key={key}>
+                <span>
+                  {label} <i>{supplier}</i>
+                </span>
+                <input
+                  value={form.specs[key] || ""}
+                  onChange={(e) =>
+                    update("specs", { ...form.specs, [key]: e.target.value })
+                  }
+                />
+              </label>
+            ))}
+            <label className="rpField rpSpecsMore">
+              <span>Otros detalles</span>
+              <input
+                value={form.description}
+                placeholder="Empaque, logo, tapa…"
+                onChange={(e) => update("description", e.target.value)}
+              />
+            </label>
+          </div>
+        </div>
         <div className="rpBox">
           <h3>
             <Package /> Caja del proveedor
@@ -841,9 +923,7 @@ function CatalogSection({ refreshKey, onCatalogChanged }) {
                   <div className="cbmSummary"><span>CBM por caja</span><strong>{oneBoxCbm(box).toFixed(4)}</strong></div>
                   <div className="cbmSummary"><span>CBM por unidad</span><strong>{perBox ? (oneBoxCbm(box) / perBox).toFixed(6) : "—"}</strong></div>
                 </div>
-                {info.description && (
-                  <p className="catalogDescription">{info.description}</p>
-                )}
+                <ProductSpecs product={p} />
                 {(info.url || info.notes) && (
                   <div className="catalogInfoLine">
                     {info.url && (
@@ -935,9 +1015,7 @@ function CatalogProductDetail({ product, onClose, onSaved }) {
             </small>
           </div>
         </div>
-        {infoOf(product).description && (
-          <p className="catalogDescription">{infoOf(product).description}</p>
-        )}
+        <ProductSpecs product={product} />
         <h3>
           <Package /> Información de la caja
         </h3>

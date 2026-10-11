@@ -1397,3 +1397,79 @@ main:has(.qtTable) {
   border-radius: 10px;
   margin-bottom: 14px;
 }
+/* Descripción del producto como ficha con nombres. */
+.rpSpecs {
+  border: 1px solid var(--line);
+  border-radius: 13px;
+  padding: 14px;
+  margin-bottom: 16px;
+}
+.rpSpecs h3 {
+  margin: 0 0 10px;
+  font: 800 15px Manrope;
+}
+.rpSpecs h3 i {
+  font-style: normal;
+  font-weight: 700;
+  font-size: 12px;
+  color: #6f7a86;
+  margin-left: 4px;
+}
+.rpSpecsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+.catalogSpecs {
+  padding: 14px;
+  border-top: 1px solid var(--line);
+}
+.catalogSpecs > b {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--lime);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+}
+.catalogSpecs dl {
+  margin: 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 3px;
+}
+.catalogSpecs dl > div {
+  display: flex;
+  gap: 8px;
+  font-size: 14.5px;
+  line-height: 1.5;
+}
+.catalogSpecs dt {
+  color: var(--muted);
+  font-weight: 700;
+  white-space: nowrap;
+}
+.catalogSpecs dd {
+  margin: 0;
+  color: #fff;
+  font-weight: 700;
+}
+.catalogSpecs p {
+  margin: 8px 0 0;
+  color: #c5ced8;
+  font-size: 14px;
+  line-height: 1.5;
+  white-space: pre-line;
+}
+.catalogDetail .catalogSpecs {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  margin-bottom: 14px;
+}
+@media (max-width: 820px) {
+  .rpSpecsGrid,
+  .catalogSpecs dl {
+    grid-template-columns: 1fr;
+  }
+}
