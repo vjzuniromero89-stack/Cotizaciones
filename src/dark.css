@@ -1086,3 +1086,123 @@ body {
   cursor: pointer;
   white-space: nowrap;
 }
+/* Registrar producto: ficha con datos del proveedor. */
+.registerProductDialog {
+  width: min(960px, 100%);
+}
+.rpTop {
+  display: grid;
+  grid-template-columns: 190px 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+.rpTop .catalogPhotoPicker {
+  height: 190px;
+}
+.rpCol {
+  display: grid;
+  gap: 10px;
+  align-content: start;
+  min-width: 0;
+}
+.rpField {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+.rpField > span {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 800;
+}
+.rpField input,
+.rpField select {
+  width: 100%;
+  min-width: 0;
+  height: 40px;
+  border: 1px solid #343640;
+  border-radius: 8px;
+  background: var(--field);
+  color: #fff;
+  font: inherit;
+  padding: 0 10px;
+}
+.rpBox {
+  border: 1px solid var(--line);
+  border-radius: 13px;
+  background: var(--surface-2);
+  padding: 14px;
+  margin-bottom: 16px;
+}
+.rpBox h3 {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 0 0 4px;
+  font: 800 15px Manrope;
+}
+.rpBox h3 svg {
+  width: 17px;
+  color: var(--lime);
+}
+.rpBox p {
+  margin: 0 0 10px;
+  color: var(--muted);
+  font-size: 12px;
+}
+.rpBoxGrid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 8px;
+}
+.rpCalc {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-top: 10px;
+}
+.rpCalc div {
+  background: #173629;
+  border: 1px solid #2d7c55;
+  border-radius: 10px;
+  padding: 9px 11px;
+}
+.rpCalc span {
+  display: block;
+  color: #3be090;
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+.rpCalc strong {
+  font: 800 15px Manrope;
+}
+.catalogInfoLine {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  padding: 10px 14px;
+  border-top: 1px solid var(--line);
+  font-size: 12.5px;
+  color: var(--muted);
+}
+.catalogInfoLine a {
+  color: var(--lime);
+  font-weight: 800;
+  text-decoration: none;
+}
+@media (max-width: 820px) {
+  .rpTop {
+    grid-template-columns: 1fr;
+  }
+  .rpTop .catalogPhotoPicker {
+    height: 160px;
+  }
+  .rpBoxGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .rpCalc {
+    grid-template-columns: 1fr;
+  }
+}

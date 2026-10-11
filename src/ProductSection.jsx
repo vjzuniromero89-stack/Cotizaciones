@@ -173,16 +173,15 @@ export default function ProductSection({
       id: crypto.randomUUID(),
       name: saved.name || "",
       price: saved.unit_price ?? "",
-      qty: saved.default_quantity ?? "",
+      qty: "",
       imageUrl: saved.image_url || "",
       uploading: false,
       boxes: (saved.boxes?.length ? saved.boxes : [blankBox()])
         .slice(0, 1)
-        .map((b) => ({
+        .map(({ info, ...b }) => ({
           ...b,
           id: crypto.randomUUID(),
-          qty:
-            autoBoxes(saved.default_quantity, b.unitsPerBox) || (b.qty ?? ""),
+          qty: "",
           qtyManual: false,
           unitsPerBox: b.unitsPerBox ?? "",
           l: b.l ?? "",

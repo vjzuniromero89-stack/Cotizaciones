@@ -429,36 +429,51 @@ function ProductDetail({ id, onClose, onChanged }) {
   );
 }
 
+// Los datos del proveedor viajan dentro de la caja del producto ("info"),
+// porque el catálogo no tiene columnas propias para ellos.
+const infoOf = (product) => product?.boxes?.[0]?.info || {};
+const oneBoxCbm = (b) =>
+  Number(b?.l || 0) *
+  Number(b?.w || 0) *
+  Number(b?.h || 0) *
+  (b?.unit === "in" ? 0.000016387064 : 0.000001);
+const oneBoxKg = (b) =>
+  b?.weightUnit === "lb"
+    ? Number(b?.weight || 0) / 2.2046226218
+    : Number(b?.weight || 0);
+const safeLink = (url) => {
+  const text = String(url || "").trim();
+  if (!text) return "";
+  return /^https?:\/\//i.test(text) ? text : "https://" + text;
+};
+
 function RegisterProductDialog({ onClose, onSaved, product = null }) {
   const [form, setForm] = useState({
       name: product?.name || "",
       imageUrl: product?.image_url || "",
       price: product?.unit_price ?? "",
-      qty: product?.default_quantity ?? "",
-      boxes: product?.boxes?.length
-        ? product.boxes.map((b) => ({ ...b, id: b.id || crypto.randomUUID() }))
-        : [
-        {
-          id: crypto.randomUUID(),
-          qty: "",
-          unitsPerBox: "",
-          l: "",
-          w: "",
-          h: "",
-          unit: "cm",
-          weight: "",
-          weightUnit: "kg",
-        },
-      ],
+      category: infoOf(product).category || "",
+      supplier: infoOf(product).supplier || "",
+      url: infoOf(product).url || "",
+      notes: infoOf(product).notes || "",
+      box: {
+        id: product?.boxes?.[0]?.id || crypto.randomUUID(),
+        unitsPerBox: product?.boxes?.[0]?.unitsPerBox ?? "",
+        l: product?.boxes?.[0]?.l ?? "",
+        w: product?.boxes?.[0]?.w ?? "",
+        h: product?.boxes?.[0]?.h ?? "",
+        unit: product?.boxes?.[0]?.unit || "cm",
+        weight: product?.boxes?.[0]?.weight ?? "",
+        weightUnit: product?.boxes?.[0]?.weightUnit || "kg",
+      },
     }),
     [busy, setBusy] = useState(false),
     [error, setError] = useState("");
   const update = (k, v) => setForm((x) => ({ ...x, [k]: v }));
-  const updateBox = (id, k, v) =>
-    setForm((x) => ({
-      ...x,
-      boxes: x.boxes.map((b) => (b.id === id ? { ...b, [k]: v } : b)),
-    }));
+  const updateBox = (k, v) =>
+    setForm((x) => ({ ...x, box: { ...x.box, [k]: v } }));
+  const boxCbm = oneBoxCbm(form.box),
+    perBox = Number(form.box.unitsPerBox || 0);
   async function upload(original) {
     if (!original) return;
     setBusy(true);
@@ -495,8 +510,20 @@ function RegisterProductDialog({ onClose, onSaved, product = null }) {
           name: form.name,
           imageUrl: form.imageUrl,
           price: form.price,
-          qty: form.qty,
-          boxes: form.boxes,
+          // La cantidad ya no se guarda con el producto: se escribe al cotizar.
+          qty: 0,
+          boxes: [
+            {
+              ...form.box,
+              qty: "",
+              info: {
+                category: form.category.trim(),
+                supplier: form.supplier.trim(),
+                url: form.url.trim(),
+                notes: form.notes.trim(),
+              },
+            },
+          ],
         }),
       });
       onSaved();
@@ -522,7 +549,7 @@ function RegisterProductDialog({ onClose, onSaved, product = null }) {
             <X />
           </button>
         </div>
-        <div className="registerProductMain">
+        <div className="rpTop">
           <label className="catalogPhotoPicker">
             {form.imageUrl ? (
               <img src={form.imageUrl} alt="" />
@@ -538,8 +565,8 @@ function RegisterProductDialog({ onClose, onSaved, product = null }) {
               onChange={(e) => upload(e.target.files[0])}
             />
           </label>
-          <div className="registerFields">
-            <label>
+          <div className="rpCol">
+            <label className="rpField">
               <span>Nombre del producto *</span>
               <input
                 required
@@ -547,8 +574,8 @@ function RegisterProductDialog({ onClose, onSaved, product = null }) {
                 onChange={(e) => update("name", e.target.value)}
               />
             </label>
-            <label>
-              <span>Precio de compra por unidad</span>
+            <label className="rpField">
+              <span>Precio de compra por unidad (US$)</span>
               <input
                 type="number"
                 min="0"
@@ -557,88 +584,117 @@ function RegisterProductDialog({ onClose, onSaved, product = null }) {
                 onChange={(e) => update("price", e.target.value)}
               />
             </label>
-            <label>
-              <span>Cantidad de referencia</span>
+            <label className="rpField">
+              <span>Categoría</span>
               <input
-                type="number"
-                min="0"
-                value={form.qty}
-                onChange={(e) => update("qty", e.target.value)}
+                value={form.category}
+                placeholder="Ej. Botellas"
+                onChange={(e) => update("category", e.target.value)}
+              />
+            </label>
+          </div>
+          <div className="rpCol">
+            <label className="rpField">
+              <span>Proveedor</span>
+              <input
+                value={form.supplier}
+                placeholder="Nombre de la fábrica o tienda"
+                onChange={(e) => update("supplier", e.target.value)}
+              />
+            </label>
+            <label className="rpField">
+              <span>Enlace del producto</span>
+              <input
+                value={form.url}
+                placeholder="Alibaba, 1688…"
+                onChange={(e) => update("url", e.target.value)}
+              />
+            </label>
+            <label className="rpField">
+              <span>Notas</span>
+              <input
+                value={form.notes}
+                placeholder="Mínimo de compra, colores…"
+                onChange={(e) => update("notes", e.target.value)}
               />
             </label>
           </div>
         </div>
-        <div className="registeredBoxes">
+        <div className="rpBox">
           <h3>
-            <Package /> Información de cajas
+            <Package /> Caja del proveedor
           </h3>
-          {form.boxes.map((b, i) => (
-            <div className="registerBoxRow" key={b.id}>
-              <b>Tipo {i + 1}</b>
-              {[
-                ["Cantidad cajas", "qty"],
-                ["Productos/caja", "unitsPerBox"],
-                ["Largo", "l"],
-                ["Ancho", "w"],
-                ["Alto", "h"],
-                ["Peso/caja", "weight"],
-              ].map(([label, key]) => (
-                <label key={key}>
-                  <span>{label}</span>
-                  <input
-                    type="number"
-                    min="0"
-                    step="any"
-                    value={b[key]}
-                    onChange={(e) => updateBox(b.id, key, e.target.value)}
-                  />
-                </label>
-              ))}
-              <label>
-                <span>Medidas</span>
-                <select
-                  value={b.unit}
-                  onChange={(e) => updateBox(b.id, "unit", e.target.value)}
-                >
-                  <option value="in">Pulgadas</option>
-                  <option value="cm">Centímetros</option>
-                </select>
+          <p>
+            Cómo viene empacado. La cantidad de unidades y de cajas se escribe
+            al crear la cotización.
+          </p>
+          <div className="rpBoxGrid">
+            {[
+              ["Productos por caja", "unitsPerBox"],
+              ["Largo", "l"],
+              ["Ancho", "w"],
+              ["Alto", "h"],
+            ].map(([label, key]) => (
+              <label className="rpField" key={key}>
+                <span>{label}</span>
+                <input
+                  type="number"
+                  min="0"
+                  step="any"
+                  value={form.box[key]}
+                  onChange={(e) => updateBox(key, e.target.value)}
+                />
               </label>
-              <label>
-                <span>Unidad peso</span>
-                <select
-                  value={b.weightUnit}
-                  onChange={(e) =>
-                    updateBox(b.id, "weightUnit", e.target.value)
-                  }
-                >
-                  <option value="kg">Kilogramos</option>
-                  <option value="lb">Libras</option>
-                </select>
-              </label>
-              <div className="catalogCbmResult">
-                <span>CBM por volumen</span>
-                <strong>{boxVolumeCbm(b).toFixed(4)} CBM</strong>
-              </div>
-              <div className="catalogCbmResult">
-                <span>CBM por peso</span>
-                <strong>{boxWeightCbm(b).toFixed(4)} CBM</strong>
-              </div>
-              {form.boxes.length > 1 && (
-                <button
-                  type="button"
-                  onClick={() =>
-                    update(
-                      "boxes",
-                      form.boxes.filter((x) => x.id !== b.id),
-                    )
-                  }
-                >
-                  <Trash2 />
-                </button>
-              )}
+            ))}
+            <label className="rpField">
+              <span>Medida</span>
+              <select
+                value={form.box.unit}
+                onChange={(e) => updateBox("unit", e.target.value)}
+              >
+                <option value="cm">Centímetros</option>
+                <option value="in">Pulgadas</option>
+              </select>
+            </label>
+            <label className="rpField">
+              <span>Peso por caja</span>
+              <input
+                type="number"
+                min="0"
+                step="any"
+                value={form.box.weight}
+                onChange={(e) => updateBox("weight", e.target.value)}
+              />
+            </label>
+            <label className="rpField">
+              <span>Unidad de peso</span>
+              <select
+                value={form.box.weightUnit}
+                onChange={(e) => updateBox("weightUnit", e.target.value)}
+              >
+                <option value="kg">Kilogramos</option>
+                <option value="lb">Libras</option>
+              </select>
+            </label>
+          </div>
+          <div className="rpCalc">
+            <div>
+              <span>CBM por caja</span>
+              <strong>{boxCbm.toFixed(4)}</strong>
             </div>
-          ))}
+            <div>
+              <span>CBM por unidad</span>
+              <strong>{perBox > 0 ? (boxCbm / perBox).toFixed(6) : "—"}</strong>
+            </div>
+            <div>
+              <span>Peso por unidad</span>
+              <strong>
+                {perBox > 0
+                  ? (oneBoxKg(form.box) / perBox).toFixed(3) + " kg"
+                  : "—"}
+              </strong>
+            </div>
+          </div>
         </div>
         {error && (
           <div className="saveError">
@@ -683,7 +739,7 @@ function CatalogSection({ refreshKey, onCatalogChanged }) {
       <div className="catalogTitle">
         <div>
           <h2>Mis productos</h2>
-          <p>Cada producto conserva su foto, precio y sus propias cajas.</p>
+          <p>Cada producto conserva su foto, precio, proveedor y su caja.</p>
         </div>
         <b>{items.length} guardados</b>
       </div>
@@ -692,10 +748,9 @@ function CatalogSection({ refreshKey, onCatalogChanged }) {
       ) : items.length ? (
         <div className="catalogGrid">
           {items.map((p) => {
-            const boxes = p.boxes || [];
-            const totalBoxes = boxes.reduce((n, b) => n + Number(b.qty || 0), 0);
-            const totalVolumeCbm = boxes.reduce((n, b) => n + boxVolumeCbm(b), 0);
-            const totalWeightCbm = boxes.reduce((n, b) => n + boxWeightCbm(b), 0);
+            const box = p.boxes?.[0];
+            const info = infoOf(p);
+            const perBox = Number(box?.unitsPerBox || 0);
             return (
               <article className="catalogCard catalogCardFull" key={p.id}>
                 <div className="catalogProductTop">
@@ -707,7 +762,11 @@ function CatalogSection({ refreshKey, onCatalogChanged }) {
                   <div className="catalogProductIdentity">
                     <small>PRODUCTO GUARDADO</small>
                     <h3>{p.name}</h3>
-                    <span>{Number(p.default_quantity || 0).toLocaleString()} unidades</span>
+                    <span>
+                      {[info.category, info.supplier]
+                        .filter(Boolean)
+                        .join(" · ") || "Sin categoría ni proveedor"}
+                    </span>
                   </div>
                   <div className="catalogCardActions">
                     <button
@@ -729,26 +788,26 @@ function CatalogSection({ refreshKey, onCatalogChanged }) {
 
                 <div className="catalogProductSummary">
                   <div><span>Precio por unidad</span><strong>{money(p.unit_price)}</strong></div>
-                  <div><span>Cantidad registrada</span><strong>{Number(p.default_quantity || 0).toLocaleString()}</strong></div>
-                  <div><span>Total de compra</span><strong>{money(Number(p.unit_price || 0) * Number(p.default_quantity || 0))}</strong></div>
-                  <div><span>Total de cajas</span><strong>{totalBoxes.toLocaleString()}</strong></div>
-                  <div className="cbmSummary"><span>CBM por volumen</span><strong>{totalVolumeCbm.toFixed(4)} CBM</strong></div>
-                  <div className="cbmSummary"><span>CBM por peso</span><strong>{totalWeightCbm.toFixed(4)} CBM</strong></div>
+                  <div><span>Productos por caja</span><strong>{perBox ? perBox.toLocaleString() : "—"}</strong></div>
+                  <div><span>Medidas de la caja</span><strong>{box?.l ? `${box.l} × ${box.w} × ${box.h} ${box.unit === "in" ? "in" : "cm"}` : "—"}</strong></div>
+                  <div><span>Peso por caja</span><strong>{box?.weight ? `${box.weight} ${box.weightUnit || "kg"}` : "—"}</strong></div>
+                  <div className="cbmSummary"><span>CBM por caja</span><strong>{oneBoxCbm(box).toFixed(4)}</strong></div>
+                  <div className="cbmSummary"><span>CBM por unidad</span><strong>{perBox ? (oneBoxCbm(box) / perBox).toFixed(6) : "—"}</strong></div>
                 </div>
-
-                <div className="catalogBoxesInline">
-                  {boxes.length ? boxes.map((b, i) => (
-                    <div className="catalogBoxInline" key={b.id || i}>
-                      <b>Caja {i + 1}</b>
-                      <span><small>Cantidad</small>{Number(b.qty || 0).toLocaleString()} cajas</span>
-                      <span><small>Productos/caja</small>{Number(b.unitsPerBox || 0).toLocaleString()}</span>
-                      <span><small>Medidas</small>{b.l || 0} × {b.w || 0} × {b.h || 0} {b.unit === "in" ? "in" : "cm"}</span>
-                      <span><small>Peso/caja</small>{b.weight || 0} {b.weightUnit || "kg"}</span>
-                      <span><small>CBM volumen</small>{boxVolumeCbm(b).toFixed(4)}</span>
-                      <span><small>CBM peso</small>{boxWeightCbm(b).toFixed(4)}</span>
-                    </div>
-                  )) : <p className="catalogNoBoxes">Sin información de caja.</p>}
-                </div>
+                {(info.url || info.notes) && (
+                  <div className="catalogInfoLine">
+                    {info.url && (
+                      <a
+                        href={safeLink(info.url)}
+                        target="_blank"
+                        rel="noreferrer noopener"
+                      >
+                        Ver en la página del proveedor ↗
+                      </a>
+                    )}
+                    {info.notes && <span>{info.notes}</span>}
+                  </div>
+                )}
               </article>
             );
           })}
@@ -814,8 +873,9 @@ function CatalogProductDetail({ product, onClose, onSaved }) {
             <span>Precio de compra por unidad</span>
             <strong>{money(product.unit_price)}</strong>
             <small>
-              Cantidad de referencia:{" "}
-              {Number(product.default_quantity || 0).toLocaleString()}
+              {[infoOf(product).category, infoOf(product).supplier]
+                .filter(Boolean)
+                .join(" · ") || "La cantidad se escribe al crear la cotización"}
             </small>
           </div>
         </div>
@@ -824,12 +884,10 @@ function CatalogProductDetail({ product, onClose, onSaved }) {
         </h3>
         {boxes.length ? (
           <div className="catalogDetailBoxes">
-            {boxes.map((b, i) => (
+            {boxes.slice(0, 1).map((b, i) => (
               <article key={b.id || i}>
-                <b>Caja {i + 1}</b>
-                <span>
-                  {b.qty || 0} cajas · {b.unitsPerBox || 0} productos/caja
-                </span>
+                <b>Caja del proveedor</b>
+                <span>{b.unitsPerBox || 0} productos por caja</span>
                 <span>
                   {b.l || 0} × {b.w || 0} × {b.h || 0}{" "}
                   {b.unit === "in" ? "pulgadas" : "cm"}
