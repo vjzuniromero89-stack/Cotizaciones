@@ -230,7 +230,14 @@ const recordProductPrices = (record, clientPrices) => {
   });
 };
 
-export function ClientQuote({ data, onClose, onDeleted, publicMode, closeLabel }) {
+export function ClientQuote({
+  data,
+  onClose,
+  onDeleted,
+  onEdit,
+  publicMode,
+  closeLabel,
+}) {
   const [preview, setPreview] = useState(false);
   const [sharing, setSharing] = useState(false);
   const printRef = useRef(null);
@@ -322,6 +329,11 @@ export function ClientQuote({ data, onClose, onDeleted, publicMode, closeLabel }
               <button onClick={onClose}>
                 <X /> {closeLabel || "Cerrar"}
               </button>
+              {!publicMode && onEdit && (
+                <button className="clientEdit" onClick={onEdit}>
+                  <Pencil /> Editar
+                </button>
+              )}
               {!publicMode && (
                 <button className="clientDelete" onClick={deleteQuote}>
                   <Trash2 /> Eliminar
@@ -481,10 +493,28 @@ export function ClientQuote({ data, onClose, onDeleted, publicMode, closeLabel }
 }
 
 export function ClientDetail({ id, onClose, onDeleted }) {
-  const [data, setData] = useState(null);
+  const [data, setData] = useState(null),
+    [editing, setEditing] = useState(false);
+  const load = () => api("/records/" + id).then(setData);
   useEffect(() => {
-    api("/records/" + id).then(setData);
+    load();
   }, [id]);
+  if (editing)
+    return (
+      <Detail
+        id={id}
+        type="quote"
+        startEditing
+        onClose={() => {
+          setEditing(false);
+          load();
+        }}
+        onChanged={() => {
+          load();
+          onDeleted?.();
+        }}
+      />
+    );
   if (!data)
     return (
       <div className="overlay">
@@ -498,13 +528,14 @@ export function ClientDetail({ id, onClose, onDeleted }) {
       data={data}
       onClose={onClose}
       onDeleted={onDeleted}
+      onEdit={data.status === "pending" ? () => setEditing(true) : undefined}
     />
   );
 }
 
-function Detail({ id, type, onClose, onChanged }) {
+function Detail({ id, type, onClose, onChanged, startEditing = false }) {
   const [data, setData] = useState(null),
-    [edit, setEdit] = useState(false),
+    [edit, setEdit] = useState(startEditing),
     [form, setForm] = useState(null),
     [busy, setBusy] = useState(false),
     [saveError, setSaveError] = useState("");
@@ -629,6 +660,50 @@ function Detail({ id, type, onClose, onChanged }) {
         idx === index ? { ...p, [k]: v } : p,
       ),
     }));
+  // Quita un producto de la cotización junto con sus cajas.
+  const removeProduct = (index) =>
+    setForm((x) => {
+      const gone = (x.products || [])[index];
+      if (!gone) return x;
+      return {
+        ...x,
+        products: x.products.filter((_, idx) => idx !== index),
+        boxes: (x.boxes || []).filter(
+          (b) =>
+            !(
+              b.productId === gone.id ||
+              (!b.productId && b.productName === gone.name)
+            ),
+        ),
+      };
+    });
+  const addProduct = () =>
+    setForm((x) => {
+      const id = crypto.randomUUID();
+      return {
+        ...x,
+        products: [
+          ...(x.products || []),
+          { id, name: "", qty: "", price: "", salePrice: "", imageUrl: "", specs: [] },
+        ],
+        boxes: [
+          ...(x.boxes || []),
+          {
+            id: crypto.randomUUID(),
+            productId: id,
+            productName: "",
+            qty: "",
+            unitsPerBox: "",
+            l: "",
+            w: "",
+            h: "",
+            unit: "cm",
+            weight: "",
+            weightUnit: "kg",
+          },
+        ],
+      };
+    });
   const updateBox = (boxRef, k, v) =>
     setForm((x) => ({
       ...x,
@@ -834,6 +909,30 @@ function Detail({ id, type, onClose, onChanged }) {
                         className="combinedProductRow"
                         key={p.id || productIndex}
                       >
+                        {edit && (
+                          <div className="productEditBar">
+                            <b>Producto {productIndex + 1}</b>
+                            <button
+                              type="button"
+                              disabled={sourceProducts.length < 2}
+                              title={
+                                sourceProducts.length < 2
+                                  ? "La cotización necesita al menos un producto"
+                                  : "Quitar este producto de la cotización"
+                              }
+                              onClick={() => {
+                                if (
+                                  window.confirm(
+                                    `¿Quitar ${p.name || "este producto"} de la cotización?`,
+                                  )
+                                )
+                                  removeProduct(productIndex);
+                              }}
+                            >
+                              <Trash2 /> Quitar producto
+                            </button>
+                          </div>
+                        )}
                         <div className="quoteProductIdentity">
                           {p.imageUrl ? (
                             <img src={p.imageUrl} alt={p.name || "Producto"} />
@@ -1119,6 +1218,11 @@ function Detail({ id, type, onClose, onChanged }) {
                 )}
               </div>
             </div>
+            {edit && (
+              <button type="button" className="addQuoteProduct" onClick={addProduct}>
+                <Plus /> Agregar otro producto
+              </button>
+            )}
             <p className="allocationMethod">
               {shownRoute === "miami"
                 ? "El envío se asigna según el peso facturable de cada producto en China–Miami y Miami–Managua."

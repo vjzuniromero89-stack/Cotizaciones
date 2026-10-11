@@ -1583,3 +1583,51 @@ textarea.quoteDetailInput {
     text-align: left;
   }
 }
+/* Editar una cotización: quitar y agregar productos. */
+.productEditBar {
+  grid-column: 1/-1;
+  order: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.productEditBar b {
+  font: 800 15px Manrope;
+  color: var(--lime);
+}
+.productEditBar button,
+.addQuoteProduct {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border-radius: 9px;
+  padding: 9px 13px;
+  font-weight: 800;
+  font-size: 14px;
+  cursor: pointer;
+}
+.productEditBar button {
+  border: 1px solid #6b2a26;
+  background: #2a1513;
+  color: #ff8a80;
+}
+.productEditBar button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+.productEditBar svg,
+.addQuoteProduct svg {
+  width: 15px;
+  height: 15px;
+}
+.addQuoteProduct {
+  margin: 4px 16px 12px;
+  border: 1px solid #2d7c55;
+  background: #173629;
+  color: #3be090;
+}
+.clientQuoteTools .clientEdit {
+  background: #1d2b4f;
+  border-color: #1d2b4f;
+  color: #fff;
+}
