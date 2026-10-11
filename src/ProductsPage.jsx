@@ -777,6 +777,38 @@ export function RegisterProductDialog({
             </label>
           </div>
         </div>
+        {gallery && (
+          <div
+            className="rpGallery"
+            ref={(el) => el?.scrollIntoView({ block: "nearest", behavior: "smooth" })}
+          >
+            <div>
+              <b>Elige una foto de la galería</b>
+              <button type="button" onClick={() => setGallery(null)}>
+                Cerrar
+              </button>
+            </div>
+            {gallery.length ? (
+              <div className="rpGalleryGrid">
+                {gallery.map((photo) => (
+                  <button
+                    type="button"
+                    key={photo.id}
+                    title={photo.name || photo.product || "Foto"}
+                    onClick={() => {
+                      update("imageUrl", photo.url);
+                      setGallery(null);
+                    }}
+                  >
+                    <img src={photo.url} alt="" loading="lazy" />
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <p>La galería está vacía. Agrega fotos en la pestaña Fotos.</p>
+            )}
+          </div>
+        )}
         <div className="rpSpecs">
           <h3>
             Descripción <i>Description</i>
@@ -886,35 +918,6 @@ export function RegisterProductDialog({
             </div>
           </div>
         </div>
-        {gallery && (
-          <div className="rpGallery">
-            <div>
-              <b>Elige una foto de la galería</b>
-              <button type="button" onClick={() => setGallery(null)}>
-                Cerrar
-              </button>
-            </div>
-            {gallery.length ? (
-              <div className="rpGalleryGrid">
-                {gallery.map((photo) => (
-                  <button
-                    type="button"
-                    key={photo.id}
-                    title={photo.name || photo.product || "Foto"}
-                    onClick={() => {
-                      update("imageUrl", photo.url);
-                      setGallery(null);
-                    }}
-                  >
-                    <img src={photo.url} alt="" loading="lazy" />
-                  </button>
-                ))}
-              </div>
-            ) : (
-              <p>La galería está vacía. Agrega fotos en la pestaña Fotos.</p>
-            )}
-          </div>
-        )}
         {error && (
           <div className="saveError">
             <b>No se pudo guardar</b>
