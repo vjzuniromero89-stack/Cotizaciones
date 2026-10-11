@@ -1473,3 +1473,36 @@ main:has(.qtTable) {
     grid-template-columns: 1fr;
   }
 }
+/* Detalle del pedido por producto (colores, cantidad por color…). */
+.qtRow textarea.qtDetail {
+  width: 100%;
+  min-width: 0;
+  margin-top: 4px;
+  border: 1px solid #343640;
+  border-radius: 7px;
+  background: var(--field);
+  color: #fff;
+  font: inherit;
+  font-size: 13.5px;
+  line-height: 1.35;
+  padding: 6px 8px;
+  resize: vertical;
+  min-height: 48px;
+}
+.quoteDetailText {
+  margin: 6px 0 0;
+  padding: 7px 10px;
+  border-left: 3px solid #3be090;
+  background: var(--surface-2);
+  border-radius: 0 8px 8px 0;
+  color: #eef2f5;
+  font-size: 14px;
+  line-height: 1.45;
+  white-space: pre-line;
+}
+textarea.quoteDetailInput {
+  height: auto;
+  min-height: 56px;
+  resize: vertical;
+  line-height: 1.4;
+}

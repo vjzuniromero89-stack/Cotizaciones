@@ -339,7 +339,7 @@ export default function ProductSection({
                   onChange={(e) => upload(p.id, e.target.files[0])}
                 />
               </label>
-              <label className="qtCell qtName">
+              <div className="qtCell qtName">
                 <span className="qtLabel">Producto</span>
                 <input
                   value={p.name}
@@ -347,7 +347,15 @@ export default function ProductSection({
                   onChange={(e) => update(p.id, "name", e.target.value)}
                   placeholder={"Producto " + (i + 1)}
                 />
-              </label>
+                <textarea
+                  className="qtDetail"
+                  rows={2}
+                  value={p.detail || ""}
+                  title="Detalle del pedido: colores, cantidad por color, logo…"
+                  onChange={(e) => update(p.id, "detail", e.target.value)}
+                  placeholder="Detalle: colores y cantidad de cada uno…"
+                />
+              </div>
                 <label className="qtCell">
                   <span className="qtLabel">Precio</span>
                   <input

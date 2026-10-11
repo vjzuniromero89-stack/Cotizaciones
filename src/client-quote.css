@@ -188,3 +188,14 @@
     break-inside: avoid;
   }
 }
+.qeItem p.qeDetail {
+  margin: 0 0 8px;
+  padding: 7px 10px;
+  border-left: 3px solid #ffb629;
+  background: #fff8ea;
+  border-radius: 0 8px 8px 0;
+  color: #14202b;
+  font-size: 13.5px;
+  line-height: 1.45;
+  white-space: pre-line;
+}

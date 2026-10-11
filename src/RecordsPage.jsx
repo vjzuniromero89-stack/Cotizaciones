@@ -426,6 +426,7 @@ export function ClientQuote({ data, onClose, onDeleted, publicMode, closeLabel }
                         {" · caja de "}
                         {logistics.boxSize}
                       </p>
+                      {p.detail && <p className="qeDetail">{p.detail}</p>}
                       <div className="qeLine qeUnit">
                         <span>Precio por unidad</span>
                         <b>
@@ -881,6 +882,28 @@ function Detail({ id, type, onClose, onChanged }) {
                                 {Number(p.qty || 0).toLocaleString()} unidades
                                 × {money(p.price)}
                               </small>
+                            )}
+                            {edit ? (
+                              <label className="boxField">
+                                <span>Detalle del pedido</span>
+                                <textarea
+                                  className="cellInput quoteDetailInput"
+                                  rows={2}
+                                  value={p.detail || ""}
+                                  placeholder="Colores y cantidad de cada uno…"
+                                  onChange={(e) =>
+                                    updateProduct(
+                                      productIndex,
+                                      "detail",
+                                      e.target.value,
+                                    )
+                                  }
+                                />
+                              </label>
+                            ) : (
+                              p.detail && (
+                                <p className="quoteDetailText">{p.detail}</p>
+                              )
                             )}
                           </div>
                         </div>
