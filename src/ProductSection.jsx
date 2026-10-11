@@ -275,188 +275,213 @@ export default function ProductSection({
         </div>
       )}
       <div className="manualDivider">
-        <span>O completa el producto manualmente</span>
+        <span>O escribe los productos en la tabla</span>
       </div>
-      <div className="productCargoList">
+      <div className="qtTable">
+        <div className="qtRow qtHead">
+          <span />
+          <span>Producto</span>
+          <span>Precio</span>
+          <span>Unidades</span>
+          <span>Cajas</span>
+          <span>Por caja</span>
+          <span>Medidas de la caja</span>
+          <span>Peso por caja</span>
+          <span>CBM</span>
+          <span>Peso total</span>
+          <span>Costo/unidad</span>
+          <span />
+        </div>
         {products.map((p, i) => {
           const b = p.boxes?.[0] || blankBox();
-          const volumeCbm = boxVolumeCbm(b);
-          const weightCbm = boxWeightCbm(b);
+          const row = pricingRows[i];
           return (
-            <article className="productCargoCard unifiedProductCard" key={p.id}>
-              <div className="productCargoHead">
-                <div>
-                  <small>PRODUCTO {String(i + 1).padStart(2, "0")}</small>
-                  <h3>{p.name || "Nuevo producto"}</h3>
-                </div>
-                {products.length > 1 && (
-                  <button
-                    className="removeProduct"
-                    onClick={() =>
-                      setProducts((x) => x.filter((v) => v.id !== p.id))
-                    }
-                    title="Eliminar producto"
-                  >
-                    <Trash2 />
-                  </button>
+            <div className="qtRow" key={p.id}>
+              <label className="photoPicker qtPhoto">
+                {p.imageUrl ? (
+                  <img src={p.imageUrl} alt="" />
+                ) : (
+                  <>
+                    <ImagePlus />
+                    <span>{p.uploading ? "…" : "Foto"}</span>
+                  </>
                 )}
-              </div>
-              <div className="productRow productInfoRow">
-                <label className="photoPicker">
-                  {p.imageUrl ? (
-                    <img src={p.imageUrl} alt="" />
-                  ) : (
-                    <>
-                      <ImagePlus />
-                      <span>{p.uploading ? "Subiendo…" : "Foto"}</span>
-                    </>
-                  )}
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => upload(p.id, e.target.files[0])}
+                />
+              </label>
+              <label className="qtCell qtName">
+                <span className="qtLabel">Producto</span>
+                <input
+                  value={p.name}
+                  onChange={(e) => update(p.id, "name", e.target.value)}
+                  placeholder={"Producto " + (i + 1)}
+                />
+              </label>
+                <label className="qtCell">
+                  <span className="qtLabel">Precio</span>
                   <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => upload(p.id, e.target.files[0])}
+                    type="number"
+                    min="0"
+                    step="any"
+                    value={p.price}
+                    onChange={(e) => update(p.id, "price", e.target.value)}
                   />
                 </label>
-                <label>
-                  <span>Nombre del producto</span>
+                <label className="qtCell">
+                  <span className="qtLabel">Unidades</span>
                   <input
-                    value={p.name}
-                    onChange={(e) => update(p.id, "name", e.target.value)}
-                    placeholder={"Producto " + (i + 1)}
+                    type="number"
+                    min="0"
+                    step="any"
+                    value={p.qty}
+                    onChange={(e) => update(p.id, "qty", e.target.value)}
                   />
                 </label>
-                <NumberField
-                  label="Precio unitario"
-                  value={p.price}
-                  onChange={(v) => update(p.id, "price", v)}
-                />
-                <NumberField
-                  label="Cantidad de unidades"
-                  value={p.qty}
-                  onChange={(v) => update(p.id, "qty", v)}
-                />
-                <div className="productLineTotal">
-                  <span>Subtotal</span>
-                  <b>{money(Number(p.price) * Number(p.qty))}</b>
-                </div>
-              </div>
-              <div className="singleBoxInfo">
-                <div className="singleBoxTitle">
-                  <PackagePlus />
-                  <b>Información de la caja</b>
-                  <span>{Number(b.qty || 0)} cajas</span>
-                </div>
-                <div className="productBoxEditor">
-                  <NumberField
-                    label="Cantidad de cajas"
+                <label className="qtCell">
+                  <span className="qtLabel">Cajas</span>
+                  <input
+                    type="number"
+                    min="0"
+                    step="any"
                     value={b.qty}
-                    onChange={(v) => updateBox(p.id, b.id, "qty", v)}
+                    onChange={(e) => updateBox(p.id, b.id, "qty", e.target.value)}
                   />
-                  <NumberField
-                    label="Productos por caja"
+                </label>
+                <label className="qtCell">
+                  <span className="qtLabel">Por caja</span>
+                  <input
+                    type="number"
+                    min="0"
+                    step="any"
                     value={b.unitsPerBox ?? ""}
-                    onChange={(v) => updateBox(p.id, b.id, "unitsPerBox", v)}
+                    onChange={(e) => updateBox(p.id, b.id, "unitsPerBox", e.target.value)}
                   />
-                  <NumberField
-                    label="Largo"
+                </label>
+              <div className="qtCell qtDims">
+                <span className="qtLabel">Medidas de la caja</span>
+                <div>
+                  <input
+                    type="number"
+                    min="0"
+                    step="any"
+                    placeholder="Largo"
+                    title="Largo"
                     value={b.l}
-                    onChange={(v) => updateBox(p.id, b.id, "l", v)}
+                    onChange={(e) => updateBox(p.id, b.id, "l", e.target.value)}
                   />
-                  <NumberField
-                    label="Ancho"
+                  <input
+                    type="number"
+                    min="0"
+                    step="any"
+                    placeholder="Ancho"
+                    title="Ancho"
                     value={b.w}
-                    onChange={(v) => updateBox(p.id, b.id, "w", v)}
+                    onChange={(e) => updateBox(p.id, b.id, "w", e.target.value)}
                   />
-                  <NumberField
-                    label="Alto"
+                  <input
+                    type="number"
+                    min="0"
+                    step="any"
+                    placeholder="Alto"
+                    title="Alto"
                     value={b.h}
-                    onChange={(v) => updateBox(p.id, b.id, "h", v)}
+                    onChange={(e) => updateBox(p.id, b.id, "h", e.target.value)}
                   />
-                  <label>
-                    <span>Medidas</span>
-                    <select
-                      value={b.unit}
-                      onChange={(e) =>
-                        updateBox(p.id, b.id, "unit", e.target.value)
-                      }
-                    >
-                      <option value="in">Pulgadas</option>
-                      <option value="cm">Centímetros</option>
-                    </select>
-                  </label>
-                  <NumberField
-                    label="Peso/caja"
-                    value={b.weight}
-                    onChange={(v) => updateBox(p.id, b.id, "weight", v)}
-                  />
-                  <label>
-                    <span>Unidad peso</span>
-                    <select
-                      value={b.weightUnit}
-                      onChange={(e) =>
-                        updateBox(p.id, b.id, "weightUnit", e.target.value)
-                      }
-                    >
-                      <option value="kg">Kilogramos</option>
-                      <option value="lb">Libras</option>
-                    </select>
-                  </label>
-                  <div className="productResultRow">
-                    <div className="productCbmResult volume">
-                      <span>CBM por volumen</span>
-                      <strong>{volumeCbm.toFixed(4)} CBM</strong>
-                      <small>Medidas × cajas</small>
-                    </div>
-                    <div className="productCbmResult weight">
-                      <span>CBM por peso</span>
-                      <strong>{weightCbm.toFixed(4)} CBM</strong>
-                      <small>Peso total kg ÷ 350</small>
-                    </div>
-                    <div className="productCbmResult weight">
-                      <span>Peso total</span>
-                      <strong>{weightNumber(boxWeightKg(b))} kg</strong>
-                      <small>
-                        {weightNumber(boxWeightKg(b) * 2.2046226218)} lb ·
-                        peso/caja × cajas
-                      </small>
-                    </div>
-                  </div>
+                  <select
+                    title="Unidad de medida"
+                    value={b.unit}
+                    onChange={(e) =>
+                      updateBox(p.id, b.id, "unit", e.target.value)
+                    }
+                  >
+                    <option value="cm">cm</option>
+                    <option value="in">in</option>
+                  </select>
                 </div>
               </div>
-            </article>
+              <div className="qtCell qtWeight">
+                <span className="qtLabel">Peso por caja</span>
+                <div>
+                  <input
+                    type="number"
+                    min="0"
+                    step="any"
+                    value={b.weight}
+                    onChange={(e) =>
+                      updateBox(p.id, b.id, "weight", e.target.value)
+                    }
+                  />
+                  <select
+                    title="Unidad de peso"
+                    value={b.weightUnit}
+                    onChange={(e) =>
+                      updateBox(p.id, b.id, "weightUnit", e.target.value)
+                    }
+                  >
+                    <option value="kg">kg</option>
+                    <option value="lb">lb</option>
+                  </select>
+                </div>
+              </div>
+              <div className="qtCell qtCalc">
+                <span className="qtLabel">CBM</span>
+                <b>{boxVolumeCbm(b).toFixed(4)}</b>
+                <small>por peso {boxWeightCbm(b).toFixed(4)}</small>
+              </div>
+              <div className="qtCell qtCalc">
+                <span className="qtLabel">Peso total</span>
+                <b>{weightNumber(boxWeightKg(b))} kg</b>
+                <small>{weightNumber(boxWeightKg(b) * 2.2046226218)} lb</small>
+              </div>
+              <div className="qtCell qtCalc qtCost">
+                <span className="qtLabel">Costo/unidad</span>
+                <b>{unitDollars(row.unitCost)}</b>
+                <small>{cordobas(row.unitCost * exchangeRate)}</small>
+              </div>
+              <button
+                className="qtRemove"
+                disabled={products.length < 2}
+                onClick={() =>
+                  setProducts((x) => x.filter((v) => v.id !== p.id))
+                }
+                title="Quitar producto"
+              >
+                <Trash2 />
+              </button>
+            </div>
           );
         })}
-      </div>
-      <div className="quotationCbmTotals">
-        <div className="quotationCbmTotalsTitle">
-          <PackagePlus />
-          <div>
-            <small>TOTAL DE TODOS LOS PRODUCTOS</small>
-            <b>Resumen de CBM de la cotización</b>
+        <div className="qtRow qtFoot">
+          <span />
+          <b>
+            {products.length} {products.length === 1 ? "producto" : "productos"}
+          </b>
+          <span />
+          <b>{units.toLocaleString()}</b>
+          <b>{totalBoxes.toLocaleString()}</b>
+          <span />
+          <span />
+          <span />
+          <div className="qtCalc">
+            <b>{totalVolumeCbm.toFixed(4)}</b>
+            <small>por peso {totalWeightCbm.toFixed(4)}</small>
           </div>
-          <span>{totalBoxes.toLocaleString()} cajas</span>
-        </div>
-        <div className="quotationCbmTotal volume">
-          <span>CBM total por volumen</span>
-          <strong>{totalVolumeCbm.toFixed(4)} CBM</strong>
-          <small>Suma de las medidas de todas las cajas</small>
-        </div>
-        <div className="quotationCbmTotal weight">
-          <span>CBM total por peso</span>
-          <strong>{totalWeightCbm.toFixed(4)} CBM</strong>
-          <small>Peso total en kg ÷ 350</small>
-        </div>
-        <div className="quotationCbmTotal weight">
-          <span>Peso total</span>
-          <strong>{weightNumber(totalWeightKg)} kg</strong>
-          <small>{weightNumber(totalWeightKg * 2.2046226218)} lb en total</small>
+          <div className="qtCalc">
+            <b>{weightNumber(totalWeightKg)} kg</b>
+            <small>{weightNumber(totalWeightKg * 2.2046226218)} lb</small>
+          </div>
+          <span />
+          <span />
         </div>
       </div>
       <button
         className="add addCompleteProduct"
         onClick={() => setProducts((x) => [...x, blank()])}
       >
-        <Plus /> Agregar otro producto a esta cotización
+        <Plus /> Agregar otra fila
       </button>
       <div className="liveProductPricing">
         <div className="livePricingHead">

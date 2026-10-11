@@ -864,3 +864,214 @@ body {
 .catalogProductTop > .catalogNoPhoto {
   border: 1px dashed var(--line);
 }
+/* Crear cotización: tabla rápida, una fila por producto. */
+.qtTable {
+  border: 1px solid var(--line);
+  border-radius: 13px;
+  overflow: hidden;
+  margin-top: 6px;
+}
+.qtRow {
+  display: grid;
+  grid-template-columns:
+    48px minmax(130px, 1fr) 62px 72px 52px 52px
+    186px 94px 80px 88px 88px 28px;
+  gap: 6px;
+  align-items: center;
+  padding: 8px 10px;
+  border-top: 1px solid var(--line);
+}
+.qtRow:first-child {
+  border-top: 0;
+}
+.qtHead {
+  background: var(--surface-2);
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+}
+.qtLabel {
+  display: none;
+}
+.qtCell {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+.qtRow input,
+.qtRow select {
+  width: 100%;
+  min-width: 0;
+  height: 36px;
+  border: 1px solid #343640;
+  border-radius: 7px;
+  background: var(--field);
+  color: #fff;
+  font: inherit;
+  font-size: 13px;
+  padding: 0 6px;
+}
+.qtRow input:focus-visible,
+.qtRow select:focus-visible {
+  outline: 2px solid var(--lime);
+  outline-offset: 0;
+}
+.qtRow input[type="number"] {
+  text-align: right;
+  -moz-appearance: textfield;
+}
+.qtRow input[type="number"]::-webkit-outer-spin-button,
+.qtRow input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.qtDims > div {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 46px;
+  gap: 3px;
+}
+.qtWeight > div {
+  display: grid;
+  grid-template-columns: 1fr 44px;
+  gap: 3px;
+}
+.qtRow select {
+  padding: 0 2px;
+}
+.qtRow .qtPhoto {
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+}
+.qtRow .qtPhoto span {
+  font-size: 10px;
+}
+.qtRow .qtPhoto input {
+  display: none;
+}
+.qtCalc {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.qtCalc b {
+  display: block;
+  font: 800 13px Manrope;
+}
+.qtCalc small {
+  display: block;
+  color: var(--muted);
+  font-size: 10.5px;
+}
+.qtCost b {
+  color: #ff9a3c;
+}
+.qtRemove {
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #6b2a26;
+  border-radius: 8px;
+  background: #2a1513;
+  color: #ff8a80;
+  cursor: pointer;
+  padding: 0;
+}
+.qtRemove:disabled {
+  opacity: 0.25;
+  cursor: default;
+}
+.qtRemove svg {
+  width: 15px;
+}
+.qtFoot {
+  border-top: 2px solid var(--lime);
+  background: var(--surface-2);
+  font-variant-numeric: tabular-nums;
+}
+.qtFoot > b {
+  font: 800 13px Manrope;
+  text-align: right;
+}
+.qtFoot > b:nth-child(2) {
+  text-align: left;
+}
+@media (max-width: 1239px) {
+  .qtTable {
+    border: 0;
+    border-radius: 0;
+    overflow: visible;
+  }
+  .qtHead {
+    display: none;
+  }
+  .qtLabel {
+    display: block;
+    color: var(--muted);
+    font-size: 10.5px;
+    font-weight: 800;
+  }
+  .qtRow {
+    grid-template-columns: 64px repeat(4, minmax(0, 1fr));
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    margin-bottom: 10px;
+    padding: 12px;
+    gap: 9px;
+    align-items: end;
+  }
+  .qtRow:first-child {
+    border-top: 1px solid var(--line);
+  }
+  .qtRow .qtPhoto {
+    width: 64px;
+    height: 64px;
+    grid-row: span 2;
+    align-self: start;
+  }
+  .qtName {
+    grid-column: span 4;
+  }
+  .qtDims,
+  .qtWeight {
+    grid-column: span 2;
+  }
+  .qtCalc {
+    text-align: left;
+  }
+  .qtRemove {
+    justify-self: end;
+  }
+  .qtFoot {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    border-top: 2px solid var(--lime);
+  }
+  .qtFoot > span {
+    display: none;
+  }
+  .qtFoot > b {
+    text-align: left;
+  }
+}
+@media (max-width: 560px) {
+  .qtRow {
+    grid-template-columns: 56px 1fr 1fr;
+  }
+  .qtRow .qtPhoto {
+    width: 56px;
+    height: 56px;
+    grid-row: auto;
+  }
+  .qtName {
+    grid-column: span 2;
+  }
+  .qtDims,
+  .qtWeight {
+    grid-column: 1/-1;
+  }
+  .qtFoot {
+    grid-template-columns: 1fr 1fr;
+  }
+}
