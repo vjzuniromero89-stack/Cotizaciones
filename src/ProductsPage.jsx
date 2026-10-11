@@ -994,11 +994,16 @@ function CatalogSection({ refreshKey, onCatalogChanged, onOptions }) {
                   <div className="catalogProductIdentity">
                     <small>PRODUCTO GUARDADO</small>
                     <h3>{p.name}</h3>
-                    <span>
-                      {[info.category, info.supplier]
-                        .filter(Boolean)
-                        .join(" · ") || "Sin categoría ni proveedor"}
-                    </span>
+                    <div className="catalogTags">
+                      <span className={info.supplier ? "supplierTag" : "supplierTag empty"}>
+                        Proveedor: <b>{info.supplier || "sin asignar"}</b>
+                      </span>
+                      {info.category && (
+                        <span>
+                          Categoría: <b>{info.category}</b>
+                        </span>
+                      )}
+                    </div>
                   </div>
                   <div className="catalogCardActions">
                     <button
@@ -1114,9 +1119,10 @@ function CatalogProductDetail({ product, onClose, onSaved, options }) {
                 : "sin definir"}
             </span>
             <small>
-              {[infoOf(product).category, infoOf(product).supplier]
-                .filter(Boolean)
-                .join(" · ") || "La cantidad se escribe al crear la cotización"}
+              Proveedor: {infoOf(product).supplier || "sin asignar"}
+              {infoOf(product).category
+                ? " · Categoría: " + infoOf(product).category
+                : ""}
             </small>
           </div>
         </div>

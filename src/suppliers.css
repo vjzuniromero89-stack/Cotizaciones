@@ -489,3 +489,34 @@
   object-position: center;
   background: #fff;
 }
+
+/* Proveedor y categoría en la tarjeta del producto. */
+.catalogTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+}
+.catalogTags span {
+  border: 1px solid var(--line);
+  border-radius: 99px;
+  padding: 4px 11px;
+  color: var(--muted);
+  font-size: 12.5px;
+}
+.catalogTags b {
+  color: #fff;
+}
+.catalogTags .supplierTag {
+  border-color: #2d7c55;
+  background: #173629;
+  color: #9fe8c4;
+}
+.catalogTags .supplierTag.empty {
+  border-color: #6b4a1a;
+  background: #2b1f0d;
+  color: #ffb866;
+}
+.catalogTags .supplierTag.empty b {
+  color: #ffb866;
+}
