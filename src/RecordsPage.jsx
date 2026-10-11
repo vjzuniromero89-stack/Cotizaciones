@@ -426,6 +426,16 @@ export function ClientQuote({ data, onClose, onDeleted, publicMode, closeLabel }
                         {" · caja de "}
                         {logistics.boxSize}
                       </p>
+                      {p.specs?.length > 0 && (
+                        <dl className="qeSpecs">
+                          {p.specs.map(([label, value]) => (
+                            <div key={label}>
+                              <dt>{label}:</dt>
+                              <dd>{value}</dd>
+                            </div>
+                          ))}
+                        </dl>
+                      )}
                       {p.detail && <p className="qeDetail">{p.detail}</p>}
                       <div className="qeLine qeUnit">
                         <span>Precio por unidad</span>

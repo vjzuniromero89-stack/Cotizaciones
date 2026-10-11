@@ -199,3 +199,24 @@
   line-height: 1.45;
   white-space: pre-line;
 }
+.qeSpecs {
+  margin: 0 0 8px;
+  display: grid;
+  gap: 1px;
+}
+.qeSpecs > div {
+  display: flex;
+  gap: 6px;
+  font-size: 13px;
+  line-height: 1.45;
+}
+.qeSpecs dt {
+  color: #6a7785;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.qeSpecs dd {
+  margin: 0;
+  color: #14202b;
+  font-weight: 700;
+}

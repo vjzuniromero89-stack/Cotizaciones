@@ -2,6 +2,7 @@ import React from "react";
 import { authFetch } from "./auth.js";
 import { shrinkImage } from "./image.js";
 import { autoBoxes, syncBoxes } from "./calculate.js";
+import { publicSpecs } from "./specs.js";
 import { Plus, Trash2, ImagePlus, PackagePlus } from "lucide-react";
 import "./products.css";
 import "./suppliers.css";
@@ -180,6 +181,7 @@ export default function ProductSection({
       price: saved.unit_price ?? "",
       qty: "",
       salePrice: saved.boxes?.[0]?.info?.salePrice ?? "",
+      specs: publicSpecs(saved.boxes?.[0]?.info),
       imageUrl: saved.image_url || "",
       uploading: false,
       boxes: (saved.boxes?.length ? saved.boxes : [blankBox()])

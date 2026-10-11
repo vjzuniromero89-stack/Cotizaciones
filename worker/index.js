@@ -134,35 +134,70 @@ async function countRecords(env, type) {
 
 // Las cotizaciones guardadas sin foto toman la del catálogo (mismo nombre de
 // producto), así una foto agregada después aparece también en las anteriores.
+// Ficha pública de un producto del catálogo (material, capacidad, peso y
+// medidas). Misma lógica que src/specs.js, que el servidor no puede importar.
+const PUBLIC_SPECS = [
+  ["material", "Material", /^(product\s+)?material|^cup body material/i],
+  ["capacity", "Capacidad", /capacity|capacidad/i],
+  ["weight", "Peso del producto", /weight|peso/i],
+  ["size", "Medidas del producto", /dimension|specification|medida|size/i],
+];
+function catalogSpecs(info = {}) {
+  let specs = info.specs;
+  if (!specs) {
+    specs = {};
+    const lines = String(info.description || "")
+      .split("\n")
+      .map((line) => line.trim())
+      .filter(Boolean);
+    const labelled = lines.some((line) => line.includes(":"));
+    lines.forEach((line, index) => {
+      if (labelled) {
+        const cut = line.indexOf(":");
+        const field = PUBLIC_SPECS.find(
+          ([key, , pattern]) =>
+            cut > 0 && pattern.test(line.slice(0, cut)) && !specs[key],
+        );
+        if (field) specs[field[0]] = line.slice(cut + 1).trim();
+      } else if (index < PUBLIC_SPECS.length)
+        specs[PUBLIC_SPECS[index][0]] = line;
+    });
+  }
+  return PUBLIC_SPECS.filter(([key]) => String(specs[key] || "").trim()).map(
+    ([key, label]) => [label, String(specs[key]).trim()],
+  );
+}
 async function withCatalogPhotos(env, rows) {
   const missing = rows.some((row) =>
-    (row?.products || []).some((p) => !p.imageUrl && p.name),
+    (row?.products || []).some(
+      (p) => p.name && (!p.imageUrl || p.specs === undefined),
+    ),
   );
   if (!missing) return rows;
   let catalog = [];
   try {
-    catalog = await restRows(
-      env,
-      "catalog_products?select=name,image_url&image_url=neq.",
-    );
+    catalog = await restRows(env, "catalog_products?select=name,image_url,boxes");
   } catch {
     return rows;
   }
-  const photos = new Map(
-    catalog.map((p) => [String(p.name).trim().toLowerCase(), p.image_url]),
+  const byName = new Map(
+    catalog.map((p) => [String(p.name).trim().toLowerCase(), p]),
   );
-  if (!photos.size) return rows;
+  if (!byName.size) return rows;
   return rows.map((row) => ({
     ...row,
-    products: (row.products || []).map((p) =>
-      p.imageUrl
-        ? p
-        : {
-            ...p,
-            imageUrl:
-              photos.get(String(p.name || "").trim().toLowerCase()) || "",
-          },
-    ),
+    products: (row.products || []).map((p) => {
+      const saved = byName.get(String(p.name || "").trim().toLowerCase());
+      if (!saved) return p;
+      return {
+        ...p,
+        imageUrl: p.imageUrl || saved.image_url || "",
+        specs:
+          p.specs === undefined
+            ? catalogSpecs(saved.boxes?.[0]?.info || {})
+            : p.specs,
+      };
+    }),
   }));
 }
 async function getRecord(env, id) {
