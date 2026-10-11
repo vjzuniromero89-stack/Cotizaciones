@@ -316,6 +316,7 @@ export default function ProductSection({
           <span className="qtRight">CBM</span>
           <span className="qtRight">Peso total</span>
           <span className="qtRight">Costo por unidad</span>
+          <span>Precio de venta por unidad US$</span>
           <span />
         </div>
         {products.map((p, i) => {
@@ -481,6 +482,41 @@ export default function ProductSection({
                 <b>{unitDollars(row.unitCost)}</b>
                 <small>{cordobas(row.unitCost * exchangeRate)}</small>
               </div>
+              <div className="qtCell qtSale">
+                <span className="qtLabel">Precio de venta por unidad US$</span>
+                <input
+                  type="number"
+                  min="0"
+                  step="any"
+                  placeholder="0.00"
+                  value={p.salePrice ?? ""}
+                  onChange={(e) => update(p.id, "salePrice", e.target.value)}
+                />
+                {Number(p.salePrice) > 0 ? (
+                  <>
+                    <b>{cordobas(Number(p.salePrice) * exchangeRate)}</b>
+                    {row.unitCost > 0 && (
+                      <small
+                        className={
+                          Number(p.salePrice) >= row.unitCost
+                            ? "qtGain"
+                            : "qtLoss"
+                        }
+                      >
+                        Ganancia {unitDollars(Number(p.salePrice) - row.unitCost)}{" "}
+                        ·{" "}
+                        {(
+                          ((Number(p.salePrice) - row.unitCost) / row.unitCost) *
+                          100
+                        ).toFixed(1)}
+                        %
+                      </small>
+                    )}
+                  </>
+                ) : (
+                  <small>C$ —</small>
+                )}
+              </div>
               <button
                 className="qtRemove"
                 disabled={products.length < 2}
@@ -513,6 +549,7 @@ export default function ProductSection({
             <b>{weightNumber(totalWeightKg)} kg</b>
             <small>{weightNumber(totalWeightKg * 2.2046226218)} lb</small>
           </div>
+          <span />
           <span />
           <span />
         </div>
