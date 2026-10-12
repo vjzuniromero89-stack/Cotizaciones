@@ -396,6 +396,9 @@ async function handleApi(request, env, url) {
               specs: catalogSpecs(info),
               salePrice: Math.max(0, Number(info.salePrice) || 0),
               unitsPerBox: Math.max(0, Number(box.unitsPerBox) || 0),
+              // Condiciones del precio: pedido mínimo y regla de colores.
+              minQty: Math.max(0, Number(info.minQty) || 0),
+              colorRule: String(info.colorRule || "").trim(),
             };
           }),
       });

@@ -496,6 +496,8 @@ export function RegisterProductDialog({
       imageUrl: product?.image_url || "",
       price: product?.unit_price ?? "",
       salePrice: infoOf(product).salePrice ?? "",
+      minQty: infoOf(product).minQty ?? "",
+      colorRule: infoOf(product).colorRule || "",
       specs: specsOf(product).specs,
       description: specsOf(product).rest,
       category: infoOf(product).category || "",
@@ -620,6 +622,8 @@ export function RegisterProductDialog({
               info: {
                 salePrice:
                   Number(form.salePrice) > 0 ? Number(form.salePrice) : "",
+                minQty: Number(form.minQty) > 0 ? Number(form.minQty) : "",
+                colorRule: form.colorRule.trim(),
                 specs: Object.fromEntries(
                   SPEC_FIELDS.map(([key]) => [
                     key,
@@ -720,6 +724,40 @@ export function RegisterProductDialog({
                   : "C$ —"}
               </em>
             </label>
+            <div className="rpConditions">
+              <small>Condiciones de este precio (las ve el cliente)</small>
+              <label className="rpField">
+                <span>Pedido mínimo (piezas)</span>
+                <input
+                  type="number"
+                  min="0"
+                  value={form.minQty}
+                  placeholder="Ej. 2000"
+                  onChange={(e) => update("minQty", e.target.value)}
+                />
+              </label>
+              <label className="rpField">
+                <span>Colores</span>
+                <input
+                  value={form.colorRule}
+                  placeholder="Ej. 1,000 piezas por color, 2 colores"
+                  onChange={(e) => update("colorRule", e.target.value)}
+                />
+              </label>
+              {(Number(form.minQty) > 0 || form.colorRule.trim()) && (
+                <em>
+                  El cliente verá:{" "}
+                  {[
+                    Number(form.minQty) > 0
+                      ? `Precio para pedidos de ${Number(form.minQty).toLocaleString()} piezas o más`
+                      : "",
+                    form.colorRule.trim(),
+                  ]
+                    .filter(Boolean)
+                    .join(" · ")}
+                </em>
+              )}
+            </div>
             {Number(form.price) > 0 && (
               <div className="rpPercents">
                 <small>
@@ -1156,7 +1194,7 @@ function CatalogSection({ refreshKey, onCatalogChanged, onOptions }) {
 
                 <div className="catalogProductSummary">
                   <div><span>Precio de compra</span><strong>{money(p.unit_price)}</strong><small>{cordobas(p.unit_price)}</small></div>
-                  <div className="saleSummary"><span>Precio de venta</span><strong>{Number(info.salePrice) > 0 ? money(info.salePrice) : "—"}</strong><small>{Number(info.salePrice) > 0 ? cordobas(info.salePrice) : "Sin precio"}</small></div>
+                  <div className="saleSummary"><span>Precio de venta</span><strong>{Number(info.salePrice) > 0 ? money(info.salePrice) : "—"}</strong><small>{Number(info.salePrice) > 0 ? cordobas(info.salePrice) : "Sin precio"}</small>{Number(info.minQty) > 0 && <small>desde {Number(info.minQty).toLocaleString()} piezas</small>}{info.colorRule && <small>{info.colorRule}</small>}</div>
                   <div><span>Productos por caja</span><strong>{perBox ? perBox.toLocaleString() : "—"}</strong></div>
                   <div><span>Medidas de la caja</span><strong>{box?.l ? `${box.l} × ${box.w} × ${box.h} ${box.unit === "in" ? "in" : "cm"}` : "—"}</strong></div>
                   <div><span>Peso por caja</span><strong>{box?.weight ? `${box.weight} ${box.weightUnit || "kg"}` : "—"}</strong></div>

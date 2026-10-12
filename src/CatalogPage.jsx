@@ -16,7 +16,7 @@ const cs = (n) =>
 const same = (a, b) =>
   String(a || "").trim().toLowerCase() === String(b || "").trim().toLowerCase();
 
-function Price({ value, big }) {
+function Price({ value, big, minQty, colorRule }) {
   return (
     <div className={"pubPrice" + (big ? " big" : "")}>
       {value > 0 ? (
@@ -24,6 +24,12 @@ function Price({ value, big }) {
           <span>Precio por unidad · puesto en Managua</span>
           <b>US{usd(value)}</b>
           <em>{cs(value)}</em>
+          {minQty > 0 && (
+            <i>
+              Para pedidos de {Number(minQty).toLocaleString()} piezas o más
+            </i>
+          )}
+          {colorRule && <i>{colorRule}</i>}
         </>
       ) : (
         <>
@@ -92,6 +98,10 @@ export default function CatalogPage() {
       "Hola, quiero pedir este producto del catálogo:",
       "• " + p.name,
       p.salePrice > 0 ? "Precio: US" + usd(p.salePrice) + " por unidad" : "",
+      p.minQty > 0
+        ? "Pedido mínimo: " + Number(p.minQty).toLocaleString() + " piezas"
+        : "",
+      p.colorRule ? "Colores: " + p.colorRule : "",
       Number(units) > 0 ? "Cantidad: " + Number(units).toLocaleString() : "",
     ].filter(Boolean);
     return (
@@ -192,7 +202,11 @@ export default function CatalogPage() {
                 <div className="pubBody">
                   <small>{String(p.category || "").trim() || "Otros"}</small>
                   <h3>{p.name}</h3>
-                  <Price value={p.salePrice} />
+                  <Price
+                    value={p.salePrice}
+                    minQty={p.minQty}
+                    colorRule={p.colorRule}
+                  />
                   <span className="pubMore">
                     Ver ficha <ChevronRight />
                   </span>
@@ -252,7 +266,12 @@ export default function CatalogPage() {
             <div className="pubSheetInfo">
               <small>{String(open.category || "").trim() || "Otros"}</small>
               <h2>{open.name}</h2>
-              <Price value={open.salePrice} big />
+              <Price
+                value={open.salePrice}
+                minQty={open.minQty}
+                colorRule={open.colorRule}
+                big
+              />
               {state.whatsapp && (
                 <div className="pubOrder">
                   <label>

@@ -521,3 +521,17 @@
     padding-bottom: 90px;
   }
 }
+
+/* Condiciones del precio: pedido mínimo y colores. */
+.pubPrice i {
+  display: block;
+  margin-top: 4px;
+  font-style: normal;
+  font-size: 13.5px;
+  font-weight: 700;
+  line-height: 1.35;
+  color: #4a3806;
+}
+.pubPrice.big i {
+  font-size: 15.5px;
+}

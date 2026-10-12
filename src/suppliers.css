@@ -1091,3 +1091,34 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Condiciones del precio en el registro del producto. */
+.rpConditions {
+  display: grid;
+  grid-template-columns: 150px 1fr;
+  gap: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  padding: 10px 12px;
+}
+.rpConditions > small,
+.rpConditions > em {
+  grid-column: 1/-1;
+}
+.rpConditions > small {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+.rpConditions > em {
+  font-style: normal;
+  color: #ffb866;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+@media (max-width: 820px) {
+  .rpConditions {
+    grid-template-columns: 1fr;
+  }
+}
