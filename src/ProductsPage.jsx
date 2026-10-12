@@ -615,11 +615,14 @@ export function RegisterProductDialog({
     e.preventDefault();
     setBusy(true);
     setError("");
-    try {
-      await api(product ? "/catalog-products/" + product.id : "/catalog-products", {
+    // El catálogo no admite dos productos con el mismo nombre. Si ya existe
+    // (otro tamaño de la misma botella), se guarda con el tamaño al final y
+    // el nombre escrito queda como nombre de catálogo.
+    const send = (name, family) =>
+      api(product ? "/catalog-products/" + product.id : "/catalog-products", {
         method: product ? "PUT" : "POST",
         body: JSON.stringify({
-          name: form.name,
+          name,
           imageUrl: form.imageUrl,
           price: form.price,
           // La cantidad ya no se guarda con el producto: se escribe al cotizar.
@@ -633,7 +636,7 @@ export function RegisterProductDialog({
                   Number(form.salePrice) > 0 ? Number(form.salePrice) : "",
                 priceNote: form.priceNote.trim(),
                 model: form.model.trim(),
-                family: form.family.trim(),
+                family,
                 size: form.size.trim(),
                 specs: Object.fromEntries(
                   SPEC_FIELDS.map(([key]) => [
@@ -652,10 +655,33 @@ export function RegisterProductDialog({
           ],
         }),
       });
+    const repeated = (err) =>
+      /23505|already exists|duplicate key/i.test(String(err?.message || ""));
+    try {
+      const name = form.name.trim(),
+        family = form.family.trim();
+      try {
+        await send(name, family);
+      } catch (err) {
+        const size = (form.size || form.specs.capacity || "").trim();
+        if (
+          !repeated(err) ||
+          !size ||
+          name.toLowerCase().includes(size.toLowerCase())
+        )
+          throw err;
+        await send(name + " " + size, family || name);
+      }
       onSaved();
       onClose();
     } catch (e) {
-      setError(e.message);
+      setError(
+        repeated(e)
+          ? "Ya tienes un producto con ese nombre. Cada tamaño necesita un nombre distinto: agrega los ML al nombre (por ejemplo “" +
+              form.name.trim() +
+              " 600ML”) o llena la Capacidad en la descripción y se agrega solo. Para juntarlos en el catálogo usa el mismo Modelo."
+          : e.message,
+      );
     } finally {
       setBusy(false);
     }
