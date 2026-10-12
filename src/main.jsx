@@ -921,7 +921,21 @@ function RouteTwo({ r, rates, onCbmRateChange }) {
   );
 }
 function App() {
-  const [page, setPage] = useState("calculator"),
+  // Enlace "#producto=…": abre Productos con el formulario ya lleno. Los
+  // datos van después del # y no se envían al servidor; nada se guarda hasta
+  // que el usuario pulsa Guardar.
+  const [productPrefill] = useState(() => {
+    const match = window.location.hash.match(/^#producto=(.+)$/);
+    if (!match) return null;
+    try {
+      const data = JSON.parse(decodeURIComponent(match[1]));
+      window.history.replaceState(null, "", window.location.pathname);
+      return data && typeof data === "object" ? data : null;
+    } catch {
+      return null;
+    }
+  });
+  const [page, setPage] = useState(productPrefill ? "products" : "calculator"),
     [refresh, setRefresh] = useState(0),
     [quoteCustomer, setQuoteCustomer] = useState(null),
     [quoteProducts, setQuoteProducts] = useState([]),
@@ -1024,6 +1038,7 @@ function App() {
             refreshKey={refresh}
             onChange={changed}
             setPage={navigate}
+            prefill={productPrefill}
           />
         ) : page === "margins" ? (
           <MarginsPage refreshKey={refresh} />

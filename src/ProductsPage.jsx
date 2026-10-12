@@ -499,33 +499,35 @@ export function RegisterProductDialog({
   options = {},
 }) {
   const [form, setForm] = useState({
-      name: product?.name || "",
+      // "defaults" llena un producto nuevo con datos ya preparados (por
+      // ejemplo, desde un enlace con la información del proveedor).
+      name: product?.name || defaults.name || "",
       imageUrl: product?.image_url || "",
-      price: product?.unit_price ?? "",
-      salePrice: infoOf(product).salePrice ?? "",
+      price: product?.unit_price ?? defaults.price ?? "",
+      salePrice: infoOf(product).salePrice ?? defaults.salePrice ?? "",
       priceNote: infoOf(product).priceNote || "",
       photos: Array.isArray(infoOf(product).photos)
         ? infoOf(product).photos
         : [],
-      model: infoOf(product).model || "",
+      model: infoOf(product).model || defaults.model || "",
       family: infoOf(product).family || "",
       size: infoOf(product).size || "",
-      specs: specsOf(product).specs,
-      description: specsOf(product).rest,
-      category: infoOf(product).category || "",
+      specs: product ? specsOf(product).specs : defaults.specs || {},
+      description: product ? specsOf(product).rest : defaults.description || "",
+      category: infoOf(product).category || defaults.category || "",
       supplier: infoOf(product).supplier || defaults.supplier || "",
       group: infoOf(product).group || defaults.group || "",
-      url: infoOf(product).url || "",
-      notes: infoOf(product).notes || "",
+      url: infoOf(product).url || defaults.url || "",
+      notes: infoOf(product).notes || defaults.notes || "",
       box: {
         id: product?.boxes?.[0]?.id || crypto.randomUUID(),
-        unitsPerBox: product?.boxes?.[0]?.unitsPerBox ?? "",
-        l: product?.boxes?.[0]?.l ?? "",
-        w: product?.boxes?.[0]?.w ?? "",
-        h: product?.boxes?.[0]?.h ?? "",
-        unit: product?.boxes?.[0]?.unit || "cm",
-        weight: product?.boxes?.[0]?.weight ?? "",
-        weightUnit: product?.boxes?.[0]?.weightUnit || "kg",
+        unitsPerBox: product?.boxes?.[0]?.unitsPerBox ?? defaults.box?.unitsPerBox ?? "",
+        l: product?.boxes?.[0]?.l ?? defaults.box?.l ?? "",
+        w: product?.boxes?.[0]?.w ?? defaults.box?.w ?? "",
+        h: product?.boxes?.[0]?.h ?? defaults.box?.h ?? "",
+        unit: product?.boxes?.[0]?.unit || defaults.box?.unit || "cm",
+        weight: product?.boxes?.[0]?.weight ?? defaults.box?.weight ?? "",
+        weightUnit: product?.boxes?.[0]?.weightUnit || defaults.box?.weightUnit || "kg",
       },
     }),
     [busy, setBusy] = useState(false),
@@ -1529,8 +1531,8 @@ function CatalogProductDetail({ product, onClose, onSaved, options }) {
   );
 }
 
-export default function ProductsPage({ refreshKey, onChange }) {
-  const [registering, setRegistering] = useState(false),
+export default function ProductsPage({ refreshKey, onChange, prefill }) {
+  const [registering, setRegistering] = useState(Boolean(prefill)),
     [catalogRefresh, setCatalogRefresh] = useState(0),
     [copied, setCopied] = useState(false),
     [whatsapp, setWhatsapp] = useState(""),
@@ -1638,6 +1640,7 @@ export default function ProductsPage({ refreshKey, onChange }) {
       {registering && (
         <RegisterProductDialog
           options={options}
+          defaults={prefill || {}}
           onClose={() => setRegistering(false)}
           onSaved={saved}
         />
