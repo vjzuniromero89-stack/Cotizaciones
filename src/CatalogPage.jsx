@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Search, X, ChevronRight, Package, MessageCircle } from "lucide-react";
 import { DEFAULT_EXCHANGE_RATE } from "./calculate.js";
+import { priceConditions } from "./specs.js";
 import "./catalog-public.css";
 
 const usd = (n) =>
@@ -24,12 +25,9 @@ function Price({ value, big, minQty, colorRule }) {
           <span>Precio por unidad · puesto en Managua</span>
           <b>US{usd(value)}</b>
           <em>{cs(value)}</em>
-          {minQty > 0 && (
-            <i>
-              Para pedidos de {Number(minQty).toLocaleString()} piezas o más
-            </i>
-          )}
-          {colorRule && <i>{colorRule}</i>}
+          {priceConditions(minQty, colorRule).map((line) => (
+            <i key={line}>{line}</i>
+          ))}
         </>
       ) : (
         <>
@@ -98,10 +96,7 @@ export default function CatalogPage() {
       "Hola, quiero pedir este producto del catálogo:",
       "• " + p.name,
       p.salePrice > 0 ? "Precio: US" + usd(p.salePrice) + " por unidad" : "",
-      p.minQty > 0
-        ? "Pedido mínimo: " + Number(p.minQty).toLocaleString() + " piezas"
-        : "",
-      p.colorRule ? "Colores: " + p.colorRule : "",
+      ...priceConditions(p.minQty, p.colorRule),
       Number(units) > 0 ? "Cantidad: " + Number(units).toLocaleString() : "",
     ].filter(Boolean);
     return (

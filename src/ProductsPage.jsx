@@ -18,7 +18,7 @@ import "./suppliers.css";
 import { authFetch } from "./auth.js";
 import { shrinkImage, imagesFromPaste } from "./image.js";
 import { DEFAULT_EXCHANGE_RATE, estimateLandedUnit } from "./calculate.js";
-import { SPEC_FIELDS, specsOfInfo } from "./specs.js";
+import { SPEC_FIELDS, specsOfInfo, priceConditions } from "./specs.js";
 import {
   isRealProduct,
   splitCatalog,
@@ -737,24 +737,17 @@ export function RegisterProductDialog({
                 />
               </label>
               <label className="rpField">
-                <span>Colores</span>
+                <span>Piezas mínimas por color</span>
                 <input
                   value={form.colorRule}
-                  placeholder="Ej. 1,000 piezas por color, 2 colores"
+                  placeholder="Ej. 1000 (o escribe otra condición)"
                   onChange={(e) => update("colorRule", e.target.value)}
                 />
               </label>
               {(Number(form.minQty) > 0 || form.colorRule.trim()) && (
                 <em>
                   El cliente verá:{" "}
-                  {[
-                    Number(form.minQty) > 0
-                      ? `Precio para pedidos de ${Number(form.minQty).toLocaleString()} piezas o más`
-                      : "",
-                    form.colorRule.trim(),
-                  ]
-                    .filter(Boolean)
-                    .join(" · ")}
+                  {priceConditions(form.minQty, form.colorRule).join(" · ")}
                 </em>
               )}
             </div>
@@ -1194,7 +1187,7 @@ function CatalogSection({ refreshKey, onCatalogChanged, onOptions }) {
 
                 <div className="catalogProductSummary">
                   <div><span>Precio de compra</span><strong>{money(p.unit_price)}</strong><small>{cordobas(p.unit_price)}</small></div>
-                  <div className="saleSummary"><span>Precio de venta</span><strong>{Number(info.salePrice) > 0 ? money(info.salePrice) : "—"}</strong><small>{Number(info.salePrice) > 0 ? cordobas(info.salePrice) : "Sin precio"}</small>{Number(info.minQty) > 0 && <small>desde {Number(info.minQty).toLocaleString()} piezas</small>}{info.colorRule && <small>{info.colorRule}</small>}</div>
+                  <div className="saleSummary"><span>Precio de venta</span><strong>{Number(info.salePrice) > 0 ? money(info.salePrice) : "—"}</strong><small>{Number(info.salePrice) > 0 ? cordobas(info.salePrice) : "Sin precio"}</small>{priceConditions(info.minQty, info.colorRule).map((line) => <small key={line}>{line}</small>)}</div>
                   <div><span>Productos por caja</span><strong>{perBox ? perBox.toLocaleString() : "—"}</strong></div>
                   <div><span>Medidas de la caja</span><strong>{box?.l ? `${box.l} × ${box.w} × ${box.h} ${box.unit === "in" ? "in" : "cm"}` : "—"}</strong></div>
                   <div><span>Peso por caja</span><strong>{box?.weight ? `${box.weight} ${box.weightUnit || "kg"}` : "—"}</strong></div>
