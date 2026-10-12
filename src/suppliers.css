@@ -786,3 +786,182 @@
   padding: 0 10px;
   cursor: pointer;
 }
+
+/* Pestaña Ganancia por producto. */
+.marginSettings {
+  display: grid;
+  grid-template-columns: 220px 220px 1fr;
+  gap: 14px;
+  align-items: end;
+  border: 1px solid var(--line);
+  border-radius: 13px;
+  background: var(--surface);
+  padding: 14px 16px;
+  margin-bottom: 14px;
+}
+.marginSettings label {
+  display: grid;
+  gap: 4px;
+}
+.marginSettings span {
+  color: var(--muted);
+  font-size: 12.5px;
+  font-weight: 800;
+}
+.marginSettings input {
+  height: 44px;
+  border: 1px solid #343640;
+  border-radius: 9px;
+  background: var(--field);
+  color: #fff;
+  font: inherit;
+  font-size: 16px;
+  font-weight: 800;
+  padding: 0 12px;
+}
+.marginSettings p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+.marginSummary {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.marginSummary > div {
+  border: 1px solid var(--line);
+  border-radius: 13px;
+  background: var(--surface);
+  padding: 14px 16px;
+  min-width: 0;
+}
+.marginSummary span {
+  display: block;
+  color: var(--muted);
+  font-size: 12.5px;
+  font-weight: 700;
+}
+.marginSummary b {
+  display: block;
+  margin-top: 4px;
+  font: 800 20px Manrope;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.marginSummary small {
+  color: #3be090;
+  font-weight: 800;
+  font-size: 14px;
+}
+.marginSearch {
+  margin-bottom: 14px;
+}
+.marginTable {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--surface);
+}
+.marginRow {
+  display: grid;
+  grid-template-columns:
+    72px minmax(150px, 1.7fr) minmax(74px, 0.8fr) minmax(74px, 0.8fr)
+    minmax(74px, 0.8fr) minmax(120px, 1.2fr) minmax(120px, 1.2fr)
+    minmax(120px, 1.2fr) minmax(120px, 1.1fr);
+  gap: 12px;
+  align-items: center;
+  padding: 12px 16px;
+  border-top: 1px solid var(--line);
+  font-variant-numeric: tabular-nums;
+}
+.marginHead {
+  border-top: 0;
+  background: var(--surface-2);
+  color: #c5ced8;
+  font-size: 12.5px;
+  font-weight: 800;
+}
+.marginLabel {
+  display: none;
+}
+.marginRow img,
+.marginRow .compareNoPhoto {
+  width: 72px;
+  height: 72px;
+  border-radius: 10px;
+  object-fit: contain;
+  background: #fff;
+  border: 1px solid var(--line);
+}
+.marginRow .compareNoPhoto {
+  background: var(--surface-2);
+}
+.marginRow b {
+  display: block;
+  font: 800 15.5px Manrope;
+}
+.marginRow small {
+  display: block;
+  color: var(--muted);
+  font-size: 12.5px;
+}
+.marginName b {
+  font-size: 16px;
+  overflow-wrap: anywhere;
+}
+.marginCost b {
+  color: #ff9a3c;
+  font-size: 18px;
+}
+.marginSale b {
+  color: #3be090;
+  font-size: 18px;
+}
+.marginGain b {
+  color: #3be090;
+}
+.marginLoss b {
+  color: #ff6b5e;
+}
+.marginRow b.marginPercent {
+  font-size: 20px;
+}
+@media (max-width: 1150px) {
+  .marginHead {
+    display: none;
+  }
+  .marginLabel {
+    display: block;
+    color: var(--muted);
+    font-size: 11.5px;
+    font-weight: 800;
+  }
+  .marginRow {
+    grid-template-columns: 72px repeat(3, minmax(0, 1fr));
+  }
+  .marginName {
+    grid-column: span 3;
+  }
+  .marginSettings,
+  .marginSummary {
+    grid-template-columns: 1fr 1fr;
+  }
+  .marginSettings p {
+    grid-column: 1/-1;
+  }
+}
+@media (max-width: 560px) {
+  .marginRow {
+    grid-template-columns: 72px 1fr 1fr;
+  }
+  .marginName {
+    grid-column: span 2;
+  }
+  .marginSummary {
+    grid-template-columns: 1fr;
+  }
+}

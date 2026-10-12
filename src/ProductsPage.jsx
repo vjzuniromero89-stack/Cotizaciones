@@ -1188,6 +1188,7 @@ function CatalogProductDetail({ product, onClose, onSaved, options }) {
 export default function ProductsPage({ refreshKey, onChange }) {
   const [registering, setRegistering] = useState(false),
     [catalogRefresh, setCatalogRefresh] = useState(0),
+    [copied, setCopied] = useState(false),
     [options, setOptions] = useState({ suppliers: [], groups: [] });
   function saved() {
     setCatalogRefresh((x) => x + 1);
@@ -1204,9 +1205,35 @@ export default function ProductsPage({ refreshKey, onChange }) {
             únicamente en la pestaña Crear cotización.
           </p>
         </div>
-        <button className="newProduct" onClick={() => setRegistering(true)}>
-          <Plus /> Registrar producto
-        </button>
+        <div className="clientHeadActions">
+          <button
+            className="addClientButton"
+            title="Enlace público: muestra los productos y su precio de venta, sin costos"
+            onClick={async () => {
+              const url = window.location.origin + "/catalogo";
+              try {
+                await navigator.clipboard.writeText(url);
+                setCopied(true);
+                setTimeout(() => setCopied(false), 2500);
+              } catch {
+                window.prompt("Copia el enlace del catálogo:", url);
+              }
+            }}
+          >
+            {copied ? "✓ Enlace copiado" : "Copiar enlace del catálogo para clientes"}
+          </button>
+          <a
+            className="addClientButton"
+            href="/catalogo"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Ver catálogo
+          </a>
+          <button className="newProduct" onClick={() => setRegistering(true)}>
+            <Plus /> Registrar producto
+          </button>
+        </div>
       </div>
       <CatalogSection
         refreshKey={refreshKey + catalogRefresh}

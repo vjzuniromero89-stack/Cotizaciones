@@ -1,0 +1,450 @@
+/* Catálogo público para clientes (/catalogo): portada con categorías,
+   tarjetas de producto y ficha. */
+.pubCatalog {
+  --pub-side: max(20px, calc((100% - 1200px) / 2));
+  min-height: 100vh;
+  background: #eef1f5;
+  color: #14202b;
+  font-family: "DM Sans", sans-serif;
+  color-scheme: light;
+}
+.pubCover {
+  display: block;
+  height: auto;
+  position: static;
+  border: 0;
+  color: #fff;
+  padding: 26px var(--pub-side) 34px;
+  background:
+    radial-gradient(900px 420px at 88% -10%, rgba(255, 182, 41, 0.28), transparent 60%),
+    linear-gradient(135deg, #16223f 0%, #1d2b4f 55%, #243a6b 100%);
+}
+.pubBrand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font: 800 17px Manrope;
+}
+.pubBrand span {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  background: #ffb629;
+  color: #1d2b4f;
+  font: 800 15px Manrope;
+}
+.pubCover h1 {
+  margin: 34px 0 0;
+  font: 800 clamp(30px, 5vw, 50px) Manrope;
+  letter-spacing: -0.5px;
+  line-height: 1.08;
+  max-width: 760px;
+}
+.pubCover > p {
+  margin: 12px 0 0;
+  color: #c9d3ea;
+  font-size: 17px;
+  line-height: 1.5;
+  max-width: 620px;
+}
+.pubSearch {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #fff;
+  border-radius: 12px;
+  padding: 0 14px;
+  margin-top: 22px;
+  max-width: 460px;
+}
+.pubSearch svg {
+  width: 18px;
+  color: #6a7785;
+  flex: none;
+}
+.pubSearch input {
+  border: 0;
+  outline: 0;
+  height: 50px;
+  width: 100%;
+  font: inherit;
+  font-size: 16px;
+  color: #14202b;
+  background: transparent;
+}
+.pubCats {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 12px;
+  margin-top: 26px;
+}
+.pubCats button {
+  display: grid;
+  grid-template-columns: 62px 1fr 20px;
+  gap: 12px;
+  align-items: center;
+  text-align: left;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  font: inherit;
+  padding: 9px 12px 9px 9px;
+  cursor: pointer;
+}
+.pubCats button:hover {
+  background: rgba(255, 255, 255, 0.18);
+}
+.pubCats button.active {
+  background: #ffb629;
+  border-color: #ffb629;
+  color: #1d2b4f;
+}
+.pubCats img,
+.pubCats i {
+  width: 62px;
+  height: 62px;
+  border-radius: 10px;
+  object-fit: contain;
+  background: #fff;
+  display: grid;
+  place-items: center;
+  color: #6a7785;
+}
+.pubCats b {
+  display: block;
+  font: 800 16.5px Manrope;
+  overflow-wrap: anywhere;
+}
+.pubCats small {
+  display: block;
+  font-size: 13px;
+  opacity: 0.85;
+}
+.pubCats svg {
+  width: 20px;
+}
+.pubSection {
+  padding: 22px var(--pub-side) 26px;
+  scroll-margin-top: 8px;
+}
+.pubSectionHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.pubSectionHead h2 {
+  margin: 0;
+  font: 800 26px Manrope;
+}
+.pubSectionHead span {
+  color: #6a7785;
+  font-size: 15px;
+}
+.pubSectionHead button {
+  margin-left: auto;
+  border: 1px solid #cfd6df;
+  border-radius: 99px;
+  background: #fff;
+  color: #14202b;
+  font: inherit;
+  font-weight: 700;
+  padding: 7px 14px;
+  cursor: pointer;
+}
+.pubGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+}
+.pubCard {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  padding: 0;
+  background: #fff;
+  color: inherit;
+  font: inherit;
+  border: 1px solid #e0e6eb;
+  border-radius: 16px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.pubCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(20, 32, 43, 0.14);
+}
+.pubCard > img,
+.pubNoPhoto {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: contain;
+  background: #fff;
+  border-bottom: 1px solid #edf0f3;
+  display: block;
+}
+.pubNoPhoto {
+  display: grid;
+  place-items: center;
+  background: #f3f6f8;
+  color: #8a96a3;
+}
+.pubBody {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  width: 100%;
+  padding: 14px 16px 14px;
+}
+.pubBody > small,
+.pubSheetInfo > small {
+  color: #6a7785;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+}
+.pubBody h3 {
+  margin: 3px 0 12px;
+  font: 800 18px Manrope;
+  overflow-wrap: anywhere;
+}
+.pubPrice {
+  margin-top: auto;
+  background: #fff4dc;
+  border: 1px solid #ffd98a;
+  color: #1d2b4f;
+  border-radius: 12px;
+  padding: 10px 14px;
+}
+.pubPrice span {
+  display: block;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: #7a5a10;
+}
+.pubPrice b {
+  display: block;
+  font: 800 24px Manrope;
+  font-variant-numeric: tabular-nums;
+}
+.pubPrice b.ask {
+  font-size: 19px;
+}
+.pubPrice em {
+  font-style: normal;
+  font: 700 15px Manrope;
+  font-variant-numeric: tabular-nums;
+}
+.pubPrice.big {
+  margin: 14px 0 0;
+  background: #ffb629;
+  border-color: #ffb629;
+}
+.pubPrice.big b {
+  font-size: 34px;
+}
+.pubPrice.big em {
+  font-size: 18px;
+}
+.pubMore {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 12px;
+  color: #1d2b4f;
+  font-weight: 800;
+  font-size: 14.5px;
+}
+.pubMore svg {
+  width: 16px;
+}
+.pubEmpty {
+  text-align: center;
+  color: #6a7785;
+  padding: 60px 20px;
+  font-size: 16px;
+}
+.pubFoot {
+  text-align: center;
+  color: #6a7785;
+  font-size: 13.5px;
+  padding: 0 20px 36px;
+}
+/* Ficha del producto */
+.pubSheetBack {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: rgba(8, 12, 20, 0.72);
+  overflow: auto;
+  padding: 24px 14px;
+}
+.pubSheet {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+  gap: 24px;
+  width: min(980px, 100%);
+  margin: auto;
+  background: #fff;
+  border-radius: 20px;
+  padding: 22px;
+  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.45);
+}
+.pubSheetPhoto img,
+.pubSheetPhoto .pubNoPhoto {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: contain;
+  background: #fff;
+  border: 1px solid #e0e6eb;
+  border-radius: 14px;
+  display: block;
+}
+.pubSheetPhoto img {
+  cursor: zoom-in;
+}
+.pubSheetInfo {
+  padding-right: 34px;
+  min-width: 0;
+}
+.pubSheetInfo h2 {
+  margin: 4px 0 0;
+  font: 800 28px Manrope;
+  overflow-wrap: anywhere;
+}
+.pubSheetInfo h4 {
+  margin: 20px 0 8px;
+  font: 800 13px Manrope;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: #6a7785;
+}
+.pubSheetInfo dl {
+  margin: 0;
+  display: grid;
+  gap: 6px;
+}
+.pubSheetInfo dl > div {
+  display: grid;
+  grid-template-columns: 170px 1fr;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid #edf0f3;
+  font-size: 15.5px;
+}
+.pubSheetInfo dt {
+  color: #6a7785;
+  font-weight: 700;
+}
+.pubSheetInfo dd {
+  margin: 0;
+  font-weight: 700;
+}
+.pubPack {
+  margin: 16px 0 0;
+  color: #55616d;
+  font-size: 15px;
+}
+.pubClose {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #d5dee8;
+  border-radius: 50%;
+  background: #fff;
+  color: #14202b;
+  cursor: pointer;
+  z-index: 1;
+}
+.pubZoom {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: grid;
+  grid-template-rows: 1fr auto;
+  justify-items: center;
+  align-items: center;
+  gap: 12px;
+  padding: 56px 16px 24px;
+  background: rgba(8, 12, 20, 0.94);
+  cursor: zoom-out;
+}
+.pubZoom img {
+  width: min(92vw, 900px);
+  height: min(calc(100vh - 150px), 900px);
+  object-fit: contain;
+  background: #fff;
+  border-radius: 12px;
+}
+.pubZoom span {
+  color: #fff;
+  font: 800 17px Manrope;
+  text-align: center;
+}
+.pubZoom button {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: #fff;
+  color: #14202b;
+  cursor: pointer;
+}
+@media (max-width: 760px) {
+  .pubSheet {
+    grid-template-columns: 1fr;
+    padding: 16px;
+  }
+  .pubSheetInfo {
+    padding-right: 0;
+  }
+  .pubSheetInfo dl > div {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+  .pubCats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+  .pubCats button {
+    grid-template-columns: 46px 1fr;
+  }
+  .pubCats img,
+  .pubCats i {
+    width: 46px;
+    height: 46px;
+  }
+  .pubCats svg {
+    display: none;
+  }
+  .pubGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+  .pubPrice b {
+    font-size: 19px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pubCard {
+    transition: none;
+  }
+}

@@ -371,6 +371,31 @@ async function handleApi(request, env, url) {
     }
     // Enlace público del cliente ("casillero"): no requiere iniciar sesión,
     // solo conocer el token de su enlace.
+    // Catálogo público para clientes. Solo sale lo que el cliente puede ver:
+    // nunca el precio de compra, el proveedor, su enlace ni las notas.
+    if (url.pathname === "/api/catalogo" && request.method === "GET") {
+      const rows = await restRows(
+        env,
+        "catalog_products?select=id,name,image_url,boxes&order=name.asc",
+      );
+      return json({
+        products: rows
+          .filter((row) => !/^__.*__$/.test(String(row.name || "")))
+          .map((row) => {
+            const box = row.boxes?.[0] || {},
+              info = box.info || {};
+            return {
+              id: row.id,
+              name: row.name,
+              imageUrl: row.image_url || "",
+              category: String(info.category || "").trim(),
+              specs: catalogSpecs(info),
+              salePrice: Math.max(0, Number(info.salePrice) || 0),
+              unitsPerBox: Math.max(0, Number(box.unitsPerBox) || 0),
+            };
+          }),
+      });
+    }
     const portal = url.pathname.match(/^\/api\/portal\/([^/]+)$/);
     if (portal && request.method === "GET") {
       const clients = await restRows(

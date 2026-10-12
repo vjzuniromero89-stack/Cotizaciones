@@ -21,6 +21,7 @@ import {
   UserCog,
   Factory,
   Images,
+  Percent,
 } from "lucide-react";
 import "./style.css";
 import "./route-breakdown.css";
@@ -34,10 +35,12 @@ import ProductsPage from "./ProductsPage.jsx";
 import ClientsPage from "./ClientsPage.jsx";
 import SuppliersPage from "./SuppliersPage.jsx";
 import PhotosPage from "./PhotosPage.jsx";
+import MarginsPage from "./MarginsPage.jsx";
 import { isRealProduct } from "./suppliers.js";
 import UsersPage from "./UsersPage.jsx";
 import AuthPage from "./AuthPage.jsx";
 import PortalPage from "./PortalPage.jsx";
+import CatalogPage from "./CatalogPage.jsx";
 import { authFetch, clearSession, getSession } from "./auth.js";
 import "./landed.css";
 import "./dark.css";
@@ -103,6 +106,7 @@ function Nav({ page, setPage, currentUser }) {
         ["products", PackageSearch, "Productos", "Productos"],
         ["suppliers", Factory, "Proveedores", "Proveed."],
         ["photos", Images, "Fotos", "Fotos"],
+        ["margins", Percent, "Ganancia por producto", "Margen"],
         ["customers", Users, "Clientes", "Clientes"],
         ["quotes", FileText, "Cotizaciones internas", "Internas"],
         [
@@ -1021,6 +1025,8 @@ function App() {
             onChange={changed}
             setPage={navigate}
           />
+        ) : page === "margins" ? (
+          <MarginsPage refreshKey={refresh} />
         ) : page === "photos" ? (
           <PhotosPage refreshKey={refresh} />
         ) : page === "suppliers" ? (
@@ -1048,6 +1054,13 @@ function App() {
   );
 }
 const portalMatch = window.location.pathname.match(/^\/portal\/([^/]+)/);
+const catalogMatch = /^\/catalogo\/?$/.test(window.location.pathname);
 createRoot(document.getElementById("root")).render(
-  portalMatch ? <PortalPage token={portalMatch[1]} /> : <App />,
+  catalogMatch ? (
+    <CatalogPage />
+  ) : portalMatch ? (
+    <PortalPage token={portalMatch[1]} />
+  ) : (
+    <App />
+  ),
 );
