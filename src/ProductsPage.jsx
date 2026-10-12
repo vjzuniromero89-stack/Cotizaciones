@@ -17,7 +17,7 @@ import "./products-page.css";
 import "./suppliers.css";
 import { authFetch } from "./auth.js";
 import { shrinkImage, imagesFromPaste } from "./image.js";
-import { DEFAULT_EXCHANGE_RATE } from "./calculate.js";
+import { DEFAULT_EXCHANGE_RATE, estimateLandedUnit } from "./calculate.js";
 import { SPEC_FIELDS, specsOfInfo } from "./specs.js";
 import {
   isRealProduct,
@@ -534,6 +534,11 @@ export function RegisterProductDialog({
   };
   const boxCbm = oneBoxCbm(form.box),
     perBox = Number(form.box.unitsPerBox || 0);
+  // Costo estimado puesto en Nicaragua; solo si la caja tiene medidas o peso.
+  const landed =
+    boxCbm > 0 || Number(form.box.weight) > 0
+      ? estimateLandedUnit({ price: form.price, box: form.box })
+      : null;
   async function upload(original) {
     if (!original) return;
     setBusy(true);
@@ -709,6 +714,57 @@ export function RegisterProductDialog({
                   : "C$ —"}
               </em>
             </label>
+            {Number(form.salePrice) > 0 && Number(form.price) > 0 && (
+              <div
+                className={
+                  "rpProfit" +
+                  ((landed ? landed.total : Number(form.price)) >
+                  Number(form.salePrice)
+                    ? " loss"
+                    : "")
+                }
+              >
+                {landed ? (
+                  <>
+                    <small>Ganancia sobre el costo puesto en Nicaragua</small>
+                    <b>
+                      {(
+                        ((Number(form.salePrice) - landed.total) / landed.total) *
+                        100
+                      ).toFixed(1)}{" "}
+                      %
+                    </b>
+                    <span>
+                      {Number(form.salePrice) >= landed.total ? "Ganas" : "Pierdes"}{" "}
+                      {money(Math.abs(Number(form.salePrice) - landed.total))} ·{" "}
+                      {cordobas(Math.abs(Number(form.salePrice) - landed.total))}{" "}
+                      por unidad
+                    </span>
+                    <span>
+                      Costo {money(landed.total)} = compra{" "}
+                      {money(landed.purchase)} + comisión {money(landed.fee)} +
+                      flete {money(landed.freight)}
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <small>Ganancia sobre el precio de compra</small>
+                    <b>
+                      {(
+                        ((Number(form.salePrice) - Number(form.price)) /
+                          Number(form.price)) *
+                        100
+                      ).toFixed(1)}{" "}
+                      %
+                    </b>
+                    <span>
+                      Falta la caja (productos por caja y medidas) para sumar
+                      el flete y la comisión.
+                    </span>
+                  </>
+                )}
+              </div>
+            )}
           </div>
           <div className="rpCol">
             <label className="rpField">
