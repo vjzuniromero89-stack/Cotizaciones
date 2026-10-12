@@ -378,7 +378,11 @@ async function handleApi(request, env, url) {
         env,
         "catalog_products?select=id,name,image_url,boxes&order=name.asc",
       );
+      const settings =
+        rows.find((row) => row.name === "__config__")?.boxes?.[0] || {};
       return json({
+        // Solo dígitos: es el número al que el cliente escribe por WhatsApp.
+        whatsapp: String(settings.whatsapp || "").replace(/\D/g, ""),
         products: rows
           .filter((row) => !/^__.*__$/.test(String(row.name || "")))
           .map((row) => {

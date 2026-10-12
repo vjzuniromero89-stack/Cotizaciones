@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Search, X, ChevronRight, Package } from "lucide-react";
+import { Search, X, ChevronRight, Package, MessageCircle } from "lucide-react";
 import { DEFAULT_EXCHANGE_RATE } from "./calculate.js";
 import "./catalog-public.css";
 
@@ -38,7 +38,13 @@ function Price({ value, big }) {
 // Catálogo público para clientes: portada con categorías, tarjetas y ficha
 // de cada producto. El servidor nunca envía aquí costos, proveedor ni notas.
 export default function CatalogPage() {
-  const [state, setState] = useState({ loading: true, error: "", items: [] }),
+  const [state, setState] = useState({
+      loading: true,
+      error: "",
+      items: [],
+      whatsapp: "",
+    }),
+    [quantity, setQuantity] = useState(""),
     [search, setSearch] = useState(""),
     [category, setCategory] = useState(""),
     [open, setOpen] = useState(null),
@@ -49,9 +55,16 @@ export default function CatalogPage() {
       .then(async (r) => {
         const d = await r.json().catch(() => ({}));
         if (!r.ok) throw new Error(d.error || "No se pudo cargar el catálogo");
-        setState({ loading: false, error: "", items: d.products || [] });
+        setState({
+          loading: false,
+          error: "",
+          items: d.products || [],
+          whatsapp: d.whatsapp || "",
+        });
       })
-      .catch((e) => setState({ loading: false, error: e.message, items: [] }));
+      .catch((e) =>
+        setState({ loading: false, error: e.message, items: [], whatsapp: "" }),
+      );
   }, []);
   // Una ficha por categoría, con la foto de uno de sus productos.
   const categories = useMemo(() => {
@@ -73,6 +86,21 @@ export default function CatalogPage() {
         .toLowerCase()
         .includes(search.trim().toLowerCase()),
   );
+  // Mensaje listo para WhatsApp con el producto y, si la puso, la cantidad.
+  const orderLink = (p, units) => {
+    const lines = [
+      "Hola, quiero pedir este producto del catálogo:",
+      "• " + p.name,
+      p.salePrice > 0 ? "Precio: US" + usd(p.salePrice) + " por unidad" : "",
+      Number(units) > 0 ? "Cantidad: " + Number(units).toLocaleString() : "",
+    ].filter(Boolean);
+    return (
+      "https://wa.me/" +
+      state.whatsapp +
+      "?text=" +
+      encodeURIComponent(lines.join("\n"))
+    );
+  };
   const choose = (name) => {
     setCategory((current) => (same(current, name) ? "" : name));
     document
@@ -151,7 +179,10 @@ export default function CatalogPage() {
                 type="button"
                 className="pubCard"
                 key={p.id}
-                onClick={() => setOpen(p)}
+                onClick={() => {
+                  setQuantity("");
+                  setOpen(p);
+                }}
               >
                 {p.imageUrl ? (
                   <img src={p.imageUrl} alt={p.name} loading="lazy" />
@@ -173,6 +204,21 @@ export default function CatalogPage() {
           <p className="pubEmpty">No hay productos que coincidan.</p>
         )}
       </section>
+      {state.whatsapp && (
+        <a
+          className="pubWhats"
+          href={
+            "https://wa.me/" +
+            state.whatsapp +
+            "?text=" +
+            encodeURIComponent("Hola, vi el catálogo y quiero hacer una consulta.")
+          }
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <MessageCircle /> Escríbenos por WhatsApp
+        </a>
+      )}
       <footer className="pubFoot">
         Precios sujetos a confirmación de disponibilidad. El envío hasta Managua
         está incluido en el precio.
@@ -207,6 +253,28 @@ export default function CatalogPage() {
               <small>{String(open.category || "").trim() || "Otros"}</small>
               <h2>{open.name}</h2>
               <Price value={open.salePrice} big />
+              {state.whatsapp && (
+                <div className="pubOrder">
+                  <label>
+                    <span>¿Cuántas unidades? (opcional)</span>
+                    <input
+                      type="number"
+                      min="0"
+                      inputMode="numeric"
+                      value={quantity}
+                      placeholder="Ej. 500"
+                      onChange={(e) => setQuantity(e.target.value)}
+                    />
+                  </label>
+                  <a
+                    href={orderLink(open, quantity)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <MessageCircle /> Pedir por WhatsApp
+                  </a>
+                </div>
+              )}
               {open.specs?.length > 0 && (
                 <>
                   <h4>Descripción</h4>

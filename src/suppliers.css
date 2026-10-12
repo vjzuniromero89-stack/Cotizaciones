@@ -1003,3 +1003,91 @@
 .rpProfit.loss b {
   color: #ff6b5e;
 }
+
+/* Porcentajes de ganancia y WhatsApp del catálogo. */
+.rpPercents small {
+  display: block;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+.rpPercents > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+.rpPercents button {
+  border: 1px solid #2d7c55;
+  border-radius: 9px;
+  background: transparent;
+  color: #3be090;
+  font: inherit;
+  font-weight: 900;
+  font-size: 15px;
+  padding: 9px 13px;
+  cursor: pointer;
+}
+.rpPercents button.active {
+  background: #3be090;
+  color: #07140e;
+}
+.rpPercents label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--muted);
+  font-weight: 800;
+}
+.rpPercents label input {
+  width: 74px;
+  height: 40px;
+  border: 1px solid #343640;
+  border-radius: 9px;
+  background: var(--field);
+  color: #fff;
+  font: inherit;
+  font-size: 15px;
+  padding: 0 8px;
+}
+.catalogWhatsapp {
+  display: grid;
+  grid-template-columns: minmax(260px, 420px) auto 1fr;
+  gap: 10px 12px;
+  align-items: end;
+  border: 1px solid var(--line);
+  border-radius: 13px;
+  background: var(--surface);
+  padding: 14px 16px;
+  margin-bottom: 18px;
+}
+.catalogWhatsapp label {
+  display: grid;
+  gap: 4px;
+}
+.catalogWhatsapp span {
+  color: var(--muted);
+  font-size: 12.5px;
+  font-weight: 800;
+}
+.catalogWhatsapp input {
+  height: 44px;
+  border: 1px solid #343640;
+  border-radius: 9px;
+  background: var(--field);
+  color: #fff;
+  font: inherit;
+  font-size: 16px;
+  padding: 0 12px;
+}
+.catalogWhatsapp small {
+  color: var(--muted);
+  font-size: 13px;
+  align-self: center;
+}
+@media (max-width: 820px) {
+  .catalogWhatsapp {
+    grid-template-columns: 1fr;
+  }
+}

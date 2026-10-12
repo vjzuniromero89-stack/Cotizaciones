@@ -448,3 +448,76 @@
     transition: none;
   }
 }
+
+/* Pedir por WhatsApp. */
+.pubOrder {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px;
+  align-items: end;
+  margin-top: 12px;
+}
+.pubOrder label {
+  display: grid;
+  gap: 4px;
+}
+.pubOrder label span {
+  color: #6a7785;
+  font-size: 13px;
+  font-weight: 700;
+}
+.pubOrder input {
+  height: 50px;
+  border: 1px solid #cfd6df;
+  border-radius: 12px;
+  font: inherit;
+  font-size: 17px;
+  padding: 0 14px;
+  color: #14202b;
+  background: #fff;
+  min-width: 0;
+}
+.pubOrder a,
+.pubWhats {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 50px;
+  border-radius: 12px;
+  background: #1faa59;
+  color: #fff;
+  font: 800 16px Manrope;
+  text-decoration: none;
+  padding: 0 18px;
+  white-space: nowrap;
+}
+.pubOrder a:hover,
+.pubWhats:hover {
+  background: #17914a;
+}
+.pubOrder svg,
+.pubWhats svg {
+  width: 20px;
+  height: 20px;
+}
+.pubWhats {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  z-index: 50;
+  box-shadow: 0 10px 28px rgba(20, 32, 43, 0.3);
+}
+@media (max-width: 760px) {
+  .pubOrder {
+    grid-template-columns: 1fr;
+  }
+  .pubWhats {
+    left: 14px;
+    right: 14px;
+    bottom: 12px;
+  }
+  .pubFoot {
+    padding-bottom: 90px;
+  }
+}

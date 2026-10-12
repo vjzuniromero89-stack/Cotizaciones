@@ -25,6 +25,8 @@ import {
   comparisonGroups,
   galleryOf,
   categoriesOf,
+  configOf,
+  CONFIG_ROW,
 } from "./suppliers.js";
 
 const money = (n) =>
@@ -534,6 +536,10 @@ export function RegisterProductDialog({
   };
   const boxCbm = oneBoxCbm(form.box),
     perBox = Number(form.box.unitsPerBox || 0);
+  const [customPercent, setCustomPercent] = useState("");
+  // Precio de venta que deja ese porcentaje de ganancia sobre el costo.
+  const priceFor = (percent) =>
+    (landed ? landed.total : Number(form.price) || 0) * (1 + percent / 100);
   // Costo estimado puesto en Nicaragua; solo si la caja tiene medidas o peso.
   const landed =
     boxCbm > 0 || Number(form.box.weight) > 0
@@ -714,6 +720,52 @@ export function RegisterProductDialog({
                   : "C$ —"}
               </em>
             </label>
+            {Number(form.price) > 0 && (
+              <div className="rpPercents">
+                <small>
+                  Poner el precio de venta para ganar
+                  {landed ? " sobre el costo puesto en Nicaragua" : " sobre la compra"}:
+                </small>
+                <div>
+                  {[20, 30, 40, 50].map((percent) => (
+                    <button
+                      type="button"
+                      key={percent}
+                      className={
+                        Math.abs(
+                          Number(form.salePrice) - priceFor(percent),
+                        ) < 0.005
+                          ? "active"
+                          : ""
+                      }
+                      onClick={() =>
+                        update("salePrice", priceFor(percent).toFixed(2))
+                      }
+                    >
+                      {percent} %
+                    </button>
+                  ))}
+                  <label>
+                    <input
+                      type="number"
+                      min="0"
+                      step="any"
+                      placeholder="Otro"
+                      value={customPercent}
+                      onChange={(e) => {
+                        setCustomPercent(e.target.value);
+                        if (Number(e.target.value) > 0)
+                          update(
+                            "salePrice",
+                            priceFor(Number(e.target.value)).toFixed(2),
+                          );
+                      }}
+                    />
+                    %
+                  </label>
+                </div>
+              </div>
+            )}
             {Number(form.salePrice) > 0 && Number(form.price) > 0 && (
               <div
                 className={
@@ -1028,6 +1080,7 @@ function CatalogSection({ refreshKey, onCatalogChanged, onOptions }) {
         suppliers: suppliers.map((s) => s.name),
         groups: comparisonGroups(products).map((g) => g.name),
         categories: categoriesOf(products),
+        config: configOf(rows),
       });
     } catch {
       setItems([]);
@@ -1245,6 +1298,8 @@ export default function ProductsPage({ refreshKey, onChange }) {
   const [registering, setRegistering] = useState(false),
     [catalogRefresh, setCatalogRefresh] = useState(0),
     [copied, setCopied] = useState(false),
+    [whatsapp, setWhatsapp] = useState(""),
+    [whatsappSaved, setWhatsappSaved] = useState(""),
     [options, setOptions] = useState({ suppliers: [], groups: [] });
   function saved() {
     setCatalogRefresh((x) => x + 1);
@@ -1291,10 +1346,59 @@ export default function ProductsPage({ refreshKey, onChange }) {
           </button>
         </div>
       </div>
+      <form
+        className="catalogWhatsapp"
+        onSubmit={async (e) => {
+          e.preventDefault();
+          const body = JSON.stringify({
+            name: CONFIG_ROW,
+            imageUrl: "",
+            price: 0,
+            qty: 0,
+            boxes: [{ whatsapp: whatsapp.replace(/\D/g, "") }],
+          });
+          try {
+            const row = options.config?.row;
+            if (row)
+              await api("/catalog-products/" + row.id, { method: "PUT", body });
+            else await api("/catalog-products", { method: "POST", body });
+            setWhatsappSaved("Guardado ✓");
+            saved();
+          } catch (err) {
+            setWhatsappSaved(err.message || "No se pudo guardar");
+          }
+        }}
+      >
+        <label>
+          <span>
+            WhatsApp para los pedidos del catálogo (con código de país, por
+            ejemplo 505 8888 1234)
+          </span>
+          <input
+            value={whatsapp}
+            inputMode="tel"
+            placeholder="505 0000 0000"
+            onChange={(e) => {
+              setWhatsapp(e.target.value);
+              setWhatsappSaved("");
+            }}
+          />
+        </label>
+        <button className="addClientButton">Guardar número</button>
+        <small>
+          {whatsappSaved ||
+            (options.config?.whatsapp
+              ? "El catálogo muestra el botón “Pedir por WhatsApp”."
+              : "Sin número, el catálogo no muestra el botón de pedir.")}
+        </small>
+      </form>
       <CatalogSection
         refreshKey={refreshKey + catalogRefresh}
         onCatalogChanged={saved}
-        onOptions={setOptions}
+        onOptions={(next) => {
+          setOptions(next);
+          if (next.config && !whatsapp) setWhatsapp(next.config.whatsapp || "");
+        }}
       />
       {registering && (
         <RegisterProductDialog

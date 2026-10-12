@@ -4,8 +4,16 @@
 export const SUPPLIERS_ROW = "__proveedores__";
 // La galería de fotos se guarda igual, en otra fila reservada.
 export const PHOTOS_ROW = "__fotos__";
+// Ajustes del catálogo público (por ahora, el WhatsApp para pedidos).
+export const CONFIG_ROW = "__config__";
 export const isRealProduct = (row) =>
-  row?.name !== SUPPLIERS_ROW && row?.name !== PHOTOS_ROW;
+  ![SUPPLIERS_ROW, PHOTOS_ROW, CONFIG_ROW].includes(row?.name);
+export function configOf(rows) {
+  const row = (Array.isArray(rows) ? rows : []).find(
+    (r) => r.name === CONFIG_ROW,
+  );
+  return { row: row || null, whatsapp: String(row?.boxes?.[0]?.whatsapp || "") };
+}
 // Fotos de la galería más las que ya usan los productos, sin repetir.
 export function galleryOf(rows) {
   const list = Array.isArray(rows) ? rows : [];
