@@ -769,3 +769,20 @@
   border-radius: 99px;
   padding: 3px 9px;
 }
+
+/* Categoría: lista o escribir una nueva. */
+.rpNewCategory {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 6px;
+}
+.rpNewCategory button {
+  border: 1px solid #343640;
+  border-radius: 8px;
+  background: transparent;
+  color: #eef2f5;
+  font-weight: 800;
+  font-size: 12.5px;
+  padding: 0 10px;
+  cursor: pointer;
+}

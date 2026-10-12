@@ -24,6 +24,7 @@ import {
   splitCatalog,
   comparisonGroups,
   galleryOf,
+  categoriesOf,
 } from "./suppliers.js";
 
 const money = (n) =>
@@ -570,6 +571,17 @@ export function RegisterProductDialog({
     return () => document.removeEventListener("paste", onPaste);
   }, []);
   const [gallery, setGallery] = useState(null);
+  // Categorías ya escritas, más la de este producto si no está en la lista.
+  const [newCategory, setNewCategory] = useState(false);
+  const categoryList = [...(options.categories || [])];
+  if (
+    !newCategory &&
+    form.category.trim() &&
+    !categoryList.some(
+      (c) => c.toLowerCase() === form.category.trim().toLowerCase(),
+    )
+  )
+    categoryList.push(form.category.trim());
   async function openGallery() {
     try {
       setGallery(galleryOf(await api("/catalog-products")).photos);
@@ -701,11 +713,44 @@ export function RegisterProductDialog({
           <div className="rpCol">
             <label className="rpField">
               <span>Categoría</span>
-              <input
-                value={form.category}
-                placeholder="Ej. Botellas"
-                onChange={(e) => update("category", e.target.value)}
-              />
+              {categoryList.length > 0 && !newCategory ? (
+                <select
+                  value={
+                    categoryList.find(
+                      (c) =>
+                        c.toLowerCase() === form.category.trim().toLowerCase(),
+                    ) || ""
+                  }
+                  onChange={(e) => {
+                    if (e.target.value === "__nueva__") {
+                      setNewCategory(true);
+                      update("category", "");
+                    } else update("category", e.target.value);
+                  }}
+                >
+                  <option value="">Sin categoría</option>
+                  {categoryList.map((c) => (
+                    <option key={c} value={c}>
+                      {c}
+                    </option>
+                  ))}
+                  <option value="__nueva__">+ Escribir una categoría nueva…</option>
+                </select>
+              ) : (
+                <div className="rpNewCategory">
+                  <input
+                    autoFocus={newCategory}
+                    value={form.category}
+                    placeholder="Ej. Botellas"
+                    onChange={(e) => update("category", e.target.value)}
+                  />
+                  {categoryList.length > 0 && (
+                    <button type="button" onClick={() => setNewCategory(false)}>
+                      Ver lista
+                    </button>
+                  )}
+                </div>
+              )}
             </label>
             <label className="rpField">
               <span>Proveedor</span>
@@ -926,6 +971,7 @@ function CatalogSection({ refreshKey, onCatalogChanged, onOptions }) {
       setOptions({
         suppliers: suppliers.map((s) => s.name),
         groups: comparisonGroups(products).map((g) => g.name),
+        categories: categoriesOf(products),
       });
     } catch {
       setItems([]);

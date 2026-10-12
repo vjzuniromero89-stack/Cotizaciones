@@ -40,6 +40,15 @@ export function splitCatalog(rows) {
   suppliers.sort((a, b) => a.name.localeCompare(b.name, "es"));
   return { products, suppliers, row };
 }
+// Categorías ya usadas en los productos, sin repetir (no distingue mayúsculas).
+export function categoriesOf(products) {
+  const found = new Map();
+  for (const product of products) {
+    const name = String(infoOf(product).category || "").trim();
+    if (name && !found.has(key(name))) found.set(key(name), name);
+  }
+  return [...found.values()].sort((a, b) => a.localeCompare(b, "es"));
+}
 export const productsOf = (products, supplierName) =>
   products.filter((p) => key(infoOf(p).supplier) === key(supplierName));
 
