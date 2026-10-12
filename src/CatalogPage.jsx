@@ -25,16 +25,35 @@ const sizeNumber = (text) => {
   return /\bl\b|litro/i.test(text) && !/ml/i.test(text) ? value * 1000 : value;
 };
 
-// Junta en un solo producto los que comparten "familia" (mismo producto en
-// varios tamaños). Los que no tienen familia quedan solos.
+// Nombre sin el tamaño: "THIN BOTTLE STAINLESS 600ML" -> "THIN BOTTLE STAINLESS".
+const withoutSize = (name) =>
+  String(name || "")
+    .replace(/\b\d+([.,]\d+)?\s*(ml|lts?|litros?|l|oz)\b/gi, "")
+    .replace(/\s{2,}/g, " ")
+    .trim() || String(name || "");
+
+// Junta en un solo producto los que tienen el mismo modelo (la misma botella
+// en varios tamaños). Los que no tienen modelo quedan solos.
 function groupProducts(items) {
   const groups = new Map();
   for (const p of items) {
-    const family = String(p.family || "").trim();
-    const key = family ? "f:" + family.toLowerCase() : "p:" + p.id;
+    const model = String(p.model || "").trim(),
+      family = String(p.family || "").trim();
+    const key = model
+      ? "m:" + model.toLowerCase()
+      : family
+        ? "f:" + family.toLowerCase()
+        : "p:" + p.id;
     if (!groups.has(key))
-      groups.set(key, { key, title: family || p.name, items: [] });
-    groups.get(key).items.push(p);
+      groups.set(key, { key, model, title: "", items: [] });
+    const group = groups.get(key);
+    group.items.push(p);
+    // Título: el nombre de catálogo si alguno lo tiene; si no, el nombre del
+    // producto sin el tamaño.
+    if (family && !group.named) {
+      group.title = family;
+      group.named = true;
+    } else if (!group.title) group.title = model || family ? withoutSize(p.name) : p.name;
   }
   return [...groups.values()].map((g) => {
     const sorted = [...g.items].sort(
@@ -120,7 +139,7 @@ export default function CatalogPage() {
   const shown = groups.filter(
     (g) =>
       (!category || same(g.category, category)) &&
-      (g.title + " " + g.category + " " + g.items.map((p) => p.name).join(" "))
+      (g.title + " " + g.model + " " + g.category + " " + g.items.map((p) => p.name).join(" "))
         .toLowerCase()
         .includes(search.trim().toLowerCase()),
   );
@@ -128,7 +147,7 @@ export default function CatalogPage() {
   const orderLink = (group, p, units) => {
     const lines = [
       "Hola, quiero pedir este producto del catálogo:",
-      "• " + group.title,
+      "• " + group.title + (group.model ? " (modelo " + group.model + ")" : ""),
       group.items.length > 1 ? "Tamaño: " + (p.size || p.name) : "",
       p.salePrice > 0 ? "Precio: US" + usd(p.salePrice) + " por unidad" : "",
       p.salePrice > 0 ? "Condición: " + priceNoteOf(p.priceNote) : "",
@@ -329,7 +348,10 @@ export default function CatalogPage() {
               )}
             </div>
             <div className="pubSheetInfo">
-              <small>{open.category}</small>
+              <small>
+                {open.category}
+                {open.model ? " · Modelo " + open.model : ""}
+              </small>
               <h2>{open.title}</h2>
               {open.items.length > 1 && (
                 <div className="pubSizePick">

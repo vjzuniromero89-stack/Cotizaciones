@@ -57,6 +57,16 @@ export function categoriesOf(products) {
   }
   return [...found.values()].sort((a, b) => a.localeCompare(b, "es"));
 }
+// Modelos ya usados: el mismo modelo en varios productos = la misma botella
+// en distintos tamaños.
+export function modelsOf(products) {
+  const found = new Map();
+  for (const product of products) {
+    const name = String(infoOf(product).model || "").trim();
+    if (name && !found.has(key(name))) found.set(key(name), name);
+  }
+  return [...found.values()].sort((a, b) => a.localeCompare(b, "es"));
+}
 // Nombres de catálogo ya usados para juntar tamaños de un mismo producto.
 export function familiesOf(products) {
   const found = new Map();

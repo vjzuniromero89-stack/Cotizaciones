@@ -22,6 +22,7 @@ import {
   infoOf,
   categoriesOf,
   familiesOf,
+  modelsOf,
 } from "./suppliers.js";
 import "./suppliers.css";
 
@@ -290,6 +291,7 @@ export default function SuppliersPage({ refreshKey, onChange, onQuote }) {
     groups: groups.map((g) => g.name),
     categories: categoriesOf(catalog.products),
     families: familiesOf(catalog.products),
+    models: modelsOf(catalog.products),
   };
   async function writeSuppliers(list) {
     const body = JSON.stringify({

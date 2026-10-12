@@ -33,6 +33,7 @@ import {
   configOf,
   CONFIG_ROW,
   familiesOf,
+  modelsOf,
 } from "./suppliers.js";
 
 const money = (n) =>
@@ -503,6 +504,7 @@ export function RegisterProductDialog({
       price: product?.unit_price ?? "",
       salePrice: infoOf(product).salePrice ?? "",
       priceNote: infoOf(product).priceNote || "",
+      model: infoOf(product).model || "",
       family: infoOf(product).family || "",
       size: infoOf(product).size || "",
       specs: specsOf(product).specs,
@@ -630,6 +632,7 @@ export function RegisterProductDialog({
                 salePrice:
                   Number(form.salePrice) > 0 ? Number(form.salePrice) : "",
                 priceNote: form.priceNote.trim(),
+                model: form.model.trim(),
                 family: form.family.trim(),
                 size: form.size.trim(),
                 specs: Object.fromEntries(
@@ -966,16 +969,30 @@ export function RegisterProductDialog({
           </div>
         )}
         <div className="rpFamily">
-          <h3>¿Este producto viene en varios tamaños (ML)?</h3>
+          <h3>Modelo</h3>
           <p>
-            Registra cada tamaño como un producto aparte, con su precio y su
-            caja, y ponles a todos el <b>mismo nombre de catálogo</b>. En el
-            catálogo saldrán como un solo producto y el cliente elige el
-            tamaño.
+            El modelo identifica el estilo de la botella. Registra cada tamaño
+            (ML) como un producto aparte, con su precio y su caja, y ponles a
+            todos el <b>mismo modelo</b>: en el catálogo saldrán como un solo
+            producto y el cliente elige el tamaño.
           </p>
-          <div>
+          <div className="rpModelRow">
             <label className="rpField">
-              <span>Nombre en el catálogo (igual en todos sus tamaños)</span>
+              <span>Modelo (igual en todos sus tamaños)</span>
+              <input
+                list="rpModels"
+                value={form.model}
+                placeholder="Ej. TB-01 o Deportiva curva"
+                onChange={(e) => update("model", e.target.value)}
+              />
+              <datalist id="rpModels">
+                {(options.models || []).map((name) => (
+                  <option key={name} value={name} />
+                ))}
+              </datalist>
+            </label>
+            <label className="rpField">
+              <span>Nombre en el catálogo (opcional)</span>
               <input
                 list="rpFamilies"
                 value={form.family}
@@ -998,8 +1015,9 @@ export function RegisterProductDialog({
             </label>
           </div>
           <small>
-            Déjalo vacío si el producto tiene un solo tamaño. Si no escribes el
-            tamaño, se usa la Capacidad de la descripción.
+            Si no escribes nombre de catálogo, se usa el nombre del producto
+            sin el tamaño. Si no escribes el tamaño, se usa la Capacidad de la
+            descripción.
           </small>
         </div>
         <div className="rpSpecs">
@@ -1145,6 +1163,7 @@ function CatalogSection({ refreshKey, onCatalogChanged, onOptions }) {
         groups: comparisonGroups(products).map((g) => g.name),
         categories: categoriesOf(products),
         families: familiesOf(products),
+        models: modelsOf(products),
         config: configOf(rows),
       });
     } catch {
@@ -1199,11 +1218,12 @@ function CatalogSection({ refreshKey, onCatalogChanged, onOptions }) {
                           Categoría: <b>{info.category}</b>
                         </span>
                       )}
+                      <span className={info.model ? "modelTag" : "modelTag empty"}>
+                        Modelo: <b>{info.model || "sin modelo"}</b>
+                      </span>
                       {info.family && (
                         <span>
                           En el catálogo: <b>{info.family}</b>
-                          {(info.size || specsOf(p).specs.capacity) &&
-                            " · " + (info.size || specsOf(p).specs.capacity)}
                         </span>
                       )}
                     </div>

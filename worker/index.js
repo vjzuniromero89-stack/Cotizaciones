@@ -396,6 +396,7 @@ async function handleApi(request, env, url) {
               category: String(info.category || "").trim(),
               // Mismo producto en varios tamaños: comparten "family" y cada
               // uno muestra su tamaño (la capacidad, si no se escribió otro).
+              model: String(info.model || "").trim(),
               family: String(info.family || "").trim(),
               size:
                 String(info.size || "").trim() ||
