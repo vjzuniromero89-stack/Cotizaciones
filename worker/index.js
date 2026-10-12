@@ -393,6 +393,14 @@ async function handleApi(request, env, url) {
               id: row.id,
               name: row.name,
               imageUrl: row.image_url || "",
+              // Todas las fotos del producto, la principal primero.
+              images: [
+                ...new Set(
+                  [row.image_url, ...(Array.isArray(info.photos) ? info.photos : [])]
+                    .map((u) => String(u || "").trim())
+                    .filter(Boolean),
+                ),
+              ],
               category: String(info.category || "").trim(),
               // Mismo producto en varios tamaños: comparten "family" y cada
               // uno muestra su tamaño (la capacidad, si no se escribió otro).

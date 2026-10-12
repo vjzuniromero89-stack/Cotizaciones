@@ -1,5 +1,12 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Search, X, ChevronRight, Package, MessageCircle } from "lucide-react";
+import {
+  Search,
+  X,
+  ChevronRight,
+  ChevronLeft,
+  Package,
+  MessageCircle,
+} from "lucide-react";
 import { DEFAULT_EXCHANGE_RATE } from "./calculate.js";
 import { priceNoteOf } from "./specs.js";
 import "./catalog-public.css";
@@ -65,10 +72,79 @@ function groupProducts(items) {
       items: sorted,
       category: categoryOf(sorted[0]),
       photo: sorted.find((p) => p.imageUrl)?.imageUrl || "",
+      // Fotos de todos los tamaños, sin repetir, para el que no tenga propias.
+      photos: [
+        ...new Set(
+          sorted.flatMap((p) =>
+            p.images?.length ? p.images : p.imageUrl ? [p.imageUrl] : [],
+          ),
+        ),
+      ],
       minPrice: prices.length ? Math.min(...prices) : 0,
       maxPrice: prices.length ? Math.max(...prices) : 0,
     };
   });
+}
+
+// Galería de la ficha: miniaturas a la izquierda y la foto grande con flechas.
+function Gallery({ images, title, onZoom }) {
+  const [index, setIndex] = useState(0);
+  useEffect(() => setIndex(0), [images.join("|")]);
+  if (!images.length) return <span className="pubNoPhoto">Sin foto</span>;
+  const current = images[Math.min(index, images.length - 1)];
+  const move = (step) =>
+    setIndex((i) => (i + step + images.length) % images.length);
+  return (
+    <div className={"pubGallery" + (images.length > 1 ? " many" : "")}>
+      {images.length > 1 && (
+        <div className="pubThumbs" role="tablist" aria-label="Fotos del producto">
+          {images.map((url, i) => (
+            <button
+              type="button"
+              key={url}
+              role="tab"
+              aria-selected={i === index}
+              className={i === index ? "active" : ""}
+              onClick={() => setIndex(i)}
+            >
+              <img src={url} alt="" loading="lazy" />
+            </button>
+          ))}
+        </div>
+      )}
+      <div className="pubBig">
+        <img
+          src={current}
+          alt={title}
+          title="Tocar para ver la foto más grande"
+          onClick={() => onZoom(current)}
+        />
+        {images.length > 1 && (
+          <>
+            <button
+              type="button"
+              className="pubArrow left"
+              aria-label="Foto anterior"
+              onClick={() => move(-1)}
+            >
+              <ChevronLeft />
+            </button>
+            <button
+              type="button"
+              className="pubArrow"
+              aria-label="Foto siguiente"
+              onClick={() => move(1)}
+            >
+              <ChevronRight />
+            </button>
+            <span className="pubCount">
+              {Math.min(index, images.length - 1) + 1} / {images.length}
+            </span>
+          </>
+        )}
+      </div>
+    </div>
+  );
 }
 
 function Price({ value, big, note }) {
@@ -331,21 +407,17 @@ export default function CatalogPage() {
               <X />
             </button>
             <div className="pubSheetPhoto">
-              {current.imageUrl || open.photo ? (
-                <img
-                  src={current.imageUrl || open.photo}
-                  alt={open.title}
-                  title="Tocar para ver la foto más grande"
-                  onClick={() =>
-                    setZoom({
-                      imageUrl: current.imageUrl || open.photo,
-                      name: open.title,
-                    })
-                  }
-                />
-              ) : (
-                <span className="pubNoPhoto">Sin foto</span>
-              )}
+              <Gallery
+                images={
+                  current.images?.length
+                    ? current.images
+                    : current.imageUrl
+                      ? [current.imageUrl]
+                      : open.photos
+                }
+                title={open.title}
+                onZoom={(url) => setZoom({ imageUrl: url, name: open.title })}
+              />
             </div>
             <div className="pubSheetInfo">
               <small>

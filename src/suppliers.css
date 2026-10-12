@@ -1186,3 +1186,59 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Más fotos del producto. */
+.rpMorePhotos b {
+  display: block;
+  color: var(--muted);
+  font-size: 12px;
+  margin: 4px 0 6px;
+}
+.rpMorePhotos > div {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+.rpMorePhotos span,
+.rpMorePhotos label {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: #fff;
+}
+.rpMorePhotos img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  cursor: pointer;
+  display: block;
+}
+.rpMorePhotos span button {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 20px;
+  height: 20px;
+  border: 0;
+  border-radius: 50%;
+  background: #2a1513;
+  color: #ff8a80;
+  font-weight: 900;
+  line-height: 1;
+  cursor: pointer;
+}
+.rpMorePhotos label {
+  display: grid;
+  place-items: center;
+  background: transparent;
+  border: 1px dashed #3b6450;
+  color: #3be090;
+  font-size: 24px;
+  font-weight: 800;
+  cursor: pointer;
+}
+.rpMorePhotos label input {
+  display: none;
+}

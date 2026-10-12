@@ -16,7 +16,7 @@ import {
 import "./products-page.css";
 import "./suppliers.css";
 import { authFetch } from "./auth.js";
-import { shrinkImage, imagesFromPaste } from "./image.js";
+import { shrinkImage, imagesFromPaste, uploadImage } from "./image.js";
 import { DEFAULT_EXCHANGE_RATE, estimateLandedUnit } from "./calculate.js";
 import {
   SPEC_FIELDS,
@@ -504,6 +504,9 @@ export function RegisterProductDialog({
       price: product?.unit_price ?? "",
       salePrice: infoOf(product).salePrice ?? "",
       priceNote: infoOf(product).priceNote || "",
+      photos: Array.isArray(infoOf(product).photos)
+        ? infoOf(product).photos
+        : [],
       model: infoOf(product).model || "",
       family: infoOf(product).family || "",
       size: infoOf(product).size || "",
@@ -584,14 +587,53 @@ export function RegisterProductDialog({
   // Pegar con Ctrl+V un recorte de pantalla lo pone como foto del producto.
   useEffect(() => {
     const onPaste = (event) => {
-      const [file] = imagesFromPaste(event);
-      if (!file) return;
+      const files = imagesFromPaste(event);
+      if (!files.length) return;
       event.preventDefault();
-      upload(file);
+      addPhotos(files);
     };
     document.addEventListener("paste", onPaste);
     return () => document.removeEventListener("paste", onPaste);
   }, []);
+  // Varias fotos por producto: la primera es la principal y las demás se
+  // ven en la galería del catálogo.
+  const latest = React.useRef(form);
+  latest.current = form;
+  async function addPhotos(files) {
+    const images = [...files].filter((f) => f?.type?.startsWith("image/"));
+    if (!images.length) return;
+    setBusy(true);
+    setError("");
+    try {
+      for (const file of images) {
+        const url = await uploadImage(file, authFetch);
+        if (!latest.current.imageUrl) update("imageUrl", url);
+        else update("photos", [...latest.current.photos, url]);
+        latest.current = latest.current.imageUrl
+          ? { ...latest.current, photos: [...latest.current.photos, url] }
+          : { ...latest.current, imageUrl: url };
+      }
+    } catch (e) {
+      setError(e.message || "No se pudo subir la foto");
+    } finally {
+      setBusy(false);
+    }
+  }
+  const removePhoto = (url) =>
+    update(
+      "photos",
+      form.photos.filter((u) => u !== url),
+    );
+  // Convierte una foto extra en la principal (la principal pasa a extra).
+  const makeMain = (url) => {
+    const rest = form.photos.filter((u) => u !== url);
+    setForm((x) => ({
+      ...x,
+      imageUrl: url,
+      photos: x.imageUrl ? [x.imageUrl, ...rest] : rest,
+    }));
+    setDirty(true);
+  };
   const [gallery, setGallery] = useState(null);
   // Categorías ya escritas, más la de este producto si no está en la lista.
   const [newCategory, setNewCategory] = useState(false);
@@ -635,6 +677,7 @@ export function RegisterProductDialog({
                 salePrice:
                   Number(form.salePrice) > 0 ? Number(form.salePrice) : "",
                 priceNote: form.priceNote.trim(),
+                photos: form.photos.filter((u) => u && u !== form.imageUrl),
                 model: form.model.trim(),
                 family,
                 size: form.size.trim(),
@@ -723,6 +766,40 @@ export function RegisterProductDialog({
             <button type="button" className="rpGalleryButton" onClick={openGallery}>
               Elegir de la galería
             </button>
+            <div className="rpMorePhotos">
+              <b>Más fotos ({form.photos.length})</b>
+              <div>
+                {form.photos.map((url) => (
+                  <span key={url}>
+                    <img
+                      src={url}
+                      alt=""
+                      title="Tocar para ponerla como foto principal"
+                      onClick={() => makeMain(url)}
+                    />
+                    <button
+                      type="button"
+                      title="Quitar esta foto"
+                      onClick={() => removePhoto(url)}
+                    >
+                      ×
+                    </button>
+                  </span>
+                ))}
+                <label title="Agregar más fotos">
+                  +
+                  <input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={(e) => {
+                      addPhotos(e.target.files);
+                      e.target.value = "";
+                    }}
+                  />
+                </label>
+              </div>
+            </div>
           </div>
           <div className="rpCol">
             <label className="rpField">
