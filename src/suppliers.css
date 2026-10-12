@@ -1242,3 +1242,27 @@
 .rpMorePhotos label input {
   display: none;
 }
+
+/* Elegir varias fotos de la galería. */
+.rpGalleryGrid button {
+  position: relative;
+}
+.rpGalleryGrid button.picked {
+  outline: 3px solid #3be090;
+}
+.rpGalleryGrid button em {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  font-style: normal;
+  font-weight: 900;
+  font-size: 11.5px;
+  color: #07140e;
+  background: #3be090;
+  border-radius: 99px;
+  padding: 2px 7px;
+}
+.rpMorePhotos .rpGalleryButton {
+  width: 100%;
+  margin-top: 6px;
+}

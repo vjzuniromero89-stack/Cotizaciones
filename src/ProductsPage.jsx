@@ -646,7 +646,10 @@ export function RegisterProductDialog({
     )
   )
     categoryList.push(form.category.trim());
-  async function openGallery() {
+  // "main": elegir la foto principal. "extra": agregar varias a Más fotos.
+  const [galleryMode, setGalleryMode] = useState("main");
+  async function openGallery(mode = "main") {
+    setGalleryMode(mode);
     try {
       setGallery(galleryOf(await api("/catalog-products")).photos);
     } catch {
@@ -763,7 +766,11 @@ export function RegisterProductDialog({
             <small>
               También puedes pegarla con <b>Ctrl + V</b>
             </small>
-            <button type="button" className="rpGalleryButton" onClick={openGallery}>
+            <button
+              type="button"
+              className="rpGalleryButton"
+              onClick={() => openGallery("main")}
+            >
               Elegir de la galería
             </button>
             <div className="rpMorePhotos">
@@ -799,6 +806,13 @@ export function RegisterProductDialog({
                   />
                 </label>
               </div>
+              <button
+                type="button"
+                className="rpGalleryButton"
+                onClick={() => openGallery("extra")}
+              >
+                Elegir más fotos de la galería
+              </button>
             </div>
           </div>
           <div className="rpCol">
@@ -1045,9 +1059,13 @@ export function RegisterProductDialog({
             ref={(el) => el?.scrollIntoView({ block: "nearest", behavior: "smooth" })}
           >
             <div>
-              <b>Elige una foto de la galería</b>
+              <b>
+                {galleryMode === "extra"
+                  ? "Toca las fotos que quieres agregar a Más fotos"
+                  : "Elige la foto principal"}
+              </b>
               <button type="button" onClick={() => setGallery(null)}>
-                Cerrar
+                {galleryMode === "extra" ? "Listo" : "Cerrar"}
               </button>
             </div>
             {gallery.length ? (
@@ -1057,12 +1075,34 @@ export function RegisterProductDialog({
                     type="button"
                     key={photo.id}
                     title={photo.name || photo.product || "Foto"}
+                    className={
+                      galleryMode === "extra" &&
+                      (form.photos.includes(photo.url) ||
+                        form.imageUrl === photo.url)
+                        ? "picked"
+                        : ""
+                    }
                     onClick={() => {
-                      update("imageUrl", photo.url);
-                      setGallery(null);
+                      if (galleryMode !== "extra") {
+                        update("imageUrl", photo.url);
+                        setGallery(null);
+                        return;
+                      }
+                      // Sin foto principal todavía: la primera elegida lo es.
+                      if (!form.imageUrl) update("imageUrl", photo.url);
+                      else if (form.imageUrl === photo.url) return;
+                      else if (form.photos.includes(photo.url))
+                        removePhoto(photo.url);
+                      else update("photos", [...form.photos, photo.url]);
                     }}
                   >
                     <img src={photo.url} alt="" loading="lazy" />
+                    {galleryMode === "extra" &&
+                      (form.imageUrl === photo.url ? (
+                        <em>Principal</em>
+                      ) : (
+                        form.photos.includes(photo.url) && <em>✓</em>
+                      ))}
                   </button>
                 ))}
               </div>
