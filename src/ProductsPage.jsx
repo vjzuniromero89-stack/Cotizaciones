@@ -18,7 +18,12 @@ import "./suppliers.css";
 import { authFetch } from "./auth.js";
 import { shrinkImage, imagesFromPaste } from "./image.js";
 import { DEFAULT_EXCHANGE_RATE, estimateLandedUnit } from "./calculate.js";
-import { SPEC_FIELDS, specsOfInfo, priceConditions } from "./specs.js";
+import {
+  SPEC_FIELDS,
+  specsOfInfo,
+  priceNoteOf,
+  DEFAULT_PRICE_NOTE,
+} from "./specs.js";
 import {
   isRealProduct,
   splitCatalog,
@@ -27,6 +32,7 @@ import {
   categoriesOf,
   configOf,
   CONFIG_ROW,
+  familiesOf,
 } from "./suppliers.js";
 
 const money = (n) =>
@@ -496,8 +502,9 @@ export function RegisterProductDialog({
       imageUrl: product?.image_url || "",
       price: product?.unit_price ?? "",
       salePrice: infoOf(product).salePrice ?? "",
-      minQty: infoOf(product).minQty ?? "",
-      colorRule: infoOf(product).colorRule || "",
+      priceNote: infoOf(product).priceNote || "",
+      family: infoOf(product).family || "",
+      size: infoOf(product).size || "",
       specs: specsOf(product).specs,
       description: specsOf(product).rest,
       category: infoOf(product).category || "",
@@ -622,8 +629,9 @@ export function RegisterProductDialog({
               info: {
                 salePrice:
                   Number(form.salePrice) > 0 ? Number(form.salePrice) : "",
-                minQty: Number(form.minQty) > 0 ? Number(form.minQty) : "",
-                colorRule: form.colorRule.trim(),
+                priceNote: form.priceNote.trim(),
+                family: form.family.trim(),
+                size: form.size.trim(),
                 specs: Object.fromEntries(
                   SPEC_FIELDS.map(([key]) => [
                     key,
@@ -725,31 +733,19 @@ export function RegisterProductDialog({
               </em>
             </label>
             <div className="rpConditions">
-              <small>Condiciones de este precio (las ve el cliente)</small>
+              <small>Condición del precio (la ve el cliente)</small>
               <label className="rpField">
-                <span>Pedido mínimo (piezas)</span>
+                <span>
+                  Todos los productos dicen “{DEFAULT_PRICE_NOTE}”. Escribe
+                  aquí solo si este producto lleva otra condición.
+                </span>
                 <input
-                  type="number"
-                  min="0"
-                  value={form.minQty}
-                  placeholder="Ej. 2000"
-                  onChange={(e) => update("minQty", e.target.value)}
+                  value={form.priceNote}
+                  placeholder={DEFAULT_PRICE_NOTE}
+                  onChange={(e) => update("priceNote", e.target.value)}
                 />
               </label>
-              <label className="rpField">
-                <span>Piezas mínimas por color</span>
-                <input
-                  value={form.colorRule}
-                  placeholder="Ej. 1000 (o escribe otra condición)"
-                  onChange={(e) => update("colorRule", e.target.value)}
-                />
-              </label>
-              {(Number(form.minQty) > 0 || form.colorRule.trim()) && (
-                <em>
-                  El cliente verá:{" "}
-                  {priceConditions(form.minQty, form.colorRule).join(" · ")}
-                </em>
-              )}
+              <em>El cliente verá: {priceNoteOf(form.priceNote)}</em>
             </div>
             {Number(form.price) > 0 && (
               <div className="rpPercents">
@@ -969,6 +965,43 @@ export function RegisterProductDialog({
             )}
           </div>
         )}
+        <div className="rpFamily">
+          <h3>¿Este producto viene en varios tamaños (ML)?</h3>
+          <p>
+            Registra cada tamaño como un producto aparte, con su precio y su
+            caja, y ponles a todos el <b>mismo nombre de catálogo</b>. En el
+            catálogo saldrán como un solo producto y el cliente elige el
+            tamaño.
+          </p>
+          <div>
+            <label className="rpField">
+              <span>Nombre en el catálogo (igual en todos sus tamaños)</span>
+              <input
+                list="rpFamilies"
+                value={form.family}
+                placeholder="Ej. Botella deportiva de acero"
+                onChange={(e) => update("family", e.target.value)}
+              />
+              <datalist id="rpFamilies">
+                {(options.families || []).map((name) => (
+                  <option key={name} value={name} />
+                ))}
+              </datalist>
+            </label>
+            <label className="rpField">
+              <span>Tamaño que verá el cliente</span>
+              <input
+                value={form.size}
+                placeholder={form.specs.capacity || "Ej. 600 ml"}
+                onChange={(e) => update("size", e.target.value)}
+              />
+            </label>
+          </div>
+          <small>
+            Déjalo vacío si el producto tiene un solo tamaño. Si no escribes el
+            tamaño, se usa la Capacidad de la descripción.
+          </small>
+        </div>
         <div className="rpSpecs">
           <h3>
             Descripción <i>Description</i>
@@ -1111,6 +1144,7 @@ function CatalogSection({ refreshKey, onCatalogChanged, onOptions }) {
         suppliers: suppliers.map((s) => s.name),
         groups: comparisonGroups(products).map((g) => g.name),
         categories: categoriesOf(products),
+        families: familiesOf(products),
         config: configOf(rows),
       });
     } catch {
@@ -1165,6 +1199,13 @@ function CatalogSection({ refreshKey, onCatalogChanged, onOptions }) {
                           Categoría: <b>{info.category}</b>
                         </span>
                       )}
+                      {info.family && (
+                        <span>
+                          En el catálogo: <b>{info.family}</b>
+                          {(info.size || specsOf(p).specs.capacity) &&
+                            " · " + (info.size || specsOf(p).specs.capacity)}
+                        </span>
+                      )}
                     </div>
                   </div>
                   <div className="catalogCardActions">
@@ -1187,7 +1228,7 @@ function CatalogSection({ refreshKey, onCatalogChanged, onOptions }) {
 
                 <div className="catalogProductSummary">
                   <div><span>Precio de compra</span><strong>{money(p.unit_price)}</strong><small>{cordobas(p.unit_price)}</small></div>
-                  <div className="saleSummary"><span>Precio de venta</span><strong>{Number(info.salePrice) > 0 ? money(info.salePrice) : "—"}</strong><small>{Number(info.salePrice) > 0 ? cordobas(info.salePrice) : "Sin precio"}</small>{priceConditions(info.minQty, info.colorRule).map((line) => <small key={line}>{line}</small>)}</div>
+                  <div className="saleSummary"><span>Precio de venta</span><strong>{Number(info.salePrice) > 0 ? money(info.salePrice) : "—"}</strong><small>{Number(info.salePrice) > 0 ? cordobas(info.salePrice) : "Sin precio"}</small>{Number(info.salePrice) > 0 && <small>{priceNoteOf(info.priceNote)}</small>}</div>
                   <div><span>Productos por caja</span><strong>{perBox ? perBox.toLocaleString() : "—"}</strong></div>
                   <div><span>Medidas de la caja</span><strong>{box?.l ? `${box.l} × ${box.w} × ${box.h} ${box.unit === "in" ? "in" : "cm"}` : "—"}</strong></div>
                   <div><span>Peso por caja</span><strong>{box?.weight ? `${box.weight} ${box.weightUnit || "kg"}` : "—"}</strong></div>

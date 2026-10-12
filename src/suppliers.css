@@ -1122,3 +1122,44 @@
     grid-template-columns: 1fr;
   }
 }
+
+.rpConditions {
+  grid-template-columns: 1fr;
+}
+
+/* Un producto en varios tamaños. */
+.rpFamily {
+  border: 1px solid var(--line);
+  border-radius: 13px;
+  padding: 14px;
+  margin-bottom: 16px;
+}
+.rpFamily h3 {
+  margin: 0 0 4px;
+  font: 800 15px Manrope;
+}
+.rpFamily p,
+.rpFamily > small {
+  margin: 0 0 10px;
+  color: var(--muted);
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+.rpFamily p b {
+  color: #fff;
+}
+.rpFamily > div {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.rpFamily > small {
+  display: block;
+  margin: 0;
+}
+@media (max-width: 820px) {
+  .rpFamily > div {
+    grid-template-columns: 1fr;
+  }
+}

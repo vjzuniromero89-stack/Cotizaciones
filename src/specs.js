@@ -47,28 +47,8 @@ export const publicSpecs = (info) => {
   ).map(([key, label]) => [label, String(specs[key]).trim()]);
 };
 
-// Condiciones del precio, escritas para el cliente. En "colores" se puede
-// poner solo un número (piezas por color) o un texto libre.
-export function priceConditions(minQty, colorRule) {
-  const lines = [];
-  const min = Number(minQty) || 0;
-  if (min > 0) lines.push("Pedido mínimo: " + min.toLocaleString("en-US") + " piezas");
-  const text = String(colorRule || "").trim();
-  if (text) {
-    const perColor = /^[\d.,\s]+$/.test(text)
-      ? Number(text.replace(/[^\d]/g, ""))
-      : 0;
-    if (perColor > 0) {
-      const colors = min > 0 ? Math.floor(min / perColor) : 0;
-      lines.push(
-        "Mínimo " +
-          perColor.toLocaleString("en-US") +
-          " piezas por color" +
-          (colors > 1
-            ? " (hasta " + colors + " colores en el pedido mínimo)"
-            : ""),
-      );
-    } else lines.push(text);
-  }
-  return lines;
-}
+// Condición del precio que ve el cliente. Todos los productos usan la misma
+// por defecto; un producto puede llevar otra escrita a mano.
+export const DEFAULT_PRICE_NOTE = "2 colores x 1000 piezas";
+export const priceNoteOf = (note) =>
+  String(note || "").trim() || DEFAULT_PRICE_NOTE;

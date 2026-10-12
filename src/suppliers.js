@@ -57,6 +57,15 @@ export function categoriesOf(products) {
   }
   return [...found.values()].sort((a, b) => a.localeCompare(b, "es"));
 }
+// Nombres de catálogo ya usados para juntar tamaños de un mismo producto.
+export function familiesOf(products) {
+  const found = new Map();
+  for (const product of products) {
+    const name = String(infoOf(product).family || "").trim();
+    if (name && !found.has(key(name))) found.set(key(name), name);
+  }
+  return [...found.values()].sort((a, b) => a.localeCompare(b, "es"));
+}
 export const productsOf = (products, supplierName) =>
   products.filter((p) => key(infoOf(p).supplier) === key(supplierName));
 

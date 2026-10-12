@@ -535,3 +535,63 @@
 .pubPrice.big i {
   font-size: 15.5px;
 }
+
+/* Un producto con varios tamaños. */
+.pubSizes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: -4px 0 12px;
+}
+.pubSizes span {
+  border: 1px solid #cfd6df;
+  border-radius: 99px;
+  padding: 3px 10px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #1d2b4f;
+}
+.pubSizePick {
+  margin-top: 12px;
+}
+.pubSizePick > span {
+  display: block;
+  color: #6a7785;
+  font-size: 13px;
+  font-weight: 800;
+  margin-bottom: 6px;
+}
+.pubSizePick > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.pubSizePick button {
+  border: 2px solid #cfd6df;
+  border-radius: 12px;
+  background: #fff;
+  color: #14202b;
+  font: inherit;
+  padding: 8px 14px;
+  cursor: pointer;
+  text-align: center;
+  min-width: 92px;
+}
+.pubSizePick button b {
+  display: block;
+  font: 800 16px Manrope;
+}
+.pubSizePick button small {
+  display: block;
+  color: #6a7785;
+  font-size: 13px;
+  font-weight: 700;
+}
+.pubSizePick button.active {
+  border-color: #1d2b4f;
+  background: #1d2b4f;
+  color: #fff;
+}
+.pubSizePick button.active small {
+  color: #ffd98a;
+}

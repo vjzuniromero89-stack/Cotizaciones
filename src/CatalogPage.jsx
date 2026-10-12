@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Search, X, ChevronRight, Package, MessageCircle } from "lucide-react";
 import { DEFAULT_EXCHANGE_RATE } from "./calculate.js";
-import { priceConditions } from "./specs.js";
+import { priceNoteOf } from "./specs.js";
 import "./catalog-public.css";
 
 const usd = (n) =>
@@ -16,8 +16,43 @@ const cs = (n) =>
   });
 const same = (a, b) =>
   String(a || "").trim().toLowerCase() === String(b || "").trim().toLowerCase();
+const categoryOf = (p) => String(p.category || "").trim() || "Otros";
+// Número dentro de "600ML", "1 L"… para ordenar los tamaños de menor a mayor.
+const sizeNumber = (text) => {
+  const match = String(text || "").replace(",", ".").match(/[\d.]+/);
+  if (!match) return Infinity;
+  const value = Number(match[0]);
+  return /\bl\b|litro/i.test(text) && !/ml/i.test(text) ? value * 1000 : value;
+};
 
-function Price({ value, big, minQty, colorRule }) {
+// Junta en un solo producto los que comparten "familia" (mismo producto en
+// varios tamaños). Los que no tienen familia quedan solos.
+function groupProducts(items) {
+  const groups = new Map();
+  for (const p of items) {
+    const family = String(p.family || "").trim();
+    const key = family ? "f:" + family.toLowerCase() : "p:" + p.id;
+    if (!groups.has(key))
+      groups.set(key, { key, title: family || p.name, items: [] });
+    groups.get(key).items.push(p);
+  }
+  return [...groups.values()].map((g) => {
+    const sorted = [...g.items].sort(
+      (a, b) => sizeNumber(a.size || a.name) - sizeNumber(b.size || b.name),
+    );
+    const prices = sorted.map((p) => p.salePrice).filter((n) => n > 0);
+    return {
+      ...g,
+      items: sorted,
+      category: categoryOf(sorted[0]),
+      photo: sorted.find((p) => p.imageUrl)?.imageUrl || "",
+      minPrice: prices.length ? Math.min(...prices) : 0,
+      maxPrice: prices.length ? Math.max(...prices) : 0,
+    };
+  });
+}
+
+function Price({ value, big, note }) {
   return (
     <div className={"pubPrice" + (big ? " big" : "")}>
       {value > 0 ? (
@@ -25,9 +60,7 @@ function Price({ value, big, minQty, colorRule }) {
           <span>Precio por unidad · puesto en Managua</span>
           <b>US{usd(value)}</b>
           <em>{cs(value)}</em>
-          {priceConditions(minQty, colorRule).map((line) => (
-            <i key={line}>{line}</i>
-          ))}
+          <i>{priceNoteOf(note)}</i>
         </>
       ) : (
         <>
@@ -52,6 +85,7 @@ export default function CatalogPage() {
     [search, setSearch] = useState(""),
     [category, setCategory] = useState(""),
     [open, setOpen] = useState(null),
+    [sizeIndex, setSizeIndex] = useState(0),
     [zoom, setZoom] = useState(null);
   useEffect(() => {
     document.title = "Catálogo · CotizacionesChina";
@@ -70,33 +104,34 @@ export default function CatalogPage() {
         setState({ loading: false, error: e.message, items: [], whatsapp: "" }),
       );
   }, []);
+  const groups = useMemo(() => groupProducts(state.items), [state.items]);
   // Una ficha por categoría, con la foto de uno de sus productos.
   const categories = useMemo(() => {
     const found = new Map();
-    for (const p of state.items) {
-      const name = String(p.category || "").trim() || "Otros";
-      const id = name.toLowerCase();
-      if (!found.has(id)) found.set(id, { name, count: 0, photo: "" });
-      const group = found.get(id);
-      group.count += 1;
-      if (!group.photo && p.imageUrl) group.photo = p.imageUrl;
+    for (const g of groups) {
+      const id = g.category.toLowerCase();
+      if (!found.has(id)) found.set(id, { name: g.category, count: 0, photo: "" });
+      const entry = found.get(id);
+      entry.count += 1;
+      if (!entry.photo && g.photo) entry.photo = g.photo;
     }
     return [...found.values()].sort((a, b) => a.name.localeCompare(b.name, "es"));
-  }, [state.items]);
-  const shown = state.items.filter(
-    (p) =>
-      (!category || same(String(p.category || "").trim() || "Otros", category)) &&
-      (p.name + " " + (p.category || ""))
+  }, [groups]);
+  const shown = groups.filter(
+    (g) =>
+      (!category || same(g.category, category)) &&
+      (g.title + " " + g.category + " " + g.items.map((p) => p.name).join(" "))
         .toLowerCase()
         .includes(search.trim().toLowerCase()),
   );
-  // Mensaje listo para WhatsApp con el producto y, si la puso, la cantidad.
-  const orderLink = (p, units) => {
+  // Mensaje listo para WhatsApp con el producto, el tamaño y la cantidad.
+  const orderLink = (group, p, units) => {
     const lines = [
       "Hola, quiero pedir este producto del catálogo:",
-      "• " + p.name,
+      "• " + group.title,
+      group.items.length > 1 ? "Tamaño: " + (p.size || p.name) : "",
       p.salePrice > 0 ? "Precio: US" + usd(p.salePrice) + " por unidad" : "",
-      ...priceConditions(p.minQty, p.colorRule),
+      p.salePrice > 0 ? "Condición: " + priceNoteOf(p.priceNote) : "",
       Number(units) > 0 ? "Cantidad: " + Number(units).toLocaleString() : "",
     ].filter(Boolean);
     return (
@@ -112,6 +147,7 @@ export default function CatalogPage() {
       .querySelector(".pubSection")
       ?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
+  const current = open ? open.items[sizeIndex] || open.items[0] : null;
   return (
     <div className="pubCatalog">
       <header className="pubCover">
@@ -179,35 +215,64 @@ export default function CatalogPage() {
           <p className="pubEmpty">{state.error}</p>
         ) : shown.length ? (
           <div className="pubGrid">
-            {shown.map((p) => (
-              <button
-                type="button"
-                className="pubCard"
-                key={p.id}
-                onClick={() => {
-                  setQuantity("");
-                  setOpen(p);
-                }}
-              >
-                {p.imageUrl ? (
-                  <img src={p.imageUrl} alt={p.name} loading="lazy" />
-                ) : (
-                  <span className="pubNoPhoto">Sin foto</span>
-                )}
-                <div className="pubBody">
-                  <small>{String(p.category || "").trim() || "Otros"}</small>
-                  <h3>{p.name}</h3>
-                  <Price
-                    value={p.salePrice}
-                    minQty={p.minQty}
-                    colorRule={p.colorRule}
-                  />
-                  <span className="pubMore">
-                    Ver ficha <ChevronRight />
-                  </span>
-                </div>
-              </button>
-            ))}
+            {shown.map((g) => {
+              const first = g.items[0];
+              const many = g.items.length > 1;
+              return (
+                <button
+                  type="button"
+                  className="pubCard"
+                  key={g.key}
+                  onClick={() => {
+                    setQuantity("");
+                    setSizeIndex(0);
+                    setOpen(g);
+                  }}
+                >
+                  {g.photo ? (
+                    <img src={g.photo} alt={g.title} loading="lazy" />
+                  ) : (
+                    <span className="pubNoPhoto">Sin foto</span>
+                  )}
+                  <div className="pubBody">
+                    <small>{g.category}</small>
+                    <h3>{g.title}</h3>
+                    {many && (
+                      <div className="pubSizes">
+                        {g.items.map((p) => (
+                          <span key={p.id}>{p.size || p.name}</span>
+                        ))}
+                      </div>
+                    )}
+                    {many ? (
+                      <div className="pubPrice">
+                        {g.minPrice > 0 ? (
+                          <>
+                            <span>Precio por unidad · según el tamaño</span>
+                            <b>
+                              {g.minPrice === g.maxPrice ? "" : "Desde "}US
+                              {usd(g.minPrice)}
+                            </b>
+                            <em>{cs(g.minPrice)}</em>
+                            <i>{priceNoteOf(first.priceNote)}</i>
+                          </>
+                        ) : (
+                          <>
+                            <span>Precio</span>
+                            <b className="ask">Consultar</b>
+                          </>
+                        )}
+                      </div>
+                    ) : (
+                      <Price value={first.salePrice} note={first.priceNote} />
+                    )}
+                    <span className="pubMore">
+                      {many ? "Elegir tamaño" : "Ver ficha"} <ChevronRight />
+                    </span>
+                  </div>
+                </button>
+              );
+            })}
           </div>
         ) : (
           <p className="pubEmpty">No hay productos que coincidan.</p>
@@ -232,7 +297,7 @@ export default function CatalogPage() {
         Precios sujetos a confirmación de disponibilidad. El envío hasta Managua
         está incluido en el precio.
       </footer>
-      {open && (
+      {open && current && (
         <div
           className="pubSheetBack"
           onMouseDown={(e) => e.target === e.currentTarget && setOpen(null)}
@@ -247,26 +312,47 @@ export default function CatalogPage() {
               <X />
             </button>
             <div className="pubSheetPhoto">
-              {open.imageUrl ? (
+              {current.imageUrl || open.photo ? (
                 <img
-                  src={open.imageUrl}
-                  alt={open.name}
+                  src={current.imageUrl || open.photo}
+                  alt={open.title}
                   title="Tocar para ver la foto más grande"
-                  onClick={() => setZoom(open)}
+                  onClick={() =>
+                    setZoom({
+                      imageUrl: current.imageUrl || open.photo,
+                      name: open.title,
+                    })
+                  }
                 />
               ) : (
                 <span className="pubNoPhoto">Sin foto</span>
               )}
             </div>
             <div className="pubSheetInfo">
-              <small>{String(open.category || "").trim() || "Otros"}</small>
-              <h2>{open.name}</h2>
-              <Price
-                value={open.salePrice}
-                minQty={open.minQty}
-                colorRule={open.colorRule}
-                big
-              />
+              <small>{open.category}</small>
+              <h2>{open.title}</h2>
+              {open.items.length > 1 && (
+                <div className="pubSizePick">
+                  <span>Elige el tamaño</span>
+                  <div role="group" aria-label="Tamaños disponibles">
+                    {open.items.map((p, i) => (
+                      <button
+                        type="button"
+                        key={p.id}
+                        className={i === sizeIndex ? "active" : ""}
+                        aria-pressed={i === sizeIndex}
+                        onClick={() => setSizeIndex(i)}
+                      >
+                        <b>{p.size || p.name}</b>
+                        <small>
+                          {p.salePrice > 0 ? "US" + usd(p.salePrice) : "Consultar"}
+                        </small>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+              <Price value={current.salePrice} note={current.priceNote} big />
               {state.whatsapp && (
                 <div className="pubOrder">
                   <label>
@@ -281,7 +367,7 @@ export default function CatalogPage() {
                     />
                   </label>
                   <a
-                    href={orderLink(open, quantity)}
+                    href={orderLink(open, current, quantity)}
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -289,11 +375,11 @@ export default function CatalogPage() {
                   </a>
                 </div>
               )}
-              {open.specs?.length > 0 && (
+              {current.specs?.length > 0 && (
                 <>
                   <h4>Descripción</h4>
                   <dl>
-                    {open.specs.map(([label, value]) => (
+                    {current.specs.map(([label, value]) => (
                       <div key={label}>
                         <dt>{label}:</dt>
                         <dd>{value}</dd>
@@ -302,9 +388,9 @@ export default function CatalogPage() {
                   </dl>
                 </>
               )}
-              {open.unitsPerBox > 0 && (
+              {current.unitsPerBox > 0 && (
                 <p className="pubPack">
-                  Viene en cajas de <b>{open.unitsPerBox}</b> unidades.
+                  Viene en cajas de <b>{current.unitsPerBox}</b> unidades.
                 </p>
               )}
             </div>

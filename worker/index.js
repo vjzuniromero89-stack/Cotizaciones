@@ -388,17 +388,24 @@ async function handleApi(request, env, url) {
           .map((row) => {
             const box = row.boxes?.[0] || {},
               info = box.info || {};
+            const specs = catalogSpecs(info);
             return {
               id: row.id,
               name: row.name,
               imageUrl: row.image_url || "",
               category: String(info.category || "").trim(),
-              specs: catalogSpecs(info),
+              // Mismo producto en varios tamaños: comparten "family" y cada
+              // uno muestra su tamaño (la capacidad, si no se escribió otro).
+              family: String(info.family || "").trim(),
+              size:
+                String(info.size || "").trim() ||
+                (specs.find(([label]) => label === "Capacidad") || [])[1] ||
+                "",
+              specs,
               salePrice: Math.max(0, Number(info.salePrice) || 0),
               unitsPerBox: Math.max(0, Number(box.unitsPerBox) || 0),
-              // Condiciones del precio: pedido mínimo y regla de colores.
-              minQty: Math.max(0, Number(info.minQty) || 0),
-              colorRule: String(info.colorRule || "").trim(),
+              // Condición propia del precio; vacía = la de todos los productos.
+              priceNote: String(info.priceNote || "").trim(),
             };
           }),
       });
