@@ -869,7 +869,6 @@ function Detail({ id, type, onClose, onChanged, startEditing = false }) {
   return (
     <div
       className="overlay"
-      onMouseDown={(e) => e.target === e.currentTarget && onClose()}
     >
       <section className="detailSheet">
         <div className="detailTop">

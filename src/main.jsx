@@ -245,7 +245,6 @@ function SaveDialog({
   return (
     <div
       className="overlay"
-      onMouseDown={(e) => e.target === e.currentTarget && onClose()}
     >
       <form className="dialog quoteFromCalculator" onSubmit={submit}>
         <div className="dialogHead">

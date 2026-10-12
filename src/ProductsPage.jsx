@@ -96,7 +96,6 @@ function QuoteDialog({ product, onClose, onSaved }) {
   return (
     <div
       className="overlay"
-      onMouseDown={(e) => e.target === e.currentTarget && onClose()}
     >
       <form className="quoteBuilder" onSubmit={submit}>
         <div className="dialogHead">
@@ -514,9 +513,24 @@ export function RegisterProductDialog({
     }),
     [busy, setBusy] = useState(false),
     [error, setError] = useState("");
-  const update = (k, v) => setForm((x) => ({ ...x, [k]: v }));
-  const updateBox = (k, v) =>
+  // Evita perder lo escrito: cerrar con cambios sin guardar pide confirmar.
+  const [dirty, setDirty] = useState(false);
+  const update = (k, v) => {
+    setDirty(true);
+    setForm((x) => ({ ...x, [k]: v }));
+  };
+  const close = () => {
+    if (
+      dirty &&
+      !window.confirm("Tienes cambios sin guardar. ¿Cerrar y perderlos?")
+    )
+      return;
+    onClose();
+  };
+  const updateBox = (k, v) => {
+    setDirty(true);
     setForm((x) => ({ ...x, box: { ...x.box, [k]: v } }));
+  };
   const boxCbm = oneBoxCbm(form.box),
     perBox = Number(form.box.unitsPerBox || 0);
   async function upload(original) {
@@ -611,7 +625,6 @@ export function RegisterProductDialog({
   return (
     <div
       className="overlay"
-      onMouseDown={(e) => e.target === e.currentTarget && onClose()}
     >
       <form className="dialog registerProductDialog" onSubmit={submit}>
         <div className="dialogHead">
@@ -619,7 +632,7 @@ export function RegisterProductDialog({
             <small>CATÁLOGO</small>
             <h2>{product ? "Editar producto" : "Registrar producto"}</h2>
           </div>
-          <button type="button" onClick={onClose}>
+          <button type="button" onClick={close}>
             <X />
           </button>
         </div>

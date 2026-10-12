@@ -86,7 +86,6 @@ function SupplierDialog({ supplier, onClose, onSave }) {
   return (
     <div
       className="overlay"
-      onMouseDown={(e) => e.target === e.currentTarget && onClose()}
     >
       <form className="dialog supplierDialog" onSubmit={submit}>
         <div className="dialogHead">
