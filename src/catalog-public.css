@@ -689,3 +689,134 @@
     overflow-x: auto;
   }
 }
+
+/* Ficha del producto más grande. */
+.pubSheetBack {
+  padding: 18px 12px;
+  display: grid;
+  align-items: start;
+}
+.pubSheet {
+  width: min(1420px, 97vw);
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  gap: 34px;
+  padding: 30px;
+  border-radius: 22px;
+}
+.pubGallery.many {
+  grid-template-columns: 96px minmax(0, 1fr);
+  gap: 14px;
+}
+.pubThumbs {
+  max-height: min(78vh, 760px);
+  gap: 10px;
+}
+.pubSheetPhoto .pubBig img,
+.pubSheetPhoto .pubNoPhoto {
+  aspect-ratio: auto;
+  height: min(78vh, 760px);
+}
+.pubSheetInfo > small {
+  font-size: 14px;
+}
+.pubSheetInfo h2 {
+  font-size: 38px;
+  line-height: 1.12;
+  margin-top: 6px;
+}
+.pubPrice.big {
+  padding: 16px 20px;
+  margin-top: 18px;
+}
+.pubPrice.big span {
+  font-size: 13px;
+}
+.pubPrice.big b {
+  font-size: 46px;
+}
+.pubPrice.big b.ask {
+  font-size: 34px;
+}
+.pubPrice.big em {
+  font-size: 22px;
+}
+.pubPrice.big i {
+  font-size: 17px;
+}
+.pubSizePick > span,
+.pubOrder label span {
+  font-size: 15px;
+}
+.pubSizePick button {
+  padding: 10px 18px;
+  min-width: 110px;
+}
+.pubSizePick button b {
+  font-size: 19px;
+}
+.pubSizePick button small {
+  font-size: 15px;
+}
+.pubOrder {
+  margin-top: 16px;
+}
+.pubOrder input,
+.pubOrder a {
+  height: 58px;
+  font-size: 19px;
+}
+.pubSheetInfo h4 {
+  font-size: 15px;
+  margin-top: 26px;
+}
+.pubSheetInfo dl > div {
+  grid-template-columns: 210px 1fr;
+  padding: 11px 0;
+  font-size: 18px;
+}
+.pubPack {
+  font-size: 17px;
+}
+.pubClose {
+  width: 46px;
+  height: 46px;
+}
+.pubArrow {
+  width: 48px;
+  height: 48px;
+}
+.pubCount {
+  font-size: 14px;
+}
+@media (max-width: 900px) {
+  .pubSheet {
+    grid-template-columns: 1fr;
+    gap: 18px;
+    padding: 16px;
+  }
+  .pubGallery.many {
+    grid-template-columns: 1fr;
+  }
+  .pubThumbs {
+    order: 2;
+    max-height: none;
+    grid-auto-flow: column;
+    grid-auto-columns: 72px;
+    overflow-x: auto;
+  }
+  .pubSheetPhoto .pubBig img,
+  .pubSheetPhoto .pubNoPhoto {
+    height: auto;
+    aspect-ratio: 1;
+  }
+  .pubSheetInfo h2 {
+    font-size: 28px;
+  }
+  .pubPrice.big b {
+    font-size: 36px;
+  }
+  .pubSheetInfo dl > div {
+    grid-template-columns: 1fr;
+    font-size: 16.5px;
+  }
+}

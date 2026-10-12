@@ -482,7 +482,7 @@ export default function CatalogPage() {
                   </dl>
                 </>
               )}
-              {current.unitsPerBox > 0 && (
+              {current.unitsPerBox > 1 && (
                 <p className="pubPack">
                   Viene en cajas de <b>{current.unitsPerBox}</b> unidades.
                 </p>
