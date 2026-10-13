@@ -22,6 +22,7 @@ import {
   Factory,
   Images,
   Percent,
+  Tag,
 } from "lucide-react";
 import "./style.css";
 import "./route-breakdown.css";
@@ -36,6 +37,7 @@ import ClientsPage from "./ClientsPage.jsx";
 import SuppliersPage from "./SuppliersPage.jsx";
 import PhotosPage from "./PhotosPage.jsx";
 import MarginsPage from "./MarginsPage.jsx";
+import PriceListPage from "./PriceListPage.jsx";
 import { isRealProduct } from "./suppliers.js";
 import UsersPage from "./UsersPage.jsx";
 import AuthPage from "./AuthPage.jsx";
@@ -107,6 +109,7 @@ function Nav({ page, setPage, currentUser }) {
         ["suppliers", Factory, "Proveedores", "Proveed."],
         ["photos", Images, "Fotos", "Fotos"],
         ["margins", Percent, "Ganancia por producto", "Margen"],
+        ["prices", Tag, "Lista de precios", "Precios"],
         ["customers", Users, "Clientes", "Clientes"],
         ["quotes", FileText, "Cotizaciones internas", "Internas"],
         [
@@ -1040,6 +1043,8 @@ function App() {
             setPage={navigate}
             prefill={productPrefill}
           />
+        ) : page === "prices" ? (
+          <PriceListPage refreshKey={refresh} />
         ) : page === "margins" ? (
           <MarginsPage refreshKey={refresh} />
         ) : page === "photos" ? (
