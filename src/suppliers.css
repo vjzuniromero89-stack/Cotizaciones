@@ -1343,3 +1343,58 @@
     padding: 4px 8px;
   }
 }
+
+/* Tarjeta del producto: primero los costos en fila, después la información. */
+.catalogProductSummary.costRow {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  border-bottom: 0;
+}
+.catalogProductSummary.infoRow {
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  border-top: 1px solid var(--line);
+}
+.catalogProductSummary > div {
+  padding: 13px 16px;
+}
+.catalogProductSummary span {
+  font-size: 12.5px;
+}
+.catalogProductSummary strong {
+  font-size: 17px;
+}
+.catalogProductSummary.costRow strong {
+  font-size: 20px;
+}
+.catalogProductSummary small {
+  font-size: 13px;
+}
+.catalogProductSummary .landedSummary strong {
+  color: #ff9a3c;
+}
+.catalogProductSummary.infoRow strong {
+  font-size: 15.5px;
+}
+@media (max-width: 1150px) {
+  .catalogCardFull {
+    overflow-x: auto;
+  }
+  .catalogProductSummary.costRow,
+  .catalogProductSummary.infoRow {
+    min-width: 820px;
+  }
+  .catalogProductSummary.costRow {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+  .catalogProductSummary.infoRow {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+  .catalogProductSummary > div {
+    padding: 11px 12px;
+  }
+  .catalogProductSummary.costRow strong {
+    font-size: 17px;
+  }
+  .catalogProductSummary.infoRow strong {
+    font-size: 14px;
+  }
+}

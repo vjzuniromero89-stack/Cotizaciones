@@ -1343,6 +1343,11 @@ function CatalogSection({ refreshKey, onCatalogChanged, onOptions }) {
             const box = p.boxes?.[0];
             const info = infoOf(p);
             const perBox = Number(box?.unitsPerBox || 0);
+            // Costo por unidad puesto en Nicaragua: compra + comisión + flete.
+            const cost =
+              oneBoxCbm(box) > 0 || Number(box?.weight) > 0
+                ? estimateLandedUnit({ price: p.unit_price, box })
+                : null;
             return (
               <article className="catalogCard catalogCardFull" key={p.id}>
                 <div className="catalogProductTop">
@@ -1391,14 +1396,20 @@ function CatalogSection({ refreshKey, onCatalogChanged, onOptions }) {
                   </div>
                 </div>
 
-                <div className="catalogProductSummary">
+                <div className="catalogProductSummary costRow">
                   <div><span>Precio de compra</span><strong>{money(p.unit_price)}</strong><small>{cordobas(p.unit_price)}</small></div>
-                  <div className="saleSummary"><span>Precio de venta</span><strong>{Number(info.salePrice) > 0 ? money(info.salePrice) : "—"}</strong><small>{Number(info.salePrice) > 0 ? cordobas(info.salePrice) : "Sin precio"}</small>{Number(info.salePrice) > 0 && <small>{priceNoteOf(info.priceNote)}</small>}</div>
+                  <div><span>Comisión</span><strong>{cost ? money(cost.fee) : "—"}</strong><small>{cost ? cordobas(cost.fee) : ""}</small></div>
+                  <div><span>Flete</span><strong>{cost ? money(cost.freight) : "—"}</strong><small>{cost ? cordobas(cost.freight) : "falta la caja"}</small></div>
+                  <div className="landedSummary"><span>Costo en Nicaragua</span><strong>{cost ? money(cost.total) : "—"}</strong><small>{cost ? cordobas(cost.total) : ""}</small></div>
+                  <div className="saleSummary"><span>Precio de venta</span><strong>{Number(info.salePrice) > 0 ? money(info.salePrice) : "—"}</strong><small>{Number(info.salePrice) > 0 ? cordobas(info.salePrice) : "Sin precio"}</small></div>
+                </div>
+                <div className="catalogProductSummary infoRow">
                   <div><span>Productos por caja</span><strong>{perBox ? perBox.toLocaleString() : "—"}</strong></div>
                   <div><span>Medidas de la caja</span><strong>{box?.l ? `${box.l} × ${box.w} × ${box.h} ${box.unit === "in" ? "in" : "cm"}` : "—"}</strong></div>
                   <div><span>Peso por caja</span><strong>{box?.weight ? `${box.weight} ${box.weightUnit || "kg"}` : "—"}</strong></div>
                   <div className="cbmSummary"><span>CBM por caja</span><strong>{oneBoxCbm(box).toFixed(4)}</strong></div>
                   <div className="cbmSummary"><span>CBM por unidad</span><strong>{perBox ? (oneBoxCbm(box) / perBox).toFixed(6) : "—"}</strong></div>
+                  <div><span>Condición del precio</span><strong>{priceNoteOf(info.priceNote)}</strong></div>
                 </div>
                 <ProductSpecs product={p} />
                 {(info.url || info.notes) && (
