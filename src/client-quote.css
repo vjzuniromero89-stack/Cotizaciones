@@ -272,3 +272,35 @@
   width: min(92vw, 900px);
   height: min(calc(100vh - 150px), 900px);
 }
+
+/* Anticipo y saldo en la hoja del cliente. */
+.qeSide .qeTotal {
+  margin-top: auto;
+}
+.qePay {
+  display: grid;
+  gap: 8px;
+  border: 1px solid #36466f;
+  border-radius: 12px;
+  padding: 12px 14px;
+}
+.qePay > div {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
+}
+.qePay small {
+  color: #a9b8dc;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+.qePay b {
+  margin: 0;
+  font: 800 16px Manrope;
+  font-variant-numeric: tabular-nums;
+}
+.qePay .qeBalance b {
+  color: #ffb629;
+}

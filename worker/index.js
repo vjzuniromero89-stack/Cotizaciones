@@ -946,6 +946,32 @@ async function handleApi(request, env, url) {
     }
     if (item && request.method === "PATCH") {
       const b = await request.json();
+      // Pagos del cliente (anticipo y saldo): se guardan dentro de "totals"
+      // y sirven igual para cotizaciones y para órdenes.
+      if (Array.isArray(b.payments)) {
+        const current = await getRecord(env, item[1]);
+        if (!current) return json({ error: "Registro no encontrado" }, 404);
+        const payments = b.payments
+          .map((p) => ({
+            id: String(p.id || crypto.randomUUID()),
+            amount: Math.max(0, Number(p.amount) || 0),
+            date: String(p.date || "").slice(0, 10),
+            note: String(p.note || "").slice(0, 200),
+          }))
+          .filter((p) => p.amount > 0);
+        const percent = Number(b.depositPercent);
+        await updateRecord(env, item[1], {
+          totals: {
+            ...(current.totals || {}),
+            payments,
+            depositPercent:
+              Number.isFinite(percent) && percent >= 0 && percent <= 100
+                ? percent
+                : (current.totals?.depositPercent ?? 60),
+          },
+        });
+        return json({ ok: true });
+      }
       if (b.status) {
         const allowed = [
           "confirmed",

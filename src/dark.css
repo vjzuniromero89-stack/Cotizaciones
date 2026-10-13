@@ -1769,3 +1769,237 @@ textarea.quoteDetailInput {
 a.addClientButton {
   text-decoration: none;
 }
+
+/* Pagos del cliente: anticipo y saldo. */
+.payPanel {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface);
+  padding: 16px;
+  margin: 14px 0;
+  color: #eef2f5;
+  text-align: left;
+}
+.payPanel > header {
+  position: static;
+  height: auto;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+.payPanel h3 {
+  margin: 0;
+  font: 800 18px Manrope;
+  color: #fff;
+}
+.payBadge {
+  border-radius: 99px;
+  padding: 5px 12px;
+  font-size: 13px;
+  font-weight: 800;
+  background: #2b1f0d;
+  color: #ffb866;
+  border: 1px solid #6b4a1a;
+}
+.payBadge.part {
+  background: #1a2238;
+  color: #b9c6ee;
+  border-color: #3b4a7a;
+}
+.payBadge.done {
+  background: #173629;
+  color: #3be090;
+  border-color: #2d7c55;
+}
+.payFigures {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+.payFigures > div {
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  background: var(--surface-2);
+  padding: 11px 13px;
+  font-variant-numeric: tabular-nums;
+}
+.payFigures small {
+  display: block;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+.payFigures b {
+  display: block;
+  font: 800 21px Manrope;
+  color: #fff;
+}
+.payFigures span {
+  display: block;
+  color: #c5ced8;
+  font-size: 13px;
+}
+.payFigures small input {
+  width: 56px;
+  height: 28px;
+  border: 1px solid #343640;
+  border-radius: 7px;
+  background: var(--field);
+  color: #fff;
+  font: inherit;
+  text-align: center;
+}
+.payDeposit b {
+  color: #ffb866;
+}
+.payPaid b {
+  color: #3be090;
+}
+.payBalance {
+  border-color: #b8641a !important;
+  background: #3a2410 !important;
+}
+.payBalance b {
+  color: #ff9a3c;
+}
+.payQuick {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+.payQuick button,
+.payAdd > button {
+  border: 0;
+  border-radius: 10px;
+  background: #3be090;
+  color: #07140e;
+  font: inherit;
+  font-weight: 900;
+  font-size: 15px;
+  padding: 12px 16px;
+  cursor: pointer;
+}
+.payQuick button:disabled,
+.payAdd > button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+.payAdd {
+  display: grid;
+  grid-template-columns: 150px 170px 1fr auto;
+  gap: 10px;
+  align-items: end;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+.payAdd label {
+  display: grid;
+  gap: 4px;
+}
+.payAdd span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+.payAdd input {
+  height: 44px;
+  border: 1px solid #343640;
+  border-radius: 9px;
+  background: var(--field);
+  color: #fff;
+  font: inherit;
+  font-size: 15px;
+  padding: 0 10px;
+  min-width: 0;
+  color-scheme: dark;
+}
+.payAdd > button {
+  background: transparent;
+  border: 1px solid #2d7c55;
+  color: #3be090;
+  height: 44px;
+  padding: 0 14px;
+}
+.payError {
+  color: #ff8a80;
+  margin: 10px 0 0;
+}
+.payList {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+.payList li {
+  display: grid;
+  grid-template-columns: 110px 130px 120px 1fr 34px;
+  gap: 10px;
+  align-items: center;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 8px 10px 8px 12px;
+  font-size: 14px;
+  color: #c5ced8;
+  font-variant-numeric: tabular-nums;
+}
+.payList li b {
+  color: #3be090;
+  font: 800 15.5px Manrope;
+}
+.payList li button {
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #6b2a26;
+  border-radius: 8px;
+  background: #2a1513;
+  color: #ff8a80;
+  cursor: pointer;
+  padding: 0;
+}
+.payList li button svg {
+  width: 15px;
+}
+.clientQuoteTools.payHolder {
+  display: block;
+  margin-bottom: 14px;
+}
+.clientQuotePrint .clientQuoteTools.payHolder button {
+  background: #3be090;
+  border-color: #3be090;
+  color: #07140e;
+}
+.clientQuotePrint .clientQuoteTools.payHolder .payAdd > button {
+  background: transparent;
+  border-color: #2d7c55;
+  color: #3be090;
+}
+.clientQuotePrint .clientQuoteTools.payHolder .payList li button {
+  background: #2a1513;
+  border-color: #6b2a26;
+  color: #ff8a80;
+}
+.clientQuoteTools .clientPay {
+  background: #1faa59;
+  border-color: #1faa59;
+  color: #fff;
+}
+@media (max-width: 820px) {
+  .payFigures {
+    grid-template-columns: 1fr 1fr;
+  }
+  .payAdd {
+    grid-template-columns: 1fr 1fr;
+  }
+  .payList li {
+    grid-template-columns: 1fr 1fr 34px;
+  }
+}

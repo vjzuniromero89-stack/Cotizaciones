@@ -233,14 +233,226 @@ const recordProductPrices = (record, clientPrices) => {
   });
 };
 
+// Resumen de pagos de un registro: anticipo acordado, pagado y saldo.
+export const paymentSummary = (record) => {
+  const totals = record?.totals || {};
+  const total = Number(totals.saleTotal ?? Number(record?.total || 0) * 1.3) || 0;
+  const payments = Array.isArray(totals.payments) ? totals.payments : [];
+  const percent = Number(totals.depositPercent ?? 60);
+  const paid = payments.reduce((sum, p) => sum + (Number(p.amount) || 0), 0);
+  return {
+    total,
+    payments,
+    percent,
+    deposit: (total * percent) / 100,
+    paid,
+    balance: Math.max(0, total - paid),
+  };
+};
+const today = () => new Date().toISOString().slice(0, 10);
+const dateLabel = (text) =>
+  text
+    ? new Date(text + "T12:00:00").toLocaleDateString("es-NI", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+      })
+    : "";
+
+// Registro de pagos del cliente: anticipo (60 % por defecto) y saldo.
+export function PaymentsPanel({ record, onChanged }) {
+  const summary = paymentSummary(record);
+  const [percent, setPercent] = useState(summary.percent),
+    [amount, setAmount] = useState(""),
+    [date, setDate] = useState(today()),
+    [note, setNote] = useState(""),
+    [busy, setBusy] = useState(false),
+    [error, setError] = useState("");
+  const rate = exchangeRateOf(record.rates);
+  const cs = (n) =>
+    "C$ " +
+    ((n || 0) * rate).toLocaleString("en-US", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+  const deposit = (summary.total * (Number(percent) || 0)) / 100;
+  async function save(payments, nextPercent = percent) {
+    setBusy(true);
+    setError("");
+    try {
+      await api("/records/" + record.id, {
+        method: "PATCH",
+        body: JSON.stringify({
+          payments,
+          depositPercent: Number(nextPercent) || 0,
+        }),
+      });
+      await onChanged?.();
+    } catch (e) {
+      setError(e.message || "No se pudo guardar el pago");
+    } finally {
+      setBusy(false);
+    }
+  }
+  const add = (value, text) => {
+    const number = Math.round((Number(value) || 0) * 100) / 100;
+    if (!(number > 0)) return;
+    save([
+      ...summary.payments,
+      { id: crypto.randomUUID(), amount: number, date: date || today(), note: text },
+    ]);
+    setAmount("");
+    setNote("");
+  };
+  const depositPaid = summary.paid >= deposit - 0.005 && deposit > 0;
+  return (
+    <section className="payPanel">
+      <header>
+        <h3>Pagos del cliente</h3>
+        <span
+          className={
+            summary.balance <= 0.005 && summary.total > 0
+              ? "payBadge done"
+              : summary.paid > 0
+                ? "payBadge part"
+                : "payBadge"
+          }
+        >
+          {summary.balance <= 0.005 && summary.total > 0
+            ? "Pagado completo"
+            : summary.paid > 0
+              ? "Pago parcial"
+              : "Sin pagos"}
+        </span>
+      </header>
+      <div className="payFigures">
+        <div>
+          <small>Total de la venta</small>
+          <b>{money(summary.total)}</b>
+          <span>{cs(summary.total)}</span>
+        </div>
+        <div className="payDeposit">
+          <small>
+            Anticipo{" "}
+            <input
+              type="number"
+              min="0"
+              max="100"
+              value={percent}
+              onChange={(e) => setPercent(e.target.value)}
+              onBlur={() =>
+                Number(percent) !== summary.percent &&
+                save(summary.payments, percent)
+              }
+            />{" "}
+            %
+          </small>
+          <b>{money(deposit)}</b>
+          <span>{cs(deposit)}</span>
+        </div>
+        <div className="payPaid">
+          <small>Pagado</small>
+          <b>{money(summary.paid)}</b>
+          <span>{cs(summary.paid)}</span>
+        </div>
+        <div className="payBalance">
+          <small>Saldo pendiente</small>
+          <b>{money(summary.balance)}</b>
+          <span>{cs(summary.balance)}</span>
+        </div>
+      </div>
+      <div className="payQuick">
+        {!depositPaid && deposit - summary.paid > 0.005 && (
+          <button
+            type="button"
+            disabled={busy}
+            onClick={() =>
+              add(deposit - summary.paid, `Anticipo ${Number(percent) || 0} %`)
+            }
+          >
+            Registrar anticipo de {money(deposit - summary.paid)}
+          </button>
+        )}
+        {summary.paid > 0 && summary.balance > 0.005 && (
+          <button
+            type="button"
+            disabled={busy}
+            onClick={() => add(summary.balance, "Saldo restante")}
+          >
+            Registrar saldo restante de {money(summary.balance)}
+          </button>
+        )}
+      </div>
+      <div className="payAdd">
+        <label>
+          <span>Otro monto (US$)</span>
+          <input
+            type="number"
+            min="0"
+            step="any"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+          />
+        </label>
+        <label>
+          <span>Fecha del pago</span>
+          <input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
+        </label>
+        <label>
+          <span>Nota</span>
+          <input
+            value={note}
+            placeholder="Transferencia, efectivo…"
+            onChange={(e) => setNote(e.target.value)}
+          />
+        </label>
+        <button
+          type="button"
+          disabled={busy || !(Number(amount) > 0)}
+          onClick={() => add(amount, note)}
+        >
+          Agregar pago
+        </button>
+      </div>
+      {error && <p className="payError">{error}</p>}
+      {summary.payments.length > 0 && (
+        <ul className="payList">
+          {summary.payments.map((p) => (
+            <li key={p.id}>
+              <b>{money(p.amount)}</b>
+              <span>{cs(p.amount)}</span>
+              <span>{dateLabel(p.date)}</span>
+              <span>{p.note}</span>
+              <button
+                type="button"
+                disabled={busy}
+                title="Quitar este pago"
+                onClick={() => {
+                  if (window.confirm(`¿Quitar el pago de ${money(p.amount)}?`))
+                    save(summary.payments.filter((x) => x.id !== p.id));
+                }}
+              >
+                <Trash2 />
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
+  );
+}
+
 export function ClientQuote({
   data,
   onClose,
   onDeleted,
   onEdit,
+  onPaid,
   publicMode,
   closeLabel,
 }) {
+  const pay = paymentSummary(data);
+  const [paying, setPaying] = useState(false);
   const [preview, setPreview] = useState(false);
   const [sharing, setSharing] = useState(false);
   // Foto ampliada al tocarla.
@@ -339,6 +551,11 @@ export function ClientQuote({
                   <Pencil /> Editar
                 </button>
               )}
+              {!publicMode && onPaid && (
+                <button className="clientPay" onClick={() => setPaying((x) => !x)}>
+                  $ {paying ? "Ocultar pagos" : "Pagos"}
+                </button>
+              )}
               {!publicMode && (
                 <button className="clientDelete" onClick={deleteQuote}>
                   <Trash2 /> Eliminar
@@ -361,6 +578,11 @@ export function ClientQuote({
             <Printer /> Imprimir / guardar PDF
           </button>
         </div>
+        {paying && !publicMode && (
+          <div className="clientQuoteTools payHolder">
+            <PaymentsPanel record={data} onChanged={onPaid} />
+          </div>
+        )}
         <div className="qe">
           <aside className="qeSide">
             <h2>
@@ -413,6 +635,26 @@ export function ClientQuote({
               <small>TOTAL CON ENVÍO</small>
               <b>{money(total)}</b>
               <em>{cs(total)}</em>
+            </div>
+            <div className="qePay">
+              <div>
+                <small>ANTICIPO {pay.percent} %</small>
+                <b>{money(pay.deposit)}</b>
+              </div>
+              {pay.paid > 0 && (
+                <div>
+                  <small>PAGADO</small>
+                  <b>{money(pay.paid)}</b>
+                </div>
+              )}
+              <div className="qeBalance">
+                <small>
+                  {pay.paid > 0 ? "SALDO PENDIENTE" : "SALDO AL RECIBIR"}
+                </small>
+                <b>
+                  {money(pay.paid > 0 ? pay.balance : pay.total - pay.deposit)}
+                </b>
+              </div>
             </div>
           </aside>
           <div className="qeMain">
@@ -550,6 +792,7 @@ export function ClientDetail({ id, onClose, onDeleted }) {
       onClose={onClose}
       onDeleted={onDeleted}
       onEdit={data.status === "pending" ? () => setEditing(true) : undefined}
+      onPaid={load}
     />
   );
 }
@@ -831,7 +1074,13 @@ function Detail({ id, type, onClose, onChanged, startEditing = false }) {
         products: form.products || [],
         boxes: form.boxes || [],
         rates: form.rates || {},
-        totals: liveTotals,
+        // Los pagos registrados no se pierden al editar la cotización.
+        totals: {
+          ...liveTotals,
+          payments: form.totals?.payments || data.totals?.payments || [],
+          depositPercent:
+            form.totals?.depositPercent ?? data.totals?.depositPercent ?? 60,
+        },
         total: liveTotals.internalTotal,
         total_boxes: Math.round(liveTotals.totalBoxes) || 0,
       };
@@ -1543,6 +1792,17 @@ function Detail({ id, type, onClose, onChanged, startEditing = false }) {
                 Cobrar mínimo 1 CBM en ruta directa
               </label>
             </section>
+          )}
+          {!edit && (
+            <PaymentsPanel
+              record={data}
+              onChanged={async () => {
+                const fresh = await api("/records/" + id);
+                setData(fresh);
+                setForm({ ...fresh });
+                onChanged?.();
+              }}
+            />
           )}
           <section className="internalNotes">
             <h3>
