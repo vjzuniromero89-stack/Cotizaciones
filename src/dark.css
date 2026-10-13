@@ -2003,3 +2003,134 @@ a.addClientButton {
     grid-template-columns: 1fr 1fr 34px;
   }
 }
+
+/* Menú ordenado: grupos arriba y, debajo, las pantallas del grupo. */
+#root > header {
+  flex-wrap: nowrap;
+  gap: 14px;
+}
+.mainNav.groupNav {
+  flex: 1;
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: center;
+  gap: 6px;
+  width: auto;
+  order: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+.mainNav.groupNav button {
+  flex: 0 1 auto;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 16px;
+  font-size: 15.5px;
+  font-weight: 800;
+  border-radius: 11px;
+  white-space: nowrap;
+}
+.mainNav.groupNav svg {
+  width: 18px;
+  height: 18px;
+}
+.subNav {
+  position: sticky;
+  top: 76px;
+  z-index: 4;
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px max(16px, calc((100% - 1180px) / 2));
+  background: #15171d;
+  border-bottom: 1px solid var(--line);
+  overflow-x: auto;
+}
+.subNav button {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border: 1px solid transparent;
+  border-radius: 99px;
+  background: transparent;
+  color: #b8c2cc;
+  font: inherit;
+  font-size: 14.5px;
+  font-weight: 700;
+  padding: 8px 15px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.subNav button:hover {
+  color: #fff;
+}
+.subNav button.active {
+  background: #173629;
+  border-color: #2d7c55;
+  color: #3be090;
+}
+.subNav svg {
+  width: 16px;
+  height: 16px;
+}
+@media (max-width: 760px) {
+  #root > header {
+    flex-wrap: wrap;
+    height: auto;
+    padding-top: 8px;
+    padding-bottom: 6px;
+  }
+  .mainNav.groupNav {
+    order: 3;
+    flex: 1 0 100%;
+    justify-content: space-between;
+    overflow-x: auto;
+  }
+  .mainNav.groupNav button {
+    flex-direction: column;
+    gap: 2px;
+    padding: 7px 8px;
+    font-size: 11.5px;
+  }
+  .subNav {
+    position: static;
+    justify-content: flex-start;
+  }
+  .subNav button {
+    font-size: 13.5px;
+    padding: 7px 12px;
+  }
+}
+@media (max-width: 1150px) and (min-width: 761px) {
+  /* En pantallas medianas el nombre se oculta para que el menú no lo pise. */
+  #root > header .brand > div:not(.logo) {
+    display: none;
+  }
+  .mainNav.groupNav button {
+    padding: 10px 12px;
+    font-size: 15px;
+  }
+  .sessionUser > span {
+    display: none;
+  }
+}
+@media (max-width: 760px) {
+  .mainNav.groupNav {
+    overflow: visible;
+    gap: 2px;
+  }
+  .mainNav.groupNav button {
+    flex: 1 1 0;
+    min-width: 0;
+    padding: 7px 2px;
+    font-size: 11px;
+    justify-content: center;
+  }
+  .mainNav.groupNav button span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+  }
+}

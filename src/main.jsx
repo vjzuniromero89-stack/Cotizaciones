@@ -100,38 +100,90 @@ function Field({ label, value, onChange, type = "number", suffix }) {
     </label>
   );
 }
+// Menú en dos niveles: arriba los grupos y debajo las pantallas del grupo
+// en el que se está.
+const navGroups = (currentUser) => [
+  {
+    id: "quotes",
+    label: "Cotizaciones",
+    Icon: FileText,
+    pages: [
+      ["calculator", Calculator, "Crear cotización"],
+      ["clientQuotes", ReceiptText, "Para clientes"],
+      ["quotes", FileText, "Internas"],
+      ["orders", ClipboardList, "Órdenes"],
+    ],
+  },
+  {
+    id: "catalog",
+    label: "Catálogo",
+    Icon: PackageSearch,
+    pages: [
+      ["products", PackageSearch, "Productos"],
+      ["suppliers", Factory, "Proveedores"],
+      ["photos", Images, "Fotos"],
+      ["prices", Tag, "Lista de precios"],
+    ],
+  },
+  {
+    id: "customers",
+    label: "Clientes",
+    Icon: Users,
+    pages: [["customers", Users, "Clientes"]],
+  },
+  {
+    id: "numbers",
+    label: "Ganancias",
+    Icon: TrendingUp,
+    pages: [
+      ["profits", TrendingUp, "Ganancias de ventas"],
+      ["margins", Percent, "Ganancia por producto"],
+    ],
+  },
+  ...(currentUser?.role === "admin"
+    ? [
+        {
+          id: "users",
+          label: "Usuarios",
+          Icon: UserCog,
+          pages: [["users", UserCog, "Usuarios"]],
+        },
+      ]
+    : []),
+];
+const groupOf = (groups, page) =>
+  groups.find((g) => g.pages.some(([id]) => id === page)) || groups[0];
 function Nav({ page, setPage, currentUser }) {
+  const groups = navGroups(currentUser);
+  const active = groupOf(groups, page);
   return (
-    <nav className="mainNav">
-      {[
-        ["calculator", Calculator, "Crear cotización", "Crear"],
-        ["products", PackageSearch, "Productos", "Productos"],
-        ["suppliers", Factory, "Proveedores", "Proveed."],
-        ["photos", Images, "Fotos", "Fotos"],
-        ["margins", Percent, "Ganancia por producto", "Margen"],
-        ["prices", Tag, "Lista de precios", "Precios"],
-        ["customers", Users, "Clientes", "Clientes"],
-        ["quotes", FileText, "Cotizaciones internas", "Internas"],
-        [
-          "clientQuotes",
-          ReceiptText,
-          "Cotizaciones para clientes",
-          "Cotizaciones",
-        ],
-        ["orders", ClipboardList, "Órdenes", "Órdenes"],
-        ["profits", TrendingUp, "Ganancias", "Ganancias"],
-        ...(currentUser?.role === "admin"
-          ? [["users", UserCog, "Usuarios", "Usuarios"]]
-          : []),
-      ].map(([id, Icon, label, short]) => (
+    <nav className="mainNav groupNav">
+      {groups.map((g) => (
+        <button
+          key={g.id}
+          className={g.id === active.id ? "active" : ""}
+          onClick={() => setPage(g.pages[0][0])}
+        >
+          <g.Icon />
+          <span>{g.label}</span>
+        </button>
+      ))}
+    </nav>
+  );
+}
+function SubNav({ page, setPage, currentUser }) {
+  const group = groupOf(navGroups(currentUser), page);
+  if (group.pages.length < 2) return null;
+  return (
+    <nav className="subNav" aria-label={group.label}>
+      {group.pages.map(([id, Icon, label]) => (
         <button
           key={id}
           className={page === id ? "active" : ""}
           onClick={() => setPage(id)}
         >
           <Icon />
-          <span className="navFull">{label}</span>
-          <span className="navShort">{short}</span>
+          <span>{label}</span>
         </button>
       ))}
     </nav>
@@ -1028,6 +1080,7 @@ function App() {
           </button>
         </div>
       </header>
+      <SubNav page={page} setPage={navigate} currentUser={currentUser} />
       <main className="appMain">
         {page === "calculator" ? (
           <CalculatorPage
