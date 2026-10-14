@@ -122,14 +122,21 @@ async function listRecords(env, type) {
   );
 }
 
-async function countRecords(env, type) {
-  const response = await rest(
+// Siguiente número libre (COT-2026-0007, ORD-2026-0003…). Se toma el más alto
+// que ya existe y se suma uno; contar registros no sirve, porque al borrar una
+// cotización o pasarla a orden el conteo baja y el número se repite.
+async function nextNumber(env, prefix) {
+  const head = prefix + "-" + new Date().getFullYear() + "-";
+  const rows = await restRows(
     env,
-    `records?record_type=eq.${encodeURIComponent(type)}&select=id&limit=1`,
-    { headers: { Prefer: "count=exact" } },
+    `records?number=like.${encodeURIComponent(head)}*&select=number`,
   );
-  const total = (response.headers.get("content-range") || "").split("/").pop();
-  return Number(total) || 0;
+  let max = 0;
+  for (const row of rows) {
+    const n = Number(String(row.number || "").slice(head.length));
+    if (Number.isFinite(n) && n > max) max = n;
+  }
+  return head + String(max + 1).padStart(4, "0");
 }
 
 // Las cotizaciones guardadas sin foto toman la del catálogo (mismo nombre de
@@ -699,13 +706,8 @@ async function handleApi(request, env, url) {
       const profit = saleTotal - internalTotal;
       const profitPercent =
         internalTotal > 0 ? (profit / internalTotal) * 100 : 0;
-      const count = await countRecords(env, "quote");
       const id = crypto.randomUUID();
-      const number =
-        "COT-" +
-        new Date().getFullYear() +
-        "-" +
-        String(count + 1).padStart(4, "0");
+      const number = await nextNumber(env, "COT");
       await rest(env, "records", {
         method: "POST",
         headers: {
@@ -754,13 +756,8 @@ async function handleApi(request, env, url) {
       const b = await request.json();
       if (!b.title?.trim())
         return json({ error: "El nombre del producto es obligatorio" }, 400);
-      const count = await countRecords(env, "product");
       const id = crypto.randomUUID();
-      const number =
-        "PRO-" +
-        new Date().getFullYear() +
-        "-" +
-        String(count + 1).padStart(4, "0");
+      const number = await nextNumber(env, "PRO");
       const route = b.selectedRoute === "direct" ? "direct" : "miami";
       const total =
         route === "miami" ? b.result.landedMiami : b.result.landedDirect;
@@ -842,13 +839,8 @@ async function handleApi(request, env, url) {
       const profit = saleTotal - internalTotal;
       const profitPercent =
         internalTotal > 0 ? (profit / internalTotal) * 100 : 0;
-      const count = await countRecords(env, "quote");
       const id = crypto.randomUUID();
-      const number =
-        "COT-" +
-        new Date().getFullYear() +
-        "-" +
-        String(count + 1).padStart(4, "0");
+      const number = await nextNumber(env, "COT");
       await rest(env, "records", {
         method: "POST",
         headers: {
@@ -894,12 +886,7 @@ async function handleApi(request, env, url) {
 
     const promote = url.pathname.match(/^\/api\/records\/([^/]+)\/promote$/);
     if (promote && request.method === "POST") {
-      const count = await countRecords(env, "order");
-      const number =
-        "ORD-" +
-        new Date().getFullYear() +
-        "-" +
-        String(count + 1).padStart(4, "0");
+      const number = await nextNumber(env, "ORD");
       const row = await updateRecord(
         env,
         promote[1],
