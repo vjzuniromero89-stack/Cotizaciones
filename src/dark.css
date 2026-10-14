@@ -998,7 +998,7 @@ body {
 .qtFoot > b:nth-child(2) {
   text-align: left;
 }
-@media (max-width: 1239px) {
+@media (max-width: 760px) {
   .qtTable {
     border: 0;
     border-radius: 0;
@@ -1210,7 +1210,7 @@ body {
 main:has(.qtTable) {
   max-width: 1500px;
 }
-@media (min-width: 1240px) {
+@media (min-width: 761px) {
   .qtRow {
     grid-template-columns:
       52px minmax(130px, 1.7fr) minmax(62px, 0.7fr) minmax(72px, 0.8fr)
@@ -1295,7 +1295,7 @@ main:has(.qtTable) {
     text-align: left;
   }
 }
-@media (max-width: 1239px) {
+@media (max-width: 760px) {
   .qtLabel {
     font-size: 12px;
   }

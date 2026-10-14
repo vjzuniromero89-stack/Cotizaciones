@@ -13,6 +13,25 @@ body {
 .priceHistoryTop {
   flex-wrap: wrap;
 }
-.priceHistoryTop button {
+/* .catalogCard button fija 32 px (botones de ícono); este botón lleva texto. */
+.catalogCard .priceHistoryTop button {
   flex: none;
+  width: auto;
+  height: auto;
+}
+.priceHistoryChanges {
+  flex: 1 1 320px;
+  min-width: 0;
+}
+
+/* Crear cotización en pantallas medianas (celular en modo escritorio, tablet):
+   la tabla de productos se queda en una sola fila por producto, como en la PC,
+   y se desliza de lado si no cabe. */
+@media (min-width: 761px) and (max-width: 1239px) {
+  .qtTable {
+    overflow-x: auto;
+  }
+  .qtTable > .qtRow {
+    min-width: 1120px;
+  }
 }
