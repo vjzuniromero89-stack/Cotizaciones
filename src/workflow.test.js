@@ -14,9 +14,9 @@ describe("flujo de productos y cotizaciones", () => {
     const fetchMock = vi
       .fn()
       .mockResolvedValueOnce(
-        new Response("", {
+        new Response("[]", {
           status: 200,
-          headers: { "content-range": "0-0/0" },
+          headers: { "content-type": "application/json" },
         }),
       )
       .mockResolvedValueOnce(new Response("", { status: 201 }));
@@ -68,9 +68,9 @@ describe("flujo de productos y cotizaciones", () => {
         }),
       )
       .mockResolvedValueOnce(
-        new Response("", {
+        new Response("[]", {
           status: 200,
-          headers: { "content-range": "0-0/0" },
+          headers: { "content-type": "application/json" },
         }),
       )
       .mockResolvedValueOnce(new Response("", { status: 201 }));
@@ -99,9 +99,9 @@ describe("flujo de productos y cotizaciones", () => {
     const fetchMock = vi
       .fn()
       .mockResolvedValueOnce(
-        new Response("", {
+        new Response(JSON.stringify([{ number: "COT-" + new Date().getFullYear() + "-0002" }, { number: "COT-" + new Date().getFullYear() + "-0005" }]), {
           status: 200,
-          headers: { "content-range": "0-0/0" },
+          headers: { "content-type": "application/json" },
         }),
       )
       .mockResolvedValueOnce(new Response("", { status: 201 }))
@@ -138,5 +138,8 @@ describe("flujo de productos y cotizaciones", () => {
     expect(saved.totals.saleTotal).toBe(300);
     expect(saved.totals.profit).toBe(120);
     expect(saved.products[0].salePrice).toBe(3);
+    // Ya existen la 0002 y la 0005 (la 0003 y 0004 se borraron): sigue la 0006.
+    expect(saved.number).toBe("COT-" + new Date().getFullYear() + "-0006");
+    expect(fetchMock.mock.calls[0][0]).toContain("number=like.COT-");
   });
 });
