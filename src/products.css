@@ -208,14 +208,14 @@
   gap: 9px;
   align-items: end;
   padding: 12px;
-  background: #fff;
+  background: #ffffff;
   border: 1px solid var(--line);
   border-radius: 11px;
   margin-bottom: 9px;
 }
 .productCbmResult {
   min-height: 58px;
-  border: 1px solid #b9e8d3;
+  border: 1px solid #65917e;
   border-radius: 9px;
   background: #effcf6;
   padding: 7px 9px;
@@ -292,7 +292,7 @@
 }
 .addCompleteProduct {
   background: var(--navy);
-  color: #fff;
+  color: #0f0f0f;
   border-style: solid;
   margin-top: 18px;
 }
@@ -304,7 +304,7 @@
   padding: 12px;
   border: 1px solid #2a9a6c;
   border-radius: 13px;
-  background: linear-gradient(135deg, #15251e, #1a2021);
+  background: linear-gradient(135deg, #e9fef4, #f2fbfc);
 }
 .quotationCbmTotalsTitle {
   display: grid;
@@ -314,14 +314,14 @@
 }
 .quotationCbmTotalsTitle svg {
   width: 22px;
-  color: #35d98c;
+  color: #007c3b;
 }
 .quotationCbmTotalsTitle small,
 .quotationCbmTotalsTitle b {
   display: block;
 }
 .quotationCbmTotalsTitle small {
-  color: #35d98c;
+  color: #007c3b;
   font-size: 9px;
   font-weight: 900;
   letter-spacing: .8px;
@@ -333,7 +333,7 @@
 }
 .quotationCbmTotal {
   padding: 11px 13px;
-  border: 1px solid #b9e8d3;
+  border: 1px solid #65917e;
   border-radius: 10px;
   background: #effcf6;
 }
@@ -353,7 +353,7 @@
   margin: 2px 0;
 }
 .quotationCbmTotal small {
-  color: #667b72;
+  color: #6b8077;
   font-size: 9px;
 }
 @media (max-width: 700px) {
@@ -380,12 +380,12 @@
   min-width: 0;
   border: 1px solid #245c47;
   border-radius: 14px;
-  background: linear-gradient(145deg, #111a17, #191c23);
+  background: linear-gradient(145deg, #f2fffa, #f5faff);
   overflow: hidden;
 }
 .livePricingHead {
   padding: 8px 10px;
-  border-bottom: 1px solid #27352f;
+  border-bottom: 1px solid #c6d8d0;
 }
 .livePricingHead small { color: var(--lime); font-size: 8px; font-weight: 900; letter-spacing: .8px; }
 .livePricingRow {
@@ -394,15 +394,15 @@
   align-items: center;
   gap: 8px;
   padding: 7px 10px;
-  border-bottom: 1px solid #27312d;
+  border-bottom: 1px solid #cddad5;
 }
 .livePricingRow:last-child { border-bottom: 0; }
-.livePricingImage { width: 32px; height: 32px; border-radius: 6px; overflow: hidden; display: grid; place-items: center; background: #0b1110; color: #5c776b; }
+.livePricingImage { width: 32px; height: 32px; border-radius: 6px; overflow: hidden; display: grid; place-items: center; background: #f8ffff; color: #668275; }
 .livePricingImage img { width: 100%; height: 100%; object-fit: cover; }
 .livePricingImage svg { width: 19px; }
 .livePricingName { min-width: 0; font-size: 10px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.livePricingUnitCost { color: #38dda0; font-size: 11px; text-align: right; white-space: nowrap; }
-.livePricingUnitCost span { color: #71857b; margin: 0 3px; }
+.livePricingUnitCost { color: #007d48; font-size: 11px; text-align: right; white-space: nowrap; }
+.livePricingUnitCost span { color: #677b71; margin: 0 3px; }
 .productPanel > .addCompleteProduct + .liveProductPricing { margin-top: 14px; }
 @media (min-width: 850px) {
   .productPanel > .liveProductPricing { width: calc(100% - 382px); display: inline-block; vertical-align: top; margin-right: 14px; box-sizing: border-box; }
@@ -460,7 +460,7 @@
   grid-template-columns: 1fr minmax(220px, 1.5fr) auto;
   gap: 12px;
   align-items: center;
-  background: linear-gradient(135deg, #15251e, #1b1d24);
+  background: linear-gradient(135deg, #e9fef4, #f6f9ff);
   border: 1px solid #2b5b45;
   border-radius: 13px;
   padding: 14px;
@@ -481,7 +481,7 @@
 }
 .catalogPicker select {
   height: 42px;
-  border: 1px solid #3a4149;
+  border: 1px solid #b9c1cb;
   border-radius: 8px;
   padding: 0 10px;
 }
@@ -597,7 +597,7 @@
   font-size: 16px;
 }
 .autoLoadHint {
-  color: #35d98c;
+  color: #007c3b;
   font-size: 12px;
   font-weight: 700;
   white-space: nowrap;
@@ -621,5 +621,5 @@
   }
 }
 .photoPicker img {
-  background: #fff;
+  background: #ffffff;
 }

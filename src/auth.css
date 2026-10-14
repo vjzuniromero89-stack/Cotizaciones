@@ -4,23 +4,23 @@
   display: grid;
   place-items: center;
   padding: 24px;
-  background: radial-gradient(circle at top, #153c2c, #080b10 55%);
+  background: radial-gradient(circle at top, #d6fae8, #faffff 55%);
 }
 .authCard {
   width: min(440px, 100%);
-  background: #171a20;
-  border: 1px solid #303640;
+  background: #f6fbff;
+  border: 1px solid #c6ceda;
   border-radius: 22px;
   padding: 28px;
-  color: #fff;
-  box-shadow: 0 25px 80px #0008;
+  color: #0f0f0f;
+  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.14);
 }
 .authBrand {
   display: flex;
   align-items: center;
   gap: 12px;
   padding-bottom: 20px;
-  border-bottom: 1px solid #303640;
+  border-bottom: 1px solid #c6ceda;
 }
 .authBrand > span {
   width: 48px;
@@ -29,7 +29,7 @@
   place-items: center;
   background: #20ca79;
   border-radius: 13px;
-  color: #082a1b;
+  color: #143526;
 }
 .authBrand h1 {
   font-size: 20px;
@@ -37,7 +37,7 @@
 }
 .authBrand p,
 .authIntro p {
-  color: #969da8;
+  color: #545a64;
   margin: 3px 0 0;
 }
 .authIntro {
@@ -45,7 +45,7 @@
   padding: 25px 0 15px;
 }
 .authIntro > svg {
-  color: #31d58a;
+  color: #007c3c;
   width: 34px;
   height: 34px;
 }
@@ -58,7 +58,7 @@
 }
 .authCard label > span {
   display: block;
-  color: #a9b0ba;
+  color: #444a52;
   font-size: 12px;
   font-weight: 800;
   margin-bottom: 6px;
@@ -67,14 +67,14 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  background: #101319;
-  border: 1px solid #353c47;
+  background: #f9feff;
+  border: 1px solid #bec7d4;
   border-radius: 10px;
   padding: 0 12px;
 }
 .authCard label svg {
   width: 17px;
-  color: #7e8794;
+  color: #676f7c;
 }
 .authCard input {
   height: 46px;
@@ -82,7 +82,7 @@
   background: none;
   border: 0;
   outline: 0;
-  color: #fff;
+  color: #0f0f0f;
 }
 .authCard form > button {
   height: 48px;
@@ -94,6 +94,6 @@
 .authError {
   padding: 11px;
   border-radius: 9px;
-  background: #4a2020;
-  color: #ffb5b5;
+  background: #ffe5e3;
+  color: #8e4e4f;
 }

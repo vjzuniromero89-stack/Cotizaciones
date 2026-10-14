@@ -11,12 +11,12 @@
   width: min(760px, 100%);
   max-height: 94vh;
   overflow: auto;
-  background: #fff;
+  background: #ffffff;
   border-radius: 18px;
   padding: 24px;
   display: grid;
   gap: 15px;
-  box-shadow: 0 30px 100px #0007;
+  box-shadow: 0 30px 100px rgba(0, 0, 0, 0.14);
 }
 .quoteClientGrid {
   display: grid;
@@ -168,7 +168,7 @@
   margin-bottom: 14px;
 }
 .catalogTitle small {
-  color: #28d681;
+  color: #007c37;
   font-weight: 800;
   letter-spacing: 1.3px;
 }
@@ -181,8 +181,8 @@
   color: var(--muted);
 }
 .catalogTitle > b {
-  background: #1d2a24;
-  color: #68e5a4;
+  background: #e9fbf2;
+  color: #007b41;
   border: 1px solid #275f44;
   border-radius: 30px;
   padding: 8px 13px;
@@ -198,7 +198,7 @@
   grid-template-columns: 74px 1fr auto;
   gap: 12px;
   align-items: center;
-  background: var(--surface, #fff);
+  background: var(--surface, #ffffff);
   border: 1px solid var(--line);
   border-radius: 14px;
   padding: 12px;
@@ -227,7 +227,7 @@
   font-size: 12px;
 }
 .catalogCard strong {
-  color: #28d681;
+  color: #007c37;
   font-size: 17px;
 }
 .catalogCard strong small {
@@ -237,8 +237,8 @@
 .catalogCard button {
   align-self: start;
   border: 0;
-  background: #2a191b;
-  color: #ff858d;
+  background: #fff2f4;
+  color: #a73543;
   border-radius: 8px;
   width: 32px;
   height: 32px;
@@ -258,7 +258,7 @@
   gap: 13px;
   align-items: center;
   padding: 14px;
-  background: var(--surface-2, #20242c);
+  background: var(--surface-2, #f1f7ff);
   border-bottom: 1px solid var(--line);
 }
 .catalogProductTop > img,
@@ -269,7 +269,7 @@
   border-radius: 10px;
 }
 .catalogProductIdentity small {
-  color: #35d98c;
+  color: #007c3b;
   font-size: 10px;
   font-weight: 800;
   letter-spacing: 1px;
@@ -292,8 +292,8 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: #143f33;
-  color: #dffbef;
+  background: #d3fbec;
+  color: #041a12;
   border: 1px solid #2a9a6c;
 }
 .catalogCardActions .catalogDeleteButton {
@@ -309,7 +309,7 @@
 .catalogProductSummary > div {
   min-width: 0;
   padding: 12px 14px;
-  background: var(--surface, #171a20);
+  background: var(--surface, #f6fbff);
 }
 .catalogProductSummary span,
 .catalogBoxInline small {
@@ -324,7 +324,7 @@
   color: inherit;
 }
 .catalogProductSummary .cbmSummary strong {
-  color: #35d98c;
+  color: #007c3b;
 }
 .catalogBoxesInline {
   padding: 12px 14px 14px;
@@ -342,7 +342,7 @@
   border-bottom: 0;
 }
 .catalogBoxInline > b {
-  color: #35d98c;
+  color: #007c3b;
 }
 .catalogNoBoxes {
   color: var(--muted);
@@ -397,7 +397,7 @@
 }
 .catalogEmpty svg {
   width: 28px;
-  color: #28d681;
+  color: #007c37;
 }
 .catalogEmpty span {
   font-size: 13px;
@@ -456,7 +456,7 @@
   display: grid;
   place-items: center;
   overflow: hidden;
-  color: #28d681;
+  color: #007c37;
   cursor: pointer;
 }
 .catalogPhotoPicker input {
@@ -491,7 +491,7 @@
   height: 41px;
   border: 1px solid var(--line);
   border-radius: 8px;
-  background: var(--field, #fff);
+  background: var(--field, #ffffff);
   color: inherit;
   padding: 0 9px;
 }
@@ -507,7 +507,7 @@
 }
 .registeredBoxes h3 svg {
   width: 18px;
-  color: #28d681;
+  color: #007c37;
 }
 .registerBoxRow {
   display: grid;
@@ -526,8 +526,8 @@
   height: 38px;
   border: 0;
   border-radius: 8px;
-  background: #2a191b;
-  color: #ff858d;
+  background: #fff2f4;
+  color: #a73543;
 }
 .registerBoxRow > button svg {
   width: 15px;
@@ -570,8 +570,8 @@
   width: min(680px, calc(100vw - 24px));
   max-height: 90vh;
   overflow: auto;
-  background: #171a20;
-  border: 1px solid #2a3039;
+  background: #f6fbff;
+  border: 1px solid #ced6e1;
   border-radius: 18px;
   padding: 22px;
 }
@@ -582,7 +582,7 @@
   align-items: center;
   margin: 18px 0;
   padding: 16px;
-  background: #20242c;
+  background: #f1f7ff;
   border-radius: 14px;
 }
 .catalogDetailHero > img,
@@ -599,11 +599,11 @@
 }
 .catalogDetailHero span,
 .catalogDetailHero small {
-  color: #969daa;
+  color: #535a66;
 }
 .catalogDetailHero strong {
   font-size: 28px;
-  color: #35d98c;
+  color: #007c3b;
 }
 .catalogDetail h3 {
   display: flex;
@@ -612,7 +612,7 @@
 }
 .catalogDetail h3 svg {
   width: 18px;
-  color: #35d98c;
+  color: #007c3b;
 }
 .catalogDetailBoxes {
   display: grid;
@@ -622,16 +622,16 @@
   display: grid;
   grid-template-columns: 0.7fr 1.3fr 1.3fr 1fr 1fr;
   gap: 10px;
-  background: #20242c;
-  border: 1px solid #303641;
+  background: #f1f7ff;
+  border: 1px solid #c6cedb;
   border-radius: 11px;
   padding: 13px;
 }
 .catalogDetailBoxes span {
-  color: #a0a7b1;
+  color: #4b515a;
 }
 .catalogDetailBoxes strong {
-  color: #35d98c;
+  color: #007c3b;
 }
 @media (max-width: 650px) {
   .catalogDetailHero {
@@ -661,8 +661,8 @@
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  background: #143f33;
-  color: #eafff7;
+  background: #d3fbec;
+  color: #051510;
   border: 1px solid #2aa876;
 }
 .catalogDetailActions .editCatalogProduct svg {
@@ -672,7 +672,7 @@
   min-width: 120px;
   min-height: 52px;
   padding: 7px 9px;
-  border: 1px solid #b9e8d3;
+  border: 1px solid #65917e;
   border-radius: 8px;
   background: #effcf6;
   display: flex;
@@ -697,7 +697,7 @@
 }
 .catalogPhotoPicker img {
   object-fit: contain;
-  background: #fff;
+  background: #ffffff;
 }
 @media (max-width: 620px) {
   .registerProductMain {

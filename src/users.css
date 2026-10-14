@@ -6,8 +6,8 @@
   grid-template-columns: 1fr 1fr 180px auto;
   gap: 12px;
   align-items: end;
-  background: #171a21;
-  border: 1px solid #2c323c;
+  background: #f6fbff;
+  border: 1px solid #cbd3e0;
   border-radius: 14px;
   padding: 16px;
   margin: 18px 0;
@@ -15,7 +15,7 @@
 .newUserPanel label span,
 .userRole span {
   display: block;
-  color: #9aa1ac;
+  color: #505760;
   font-size: 11px;
   font-weight: 800;
   margin-bottom: 6px;
@@ -24,10 +24,10 @@
 .newUserPanel select {
   width: 100%;
   height: 42px;
-  background: #101319;
-  border: 1px solid #363d48;
+  background: #f9feff;
+  border: 1px solid #bdc5d3;
   border-radius: 9px;
-  color: #fff;
+  color: #0f0f0f;
   padding: 0 10px;
 }
 .newUserPanel button {
@@ -48,8 +48,8 @@
   grid-template-columns: 48px 1fr 160px 105px 170px;
   gap: 14px;
   align-items: center;
-  background: #171a21;
-  border: 1px solid #2c323c;
+  background: #f6fbff;
+  border: 1px solid #cbd3e0;
   border-radius: 14px;
   padding: 15px;
 }
@@ -57,14 +57,14 @@
   width: 46px;
   height: 46px;
   border-radius: 12px;
-  background: #252b34;
-  color: #abb3bf;
+  background: #edf5ff;
+  color: #404751;
   display: grid;
   place-items: center;
 }
 .userIcon.admin {
-  background: #173a2c;
-  color: #31db8e;
+  background: #d5fae9;
+  color: #007c3c;
 }
 .userCard h3 {
   margin: 0;
@@ -72,7 +72,7 @@
 .userCard p,
 .userCard small {
   margin: 3px 0 0;
-  color: #969da8;
+  color: #545a64;
 }
 .userActive {
   display: flex;
@@ -80,9 +80,9 @@
   align-items: center;
 }
 .resetPassword {
-  border: 1px solid #38404c;
-  background: #222730;
-  color: #fff;
+  border: 1px solid #b8c2d1;
+  background: #eff6ff;
+  color: #0f0f0f;
   border-radius: 9px;
   padding: 10px;
   display: flex;

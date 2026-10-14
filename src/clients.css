@@ -8,8 +8,8 @@
   margin: 20px 0;
 }
 .clientSummary > div {
-  background: #171a21;
-  border: 1px solid #282d37;
+  background: #f6fbff;
+  border: 1px solid #d2d9e6;
   border-radius: 14px;
   padding: 18px;
   display: flex;
@@ -18,10 +18,10 @@
 }
 .clientSummary svg {
   width: 20px;
-  color: #23cc80;
+  color: #007c3b;
 }
 .clientSummary span {
-  color: #979eaa;
+  color: #535964;
 }
 .clientSummary b {
   font-size: 22px;
@@ -29,8 +29,8 @@
 }
 .clientSearch {
   height: 48px;
-  background: #12151b;
-  border: 1px solid #282d37;
+  background: #f8fdff;
+  border: 1px solid #d2d9e6;
   border-radius: 12px;
   display: flex;
   align-items: center;
@@ -40,13 +40,13 @@
 }
 .clientSearch svg {
   width: 18px;
-  color: #828996;
+  color: #666c79;
 }
 .clientSearch input {
   width: 100%;
   background: none;
   border: 0;
-  color: #fff;
+  color: #0f0f0f;
   outline: 0;
 }
 .clientGrid {
@@ -55,11 +55,11 @@
   gap: 14px;
 }
 .clientCard {
-  background: #171a21;
-  border: 1px solid #282d37;
+  background: #f6fbff;
+  border: 1px solid #d2d9e6;
   border-radius: 14px;
   padding: 16px;
-  color: #fff;
+  color: #0f0f0f;
   text-align: left;
   display: grid;
   grid-template-columns: 48px 1fr auto;
@@ -68,7 +68,7 @@
   cursor: pointer;
 }
 .clientCard:hover {
-  border-color: #25c77d;
+  border-color: #00a25b;
   transform: translateY(-1px);
 }
 .clientAvatar {
@@ -77,8 +77,8 @@
   border-radius: 13px;
   display: grid;
   place-items: center;
-  background: #163828;
-  color: #35dd91;
+  background: #d7fae6;
+  color: #007c3d;
   font-weight: 800;
 }
 .clientCard h3 {
@@ -87,7 +87,7 @@
 .clientCard p,
 .clientCard small {
   margin: 0;
-  color: #9299a5;
+  color: #575e69;
   display: flex;
   align-items: center;
   gap: 5px;
@@ -96,14 +96,14 @@
   width: 14px;
 }
 .clientCard strong {
-  color: #36d98d;
+  color: #007c3c;
 }
 .clientDetail {
   width: min(720px, calc(100vw - 24px));
   max-height: 90vh;
   overflow: auto;
-  background: #171a20;
-  border: 1px solid #2a3039;
+  background: #f6fbff;
+  border: 1px solid #ced6e1;
   border-radius: 20px;
   padding: 24px;
 }
@@ -118,14 +118,14 @@
   height: 56px;
 }
 .clientDetailHead small {
-  color: #31d487;
+  color: #007c3b;
 }
 .clientDetailHead h2 {
   margin: 3px 0;
 }
 .clientDetailHead p {
   margin: 0;
-  color: #939aa5;
+  color: #575d67;
   display: flex;
   gap: 6px;
   align-items: center;
@@ -135,9 +135,9 @@
 }
 .clientDetailHead > button {
   align-self: start;
-  background: #222730;
+  background: #eff6ff;
   border: 0;
-  color: #fff;
+  color: #0f0f0f;
   border-radius: 10px;
   padding: 9px;
 }
@@ -166,9 +166,9 @@
 }
 .clientPortalLink {
   flex: 1;
-  background: #1c2530;
+  background: #ecf8ff;
   border: 1px solid #2f7c55;
-  color: #35d98c;
+  color: #007c3b;
   border-radius: 11px;
   padding: 13px;
   font-weight: 800;
@@ -189,7 +189,7 @@
   transition: background 0.15s;
 }
 .clientHistoryRow:hover {
-  background: #1c2129;
+  background: #f1f9ff;
 }
 .clientStats {
   display: grid;
@@ -197,7 +197,7 @@
   gap: 12px;
 }
 .clientStats div {
-  background: #20242c;
+  background: #f1f7ff;
   border-radius: 12px;
   padding: 14px;
   display: flex;
@@ -213,7 +213,7 @@
   justify-content: space-between;
   gap: 18px;
   padding: 14px 0;
-  border-top: 1px solid #2a3039;
+  border-top: 1px solid #ced6e1;
 }
 .clientHistory article > div {
   display: flex;
@@ -221,13 +221,13 @@
   gap: 4px;
 }
 .clientHistory span {
-  color: #9299a5;
+  color: #575e69;
 }
 .clientHistory svg {
   width: 14px;
 }
 .clientHistory strong {
-  color: #35d98c;
+  color: #007c3b;
   text-align: right;
 }
 @media (max-width: 650px) {

@@ -5,7 +5,7 @@
   margin: -8px 0 16px;
 }
 .landedGrid > div {
-  background: #173755;
+  background: #daf3ff;
   border: 1px solid #31506e;
   border-radius: 13px;
   padding: 15px;
@@ -15,7 +15,7 @@
   font-size: 12px;
   font-weight: 800;
   letter-spacing: 1px;
-  color: #a9bbce;
+  color: #344353;
 }
 .landedGrid b {
   font: 800 28px Manrope;

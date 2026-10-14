@@ -76,7 +76,7 @@
   font-variant-numeric: tabular-nums;
 }
 .compareHead {
-  color: #c5ced8;
+  color: #2b3239;
   font-size: 12.5px;
   font-weight: 800;
   border-top: 0;
@@ -99,7 +99,7 @@
   height: 56px;
   border-radius: 9px;
   object-fit: contain;
-  background: #fff;
+  background: #ffffff;
   border: 1px solid var(--line);
 }
 .compareNoPhoto {
@@ -110,14 +110,14 @@
 }
 .compareTotal b {
   font-size: 18px;
-  color: #ff9a3c;
+  color: #a14400;
 }
 .compareRow.best {
-  background: #15201b;
+  background: #effef6;
   box-shadow: inset 3px 0 0 #3be090;
 }
 .compareRow.best .compareTotal b {
-  color: #3be090;
+  color: #007c3a;
 }
 .compareBest {
   display: inline-flex;
@@ -133,7 +133,7 @@
   white-space: nowrap;
 }
 .compareExtra {
-  color: #ff8a80;
+  color: #a53935;
 }
 
 .supplierCard > header {
@@ -149,8 +149,8 @@
   border-radius: 12px;
   display: grid;
   place-items: center;
-  background: #173629;
-  color: #3be090;
+  background: #d8fdeb;
+  color: #007c3a;
 }
 .supplierIcon svg {
   width: 22px;
@@ -179,7 +179,7 @@
   text-decoration: none;
 }
 .supplierNotes {
-  color: #c5ced8 !important;
+  color: #2b3239 !important;
 }
 .supplierActions {
   display: flex;
@@ -189,22 +189,22 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  border: 1px solid #343640;
+  border: 1px solid #c9cbd8;
   border-radius: 9px;
   background: transparent;
-  color: #eef2f5;
+  color: #141719;
   font-weight: 800;
   padding: 9px 12px;
   cursor: pointer;
 }
 .supplierActions button:first-child {
   border-color: #2d7c55;
-  color: #3be090;
+  color: #007c3a;
 }
 .supplierActions button.danger {
-  border-color: #6b2a26;
-  background: #2a1513;
-  color: #ff8a80;
+  border-color: #f9bdb6;
+  background: #fff2ee;
+  color: #a53935;
 }
 .supplierActions svg {
   width: 15px;
@@ -238,7 +238,7 @@
   height: 56px;
   border-radius: 9px;
   object-fit: contain;
-  background: #fff;
+  background: #ffffff;
 }
 .supplierProduct b {
   display: block;
@@ -306,17 +306,17 @@
   border: 2px dashed #2d7c55;
   border-radius: 14px;
   padding: 18px 20px;
-  background: #15201b;
+  background: #effef6;
   margin-bottom: 18px;
 }
 .photoDrop.over {
-  background: #173629;
-  border-color: #3be090;
+  background: #d8fdeb;
+  border-color: #00a458;
 }
 .photoDrop svg {
   width: 30px;
   height: 30px;
-  color: #3be090;
+  color: #007c3a;
   flex: none;
 }
 .photoDrop b {
@@ -349,7 +349,7 @@
   width: 100%;
   aspect-ratio: 1;
   object-fit: contain;
-  background: #fff;
+  background: #ffffff;
   border-radius: 8px;
   display: block;
 }
@@ -369,7 +369,7 @@
   width: 100%;
   max-height: 60vh;
   object-fit: contain;
-  background: #fff;
+  background: #ffffff;
   border-radius: 12px;
 }
 .photoViewer p {
@@ -381,10 +381,10 @@
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  border: 1px solid #6b2a26;
+  border: 1px solid #f9bdb6;
   border-radius: 9px;
-  background: #2a1513;
-  color: #ff8a80;
+  background: #fff2ee;
+  color: #a53935;
   font-weight: 800;
   padding: 10px 14px;
   cursor: pointer;
@@ -405,13 +405,13 @@
   text-align: center;
 }
 .rpPhoto small b {
-  color: #3be090;
+  color: #007c3a;
 }
 .rpGalleryButton {
-  border: 1px solid #343640;
+  border: 1px solid #c9cbd8;
   border-radius: 8px;
   background: transparent;
-  color: #eef2f5;
+  color: #141719;
   font-weight: 800;
   font-size: 12.5px;
   padding: 8px;
@@ -430,10 +430,10 @@
   margin-bottom: 10px;
 }
 .rpGallery > div:first-child button {
-  border: 1px solid #343640;
+  border: 1px solid #c9cbd8;
   border-radius: 8px;
   background: transparent;
-  color: #eef2f5;
+  color: #141719;
   padding: 5px 10px;
   cursor: pointer;
 }
@@ -447,13 +447,13 @@
 .rpGalleryGrid button {
   border: 1px solid var(--line);
   border-radius: 9px;
-  background: #fff;
+  background: #ffffff;
   padding: 0;
   cursor: pointer;
   overflow: hidden;
 }
 .rpGalleryGrid button:hover {
-  outline: 2px solid #3be090;
+  outline: 2px solid #00a458;
 }
 .rpGalleryGrid img {
   width: 100%;
@@ -487,7 +487,7 @@
   height: 100%;
   object-fit: contain;
   object-position: center;
-  background: #fff;
+  background: #ffffff;
 }
 
 /* Proveedor y categoría en la tarjeta del producto. */
@@ -505,20 +505,20 @@
   font-size: 12.5px;
 }
 .catalogTags b {
-  color: #fff;
+  color: #0f0f0f;
 }
 .catalogTags .supplierTag {
   border-color: #2d7c55;
-  background: #173629;
-  color: #9fe8c4;
+  background: #d8fdeb;
+  color: #297354;
 }
 .catalogTags .supplierTag.empty {
   border-color: #6b4a1a;
-  background: #2b1f0d;
-  color: #ffb866;
+  background: #fff5de;
+  color: #915200;
 }
 .catalogTags .supplierTag.empty b {
-  color: #ffb866;
+  color: #915200;
 }
 .catalogTags {
   margin-top: 8px;
@@ -592,13 +592,13 @@
   user-select: none;
 }
 .supplierProduct.picked {
-  border-color: #3be090;
-  background: #15201b;
+  border-color: #00a458;
+  background: #effef6;
 }
 .supplierCheck {
   width: 26px;
   height: 26px;
-  border: 2px solid #4a5160;
+  border: 2px solid #a5adbe;
   border-radius: 7px;
   display: grid;
   place-items: center;
@@ -607,17 +607,17 @@
 }
 .supplierProduct.picked .supplierCheck {
   background: #3be090;
-  border-color: #3be090;
+  border-color: #00a458;
 }
 .supplierEdit {
   display: inline-flex;
   align-items: center;
   gap: 5px;
   margin-top: 6px;
-  border: 1px solid #343640;
+  border: 1px solid #c9cbd8;
   border-radius: 8px;
   background: transparent;
-  color: #eef2f5;
+  color: #141719;
   font-weight: 800;
   font-size: 12.5px;
   padding: 5px 9px;
@@ -637,10 +637,10 @@
   gap: 10px;
   margin-top: 16px;
   padding: 12px 16px;
-  border: 1px solid #3be090;
+  border: 1px solid #00a458;
   border-radius: 14px;
-  background: #101a15;
-  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.55);
+  background: #f2fff8;
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.14);
 }
 .pickBar b {
   font: 800 16px Manrope;
@@ -659,9 +659,9 @@
   width: 16px;
 }
 .pickClear {
-  border: 1px solid #343640;
+  border: 1px solid #c9cbd8;
   background: transparent;
-  color: #eef2f5;
+  color: #141719;
 }
 .pickGo {
   border: 0;
@@ -682,8 +682,8 @@
 .catalogOpen {
   border: 1px solid #2d7c55;
   border-radius: 10px;
-  background: #173629;
-  color: #3be090;
+  background: #d8fdeb;
+  color: #007c3a;
   font: inherit;
   font-weight: 900;
   font-size: 15px;
@@ -695,15 +695,15 @@
   border-radius: 13px;
   padding: 12px;
   margin-bottom: 14px;
-  background: #121816;
+  background: #f6fefb;
 }
 .catalogPanel > input {
   width: 100%;
   height: 42px;
-  border: 1px solid #343640;
+  border: 1px solid #c9cbd8;
   border-radius: 9px;
   background: var(--field);
-  color: #fff;
+  color: #0f0f0f;
   font: inherit;
   font-size: 15px;
   padding: 0 12px;
@@ -731,14 +731,14 @@
 }
 .catalogPanelGrid button:hover,
 .catalogPanelGrid button.added {
-  border-color: #3be090;
+  border-color: #00a458;
 }
 .catalogPanelGrid img,
 .catalogPanelNoPhoto {
   width: 100%;
   aspect-ratio: 1;
   object-fit: contain;
-  background: #fff;
+  background: #ffffff;
   border-radius: 8px;
   display: block;
 }
@@ -777,10 +777,10 @@
   gap: 6px;
 }
 .rpNewCategory button {
-  border: 1px solid #343640;
+  border: 1px solid #c9cbd8;
   border-radius: 8px;
   background: transparent;
-  color: #eef2f5;
+  color: #141719;
   font-weight: 800;
   font-size: 12.5px;
   padding: 0 10px;
@@ -810,10 +810,10 @@
 }
 .marginSettings input {
   height: 44px;
-  border: 1px solid #343640;
+  border: 1px solid #c9cbd8;
   border-radius: 9px;
   background: var(--field);
-  color: #fff;
+  color: #0f0f0f;
   font: inherit;
   font-size: 16px;
   font-weight: 800;
@@ -853,7 +853,7 @@
   white-space: nowrap;
 }
 .marginSummary small {
-  color: #3be090;
+  color: #007c3a;
   font-weight: 800;
   font-size: 14px;
 }
@@ -881,7 +881,7 @@
 .marginHead {
   border-top: 0;
   background: var(--surface-2);
-  color: #c5ced8;
+  color: #2b3239;
   font-size: 12.5px;
   font-weight: 800;
 }
@@ -894,7 +894,7 @@
   height: 72px;
   border-radius: 10px;
   object-fit: contain;
-  background: #fff;
+  background: #ffffff;
   border: 1px solid var(--line);
 }
 .marginRow .compareNoPhoto {
@@ -914,18 +914,18 @@
   overflow-wrap: anywhere;
 }
 .marginCost b {
-  color: #ff9a3c;
+  color: #a14400;
   font-size: 18px;
 }
 .marginSale b {
-  color: #3be090;
+  color: #007c3a;
   font-size: 18px;
 }
 .marginGain b {
-  color: #3be090;
+  color: #007c3a;
 }
 .marginLoss b {
-  color: #ff6b5e;
+  color: #ac312a;
 }
 .marginRow b.marginPercent {
   font-size: 20px;
@@ -970,12 +970,12 @@
 .rpProfit {
   border: 1px solid #2d7c55;
   border-radius: 11px;
-  background: #173629;
+  background: #d8fdeb;
   padding: 10px 12px;
 }
 .rpProfit small {
   display: block;
-  color: #9fe8c4;
+  color: #297354;
   font-size: 11.5px;
   font-weight: 800;
   letter-spacing: 0.3px;
@@ -983,25 +983,25 @@
 }
 .rpProfit b {
   display: block;
-  color: #3be090;
+  color: #007c3a;
   font: 800 28px Manrope;
   font-variant-numeric: tabular-nums;
 }
 .rpProfit span {
   display: block;
-  color: #c5ced8;
+  color: #2b3239;
   font-size: 13px;
   line-height: 1.45;
 }
 .rpProfit.loss {
-  border-color: #6b2a26;
-  background: #2a1513;
+  border-color: #f9bdb6;
+  background: #fff2ee;
 }
 .rpProfit.loss small {
-  color: #ffb3ab;
+  color: #904d48;
 }
 .rpProfit.loss b {
-  color: #ff6b5e;
+  color: #ac312a;
 }
 
 /* Porcentajes de ganancia y WhatsApp del catálogo. */
@@ -1022,7 +1022,7 @@
   border: 1px solid #2d7c55;
   border-radius: 9px;
   background: transparent;
-  color: #3be090;
+  color: #007c3a;
   font: inherit;
   font-weight: 900;
   font-size: 15px;
@@ -1043,10 +1043,10 @@
 .rpPercents label input {
   width: 74px;
   height: 40px;
-  border: 1px solid #343640;
+  border: 1px solid #c9cbd8;
   border-radius: 9px;
   background: var(--field);
-  color: #fff;
+  color: #0f0f0f;
   font: inherit;
   font-size: 15px;
   padding: 0 8px;
@@ -1073,10 +1073,10 @@
 }
 .catalogWhatsapp input {
   height: 44px;
-  border: 1px solid #343640;
+  border: 1px solid #c9cbd8;
   border-radius: 9px;
   background: var(--field);
-  color: #fff;
+  color: #0f0f0f;
   font: inherit;
   font-size: 16px;
   padding: 0 12px;
@@ -1112,7 +1112,7 @@
 }
 .rpConditions > em {
   font-style: normal;
-  color: #ffb866;
+  color: #915200;
   font-size: 13px;
   font-weight: 700;
   line-height: 1.4;
@@ -1146,7 +1146,7 @@
   line-height: 1.5;
 }
 .rpFamily p b {
-  color: #fff;
+  color: #0f0f0f;
 }
 .rpFamily > div {
   display: grid;
@@ -1169,9 +1169,9 @@
   grid-template-columns: 1fr 1.3fr 0.8fr;
 }
 .catalogTags .modelTag {
-  border-color: #3b4a7a;
-  background: #1a2238;
-  color: #b9c6ee;
+  border-color: #bbccfd;
+  background: #eaf7ff;
+  color: #576285;
 }
 .catalogTags .modelTag.empty {
   border-color: var(--line);
@@ -1206,7 +1206,7 @@
   border-radius: 8px;
   overflow: hidden;
   border: 1px solid var(--line);
-  background: #fff;
+  background: #ffffff;
 }
 .rpMorePhotos img {
   width: 100%;
@@ -1223,8 +1223,8 @@
   height: 20px;
   border: 0;
   border-radius: 50%;
-  background: #2a1513;
-  color: #ff8a80;
+  background: #fff2ee;
+  color: #a53935;
   font-weight: 900;
   line-height: 1;
   cursor: pointer;
@@ -1234,7 +1234,7 @@
   place-items: center;
   background: transparent;
   border: 1px dashed #3b6450;
-  color: #3be090;
+  color: #007c3a;
   font-size: 24px;
   font-weight: 800;
   cursor: pointer;
@@ -1248,7 +1248,7 @@
   position: relative;
 }
 .rpGalleryGrid button.picked {
-  outline: 3px solid #3be090;
+  outline: 3px solid #00a458;
 }
 .rpGalleryGrid button em {
   position: absolute;
@@ -1369,7 +1369,7 @@
   font-size: 13px;
 }
 .catalogProductSummary .landedSummary strong {
-  color: #ff9a3c;
+  color: #a14400;
 }
 .catalogProductSummary.infoRow strong {
   font-size: 15.5px;
@@ -1418,7 +1418,7 @@
 .priceHead {
   border-top: 0;
   background: var(--surface-2);
-  color: #c5ced8;
+  color: #2b3239;
   font-size: 13px;
   font-weight: 800;
 }
@@ -1428,7 +1428,7 @@
   height: 110px;
   border-radius: 12px;
   object-fit: contain;
-  background: #fff;
+  background: #ffffff;
   border: 1px solid var(--line);
 }
 .priceRow .compareNoPhoto {
@@ -1440,12 +1440,12 @@
 }
 .priceRow strong {
   font: 800 26px Manrope;
-  color: #3be090;
+  color: #007c3a;
 }
 .priceRow em {
   font-style: normal;
   font: 800 20px Manrope;
-  color: #eef2f5;
+  color: #141719;
 }
 @media (max-width: 760px) {
   .priceRow {
@@ -1481,7 +1481,7 @@
   align-items: center;
   gap: 6px 14px;
   font-size: 14.5px;
-  color: #c5ced8;
+  color: #2b3239;
 }
 .priceHistoryTop > b {
   color: var(--lime);
@@ -1491,11 +1491,11 @@
   text-transform: uppercase;
 }
 .priceHistoryTop strong {
-  color: #fff;
+  color: #0f0f0f;
   font-size: 16px;
 }
 .priceHistoryTop s {
-  color: #8b96a3;
+  color: #58626e;
 }
 .priceHistory em {
   font-style: normal;
@@ -1503,17 +1503,17 @@
   margin-left: 6px;
 }
 .priceHistory em.up {
-  color: #ff8a80;
+  color: #a53935;
 }
 .priceHistory em.down {
-  color: #3be090;
+  color: #007c3a;
 }
 .priceHistoryTop button {
   margin-left: auto;
-  border: 1px solid #343640;
+  border: 1px solid #c9cbd8;
   border-radius: 8px;
   background: transparent;
-  color: #eef2f5;
+  color: #141719;
   font: inherit;
   font-weight: 800;
   font-size: 13px;
@@ -1540,7 +1540,7 @@
 .priceHistoryRow.head {
   border-top: 0;
   background: var(--surface-2);
-  color: #c5ced8;
+  color: #2b3239;
   font-size: 12px;
   font-weight: 800;
 }
@@ -1567,13 +1567,13 @@
   gap: 4px;
 }
 .priceHistoryTop strong.sale {
-  color: #3be090;
+  color: #007c3a;
 }
 .priceHistory em.saleUp {
-  color: #3be090;
+  color: #007c3a;
 }
 .priceHistory em.saleDown {
-  color: #ff8a80;
+  color: #a53935;
 }
 .priceRow {
   grid-template-columns: 110px minmax(0, 1fr) 150px 170px 190px;
@@ -1584,7 +1584,7 @@
   font-variant-numeric: tabular-nums;
 }
 .priceBefore s {
-  color: #8b96a3;
+  color: #58626e;
   font: 800 18px Manrope;
 }
 .priceBefore i {
@@ -1593,10 +1593,10 @@
   font-size: 14px;
 }
 .priceBefore i.up {
-  color: #3be090;
+  color: #007c3a;
 }
 .priceBefore i.down {
-  color: #ff8a80;
+  color: #a53935;
 }
 .priceBefore small {
   color: var(--muted);
@@ -1643,7 +1643,7 @@
 .priceHistoryRow b small {
   display: block;
   font: 600 12.5px Manrope;
-  color: #c5ced8;
+  color: #2b3239;
 }
 /* Pestaña Cambios de precio. */
 .chgSummary {
@@ -1661,18 +1661,18 @@
 .chgSummary span {
   display: block;
   font-size: 13px;
-  color: #c5ced8;
+  color: #2b3239;
 }
 .chgSummary strong {
   font: 800 26px Manrope;
 }
 .chgSummary .good,
 .chgCell i.good {
-  color: #3be090;
+  color: #007c3a;
 }
 .chgSummary .bad,
 .chgCell i.bad {
-  color: #ff8a80;
+  color: #a53935;
 }
 .chgFilters {
   display: flex;
@@ -1681,17 +1681,17 @@
   margin-bottom: 12px;
 }
 .chgFilters button {
-  border: 1px solid #343640;
+  border: 1px solid #c9cbd8;
   border-radius: 99px;
   background: transparent;
-  color: #eef2f5;
+  color: #141719;
   font: 800 14px Manrope;
   padding: 8px 16px;
   cursor: pointer;
 }
 .chgFilters button.active {
   background: #3be090;
-  border-color: #3be090;
+  border-color: #00a458;
   color: #07140e;
 }
 .chgTable {
@@ -1713,7 +1713,7 @@
 .chgHead {
   border-top: 0;
   background: var(--surface-2);
-  color: #c5ced8;
+  color: #2b3239;
   font-size: 13px;
   font-weight: 800;
 }
@@ -1723,7 +1723,7 @@
   height: 84px;
   border-radius: 10px;
   object-fit: contain;
-  background: #fff;
+  background: #ffffff;
   border: 1px solid var(--line);
 }
 .chgRow .compareNoPhoto {
@@ -1736,7 +1736,7 @@
 }
 .chgName small {
   font-size: 13.5px;
-  color: #c5ced8;
+  color: #2b3239;
 }
 .chgCell {
   display: flex;
@@ -1745,7 +1745,7 @@
   font-size: 14px;
 }
 .chgCell s {
-  color: #8b96a3;
+  color: #58626e;
   font-size: 13.5px;
 }
 .chgCell strong {
@@ -1753,17 +1753,17 @@
 }
 .chgCell small {
   font-size: 14px;
-  color: #eef2f5;
+  color: #141719;
 }
 .chgCell i {
   font-style: normal;
   font-weight: 800;
   font-size: 13.5px;
-  color: #8b96a3;
+  color: #58626e;
 }
 .chgCell.same strong {
   font-size: 17px;
-  color: #c5ced8;
+  color: #2b3239;
 }
 @media (max-width: 760px) {
   .chgSummary {

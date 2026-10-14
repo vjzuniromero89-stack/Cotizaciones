@@ -48,6 +48,7 @@ import CatalogPage from "./CatalogPage.jsx";
 import { authFetch, clearSession, getSession } from "./auth.js";
 import "./landed.css";
 import "./dark.css";
+import "./tema-claro.css";
 const money = (n) =>
   new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(
     n || 0,

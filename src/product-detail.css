@@ -53,16 +53,16 @@
   border-color: #27895c;
 }
 .productCosts .saleUnit span {
-  color: #d9ffea;
+  color: #4a6c5a;
 }
 .productCosts .saleUnit span small {
   display: block;
   margin-top: 3px;
-  color: #8de8b8;
+  color: #08764c;
   font-size: 11px;
 }
 .productCosts .saleUnit strong {
-  color: #fff;
+  color: #0f0f0f;
 }
 .unitPriceTable {
   overflow: hidden;
@@ -122,7 +122,7 @@
   margin-top: 3px;
 }
 .salePriceValue {
-  color: #16a464;
+  color: #007a3e;
   font-size: 17px;
 }
 .unitPriceNote {
@@ -236,14 +236,14 @@
   grid-template-columns: 1.2fr 50px 1.2fr 0.8fr 0.7fr 0.7fr;
 }
 .boxProductName {
-  color: #16a464;
+  color: #007a3e;
 }
 .linkedQuoteBoxes .boxRow {
   grid-template-columns: 1.2fr 55px 1.25fr 0.85fr;
   gap: 9px;
 }
 .linkedQuoteBoxes .boxRow > b {
-  color: #16a464;
+  color: #007a3e;
 }
 @media (max-width: 650px) {
   .linkedBoxes .productBoxRow {

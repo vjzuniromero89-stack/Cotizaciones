@@ -13,7 +13,7 @@
   background: #f7f9fc;
   border-radius: 20px;
   padding: 26px;
-  box-shadow: 0 30px 100px #0006;
+  box-shadow: 0 30px 100px rgba(0, 0, 0, 0.14);
 }
 .loadingDetail {
   min-height: 180px;
@@ -63,7 +63,7 @@
 .detailActions button,
 .editFooterActions > button:first-child {
   border: 1px solid var(--line);
-  background: #fff;
+  background: #ffffff;
   border-radius: 9px;
   padding: 9px 12px;
   font-weight: 700;
@@ -77,7 +77,7 @@
 }
 .detailActions .danger {
   color: #b42318;
-  border-color: #ffd0cc;
+  border-color: #a47a77;
 }
 .detailGrid {
   display: grid;
@@ -86,7 +86,7 @@
 }
 .detailCard,
 .detailSection {
-  background: #fff;
+  background: #ffffff;
   border: 1px solid var(--line);
   border-radius: 14px;
   padding: 17px;
@@ -154,7 +154,7 @@
   grid-column: 1/-1;
   border: 0;
   background: var(--navy);
-  color: #fff;
+  color: #0f0f0f;
   border-radius: 10px;
   padding: 13px;
   margin-top: 10px;
@@ -232,24 +232,24 @@
 .detailActions .clientQuoteButton {
   background: var(--navy);
   border-color: var(--navy);
-  color: #fff;
+  color: #0f0f0f;
 }
 .clientQuoteOverlay {
   position: fixed;
   inset: 0;
   z-index: 50;
-  background: #101c2dd9;
+  background: rgba(11, 22, 39, 0.298);
   overflow: auto;
   padding: 28px 16px;
 }
 .clientQuotePrint {
   width: min(820px, 100%);
   margin: auto;
-  background: #fff;
+  background: #ffffff;
   color: #122236;
   border-radius: 18px;
   padding: 38px;
-  box-shadow: 0 30px 90px #0007;
+  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.14);
 }
 .clientQuoteTools {
   display: flex;
@@ -259,7 +259,7 @@
 }
 .clientQuoteTools button {
   border: 1px solid #d5dee8;
-  background: #fff;
+  background: #ffffff;
   border-radius: 9px;
   padding: 10px 13px;
   font-weight: 800;
@@ -272,15 +272,15 @@
   width: 17px;
 }
 .clientQuoteTools .printQuote {
-  background: #123454;
-  color: #fff;
-  border-color: #123454;
+  background: #daf3ff;
+  color: #0f0f0f;
+  border-color: #acd2fa;
 }
 .clientQuoteHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 3px solid #c5ff35;
+  border-bottom: 3px solid #689900;
   padding-bottom: 24px;
 }
 .quoteBrand {
@@ -292,8 +292,8 @@
   width: 48px;
   height: 48px;
   border-radius: 13px;
-  background: #123454;
-  color: #c5ff35;
+  background: #daf3ff;
+  color: #4e7100;
   display: grid;
   place-items: center;
   font: 900 20px Manrope;
@@ -306,7 +306,7 @@
   font: 900 24px Manrope;
 }
 .quoteBrand small {
-  color: #617083;
+  color: #6d7c8f;
 }
 .quoteTitle {
   text-align: right;
@@ -318,7 +318,7 @@
 .quoteTitle small {
   font-weight: 900;
   letter-spacing: 2px;
-  color: #617083;
+  color: #6d7c8f;
 }
 .quoteTitle strong {
   font: 900 22px Manrope;
@@ -337,13 +337,13 @@
 .clientQuoteMeta small {
   font-weight: 900;
   letter-spacing: 1px;
-  color: #718095;
+  color: #68778c;
 }
 .clientQuoteMeta strong {
   font: 800 18px Manrope;
 }
 .clientQuoteMeta span {
-  color: #617083;
+  color: #6d7c8f;
 }
 .clientProductTable {
   border: 1px solid #dce3eb;
@@ -358,8 +358,8 @@
   padding: 13px 16px;
 }
 .clientProductHead {
-  background: #123454;
-  color: #fff;
+  background: #daf3ff;
+  color: #0f0f0f;
   font-weight: 800;
 }
 .clientProductRow {
@@ -400,7 +400,7 @@
 }
 .clientQuoteNotes p {
   margin: 5px 0 13px;
-  color: #516176;
+  color: #6b7c92;
 }
 .clientQuoteNotes p:last-child {
   margin-bottom: 0;
@@ -412,7 +412,7 @@
   border-top: 1px solid #dce3eb;
   margin-top: 32px;
   padding-top: 18px;
-  color: #617083;
+  color: #6d7c8f;
   font-size: 13px;
 }
 .clientQuotePrint footer b {
@@ -467,7 +467,7 @@
     position: absolute;
     inset: 0;
     padding: 0;
-    background: #fff;
+    background: #ffffff;
   }
   .clientQuotePrint {
     position: absolute;
@@ -498,7 +498,7 @@
   color: #17304b;
 }
 .clientPreviewMode .clientQuotePrint {
-  box-shadow: 0 22px 65px rgba(0, 0, 0, 0.32);
+  box-shadow: 0 22px 65px rgba(0, 0, 0, 0.14);
 }
 .clientPreviewMode .clientQuoteTools {
   padding-bottom: 14px;
@@ -521,12 +521,12 @@
 }
 .clientQuoteTools .clientDelete {
   color: #b42318;
-  border-color: #f5b7b1;
+  border-color: #ae7570;
   background: #fff4f3;
 }
 .clientQuoteTools .whatsappQuote {
   color: #128c53;
-  border-color: #bfe9d3;
+  border-color: #69917d;
   background: #eafff3;
 }
 .clientQuoteTools .whatsappQuote:disabled {
@@ -564,7 +564,7 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.3px;
-  color: rgba(255, 255, 255, 0.65);
+  color: rgba(15, 15, 15, 0.65);
 }
 .clientProductInfo {
   display: flex;
@@ -573,7 +573,7 @@
   min-width: 0;
 }
 .clientPackNote {
-  color: #7c8a9c;
+  color: #606e7f;
   font-size: 10.5px;
   font-weight: 600;
   overflow: hidden;
@@ -587,12 +587,12 @@
   min-width: 0;
 }
 .clientStack small {
-  color: #7c8a9c;
+  color: #606e7f;
   font-weight: 600;
 }
 .clientSubtotal {
   font-size: 14px;
-  color: #0e2947;
+  color: #142f4d;
 }
 .clientDualPrice {
   display: grid;
@@ -605,7 +605,7 @@
 .clientDualPrice b {
   font-size: 17px;
   font-weight: 900;
-  color: #0e2947;
+  color: #142f4d;
 }
 .clientDualPrice small {
   color: #3a5a12;
@@ -638,7 +638,7 @@
   display: grid;
   place-items: center;
   background: #e8edf3;
-  color: #617083;
+  color: #6d7c8f;
   text-align: center;
   font-size: 9px;
 }
@@ -649,7 +649,7 @@
   justify-content: flex-end;
 }
 .clientRowDelete {
-  border: 1px solid #efaaa3 !important;
+  border: 1px solid #b3726c !important;
   background: #fff4f3 !important;
   color: #b42318 !important;
 }
@@ -776,7 +776,7 @@
   margin-top: 24px;
 }
 .quoteUnifiedCard {
-  background: #fff;
+  background: #ffffff;
   border: 1px solid var(--line);
   border-radius: 16px;
   padding: 17px;
@@ -885,7 +885,7 @@
   white-space: nowrap;
 }
 .internalProductRow .salePriceValue {
-  color: #20bd72;
+  color: #007c38;
 }
 .internalShippingSummary {
   display: grid;
@@ -981,7 +981,7 @@
   border: 1px solid var(--line);
   border-radius: 9px;
   padding: 10px;
-  background: var(--field, #fff);
+  background: var(--field, #ffffff);
   color: inherit;
 }
 @media (max-width: 700px) {
@@ -1090,7 +1090,7 @@
   white-space: nowrap;
 }
 .allocationRow .salePriceValue {
-  color: #20bd72;
+  color: #007c38;
 }
 @media (max-width: 700px) {
   .allocationTitle {
@@ -1151,12 +1151,12 @@
 .internalOverview input,
 .internalOverview select {
   width: 100%;
-  border: 1px solid #343640;
+  border: 1px solid #c9cbd8;
   border-radius: 8px;
   padding: 8px 10px;
   font: 800 14px Manrope;
   background: var(--field);
-  color: #fff;
+  color: #0f0f0f;
 }
 .internalOverview span input {
   font: inherit;
@@ -1164,7 +1164,7 @@
   padding: 6px 9px;
 }
 .internalOverview input::placeholder {
-  color: #747b89;
+  color: #737a88;
 }
 .internalBlock {
   border: 1px solid var(--line);
@@ -1429,16 +1429,16 @@
 .cellInput {
   width: 100%;
   min-width: 0;
-  border: 1px solid #343640;
+  border: 1px solid #c9cbd8;
   border-radius: 6px;
   padding: 5px 6px;
   font: inherit;
   font-size: 12px;
   background: var(--field);
-  color: #fff;
+  color: #0f0f0f;
 }
 .cellInput::placeholder {
-  color: #747b89;
+  color: #737a88;
 }
 .cellInput:focus-visible {
   outline: 2px solid var(--blue, #1677ff);
@@ -1502,12 +1502,12 @@
   color: var(--muted);
 }
 .rateGridInline input {
-  border: 1px solid #343640;
+  border: 1px solid #c9cbd8;
   border-radius: 8px;
   padding: 8px 10px;
   font: inherit;
   background: var(--field);
-  color: #fff;
+  color: #0f0f0f;
 }
 .rateGridMinCbm {
   margin: 0 16px 16px;

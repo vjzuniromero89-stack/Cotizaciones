@@ -1,0 +1,18 @@
+/* Tema claro: ajustes finales que se cargan después de todas las hojas de estilo. */
+body {
+  background: #f3f5f8;
+  color: #17202b;
+}
+::selection {
+  background: #bfe8d2;
+  color: #173525;
+}
+.priceHistoryTop button {
+  white-space: nowrap;
+}
+.priceHistoryTop {
+  flex-wrap: wrap;
+}
+.priceHistoryTop button {
+  flex: none;
+}

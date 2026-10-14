@@ -1,7 +1,7 @@
 @import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap");
 :root {
-  --ink: #10243e;
-  --muted: #66758a;
+  --ink: #1a2e49;
+  --muted: #6c7c91;
   --navy: #0e2947;
   --blue: #1677ff;
   --cyan: #e9f5ff;
@@ -24,7 +24,7 @@ header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: #fff;
+  background: #ffffff;
   border-bottom: 1px solid var(--line);
   position: sticky;
   top: 0;
@@ -44,7 +44,7 @@ header {
 }
 .logo {
   background: var(--navy);
-  color: #fff;
+  color: #0f0f0f;
   padding: 10px;
   border-radius: 12px;
   display: flex;
@@ -55,7 +55,7 @@ header {
 .settings,
 .add {
   border: 1px solid var(--line);
-  background: #fff;
+  background: #ffffff;
   border-radius: 10px;
   padding: 11px 15px;
   font-weight: 700;
@@ -97,12 +97,12 @@ main {
 }
 .panel,
 .results {
-  background: #fff;
+  background: #ffffff;
   border: 1px solid var(--line);
   border-radius: 20px;
   padding: 28px;
   margin-bottom: 24px;
-  box-shadow: 0 12px 40px #183b5b0a;
+  box-shadow: 0 12px 40px rgba(176, 210, 244, 0.039);
 }
 .sectionTitle,
 .sectionTitle > div,
@@ -122,7 +122,7 @@ main {
   width: 34px;
   height: 34px;
   background: var(--navy);
-  color: #fff;
+  color: #0f0f0f;
   border-radius: 9px;
   font-weight: 800;
 }
@@ -164,7 +164,7 @@ main {
 .textBtn {
   border: 0;
   background: none;
-  color: #8b98a8;
+  color: #54606f;
   cursor: pointer;
 }
 .grid,
@@ -197,7 +197,7 @@ select {
   height: 43px;
   border: 1px solid #d5dee8;
   border-radius: 9px;
-  background: #fff;
+  background: #ffffff;
   padding: 0 10px;
   color: var(--ink);
   font: 600 14px inherit;
@@ -206,7 +206,7 @@ select {
 .field input:focus,
 select:focus {
   border-color: var(--blue);
-  box-shadow: 0 0 0 3px #1677ff16;
+  box-shadow: 0 0 0 3px rgba(22, 119, 255, 0.086);
 }
 .field em {
   position: absolute;
@@ -247,7 +247,7 @@ select:focus {
   height: 18px;
   top: 3px;
   left: 3px;
-  background: #fff;
+  background: #ffffff;
   border-radius: 50%;
   transition: 0.2s;
 }
@@ -259,7 +259,7 @@ select:focus {
 }
 .results {
   background: var(--navy);
-  color: #fff;
+  color: #0f0f0f;
 }
 .resultHead {
   justify-content: flex-start;
@@ -269,7 +269,7 @@ select:focus {
   color: var(--navy);
 }
 .resultHead p {
-  color: #a9bbce;
+  color: #344353;
 }
 .routeGrid {
   display: grid;
@@ -279,7 +279,7 @@ select:focus {
 }
 .route {
   position: relative;
-  background: #173755;
+  background: #daf3ff;
   border: 1px solid #31506e;
   border-radius: 16px;
   padding: 20px;
@@ -288,7 +288,7 @@ select:focus {
   gap: 14px;
 }
 .route.winner {
-  background: #fff;
+  background: #ffffff;
   color: var(--ink);
   border: 2px solid var(--lime);
 }
@@ -309,7 +309,7 @@ select:focus {
 .verdict small {
   font-weight: 800;
   letter-spacing: 1.5px;
-  color: #93a9bf;
+  color: #405367;
 }
 .route h3 {
   font: 700 16px Manrope;
@@ -349,14 +349,14 @@ select:focus {
 .route dl div {
   display: flex;
   justify-content: space-between;
-  border-top: 1px solid #ffffff18;
+  border-top: 1px solid rgba(255, 255, 255, 0.094);
   padding: 10px 0;
 }
 .winner dl div {
   border-color: var(--line);
 }
 dt {
-  color: #9fb0c1;
+  color: #3d4c5b;
   font-size: 13px;
 }
 dd {
@@ -394,7 +394,7 @@ dd {
 }
 .capacity {
   margin-top: 16px;
-  background: #173755;
+  background: #daf3ff;
   border-radius: 15px;
   padding: 20px;
 }
@@ -414,7 +414,7 @@ dd {
   width: 16px;
 }
 .bar {
-  background: #2d4d69;
+  background: #d9f4ff;
   height: 9px;
   border-radius: 9px;
   margin: 12px 0;
@@ -427,7 +427,7 @@ dd {
   border-radius: 9px;
 }
 .capacity p {
-  color: #c0cfdd;
+  color: #26323d;
   margin: 0;
   font-size: 14px;
   display: flex;
@@ -435,7 +435,7 @@ dd {
   align-items: flex-start;
 }
 .capacity p b {
-  color: #fff;
+  color: #0f0f0f;
 }
 footer {
   text-align: center;
@@ -498,7 +498,7 @@ footer {
 }
 .productCbmBreakdown {
   margin-top: 16px;
-  background: #173755;
+  background: #daf3ff;
   border: 1px solid #31506e;
   border-radius: 15px;
   padding: 20px;
@@ -518,7 +518,7 @@ footer {
   font: 800 17px Manrope;
 }
 .productCbmTitle small {
-  color: #9fb0c1;
+  color: #3d4c5b;
 }
 .productCbmTitle > strong {
   font: 800 20px Manrope;
@@ -543,8 +543,8 @@ footer {
   padding: 11px 13px;
 }
 .productCbmHead {
-  background: #102c47;
-  color: #9fb0c1;
+  background: #daf3ff;
+  color: #3d4c5b;
   font-size: 10px;
   font-weight: 900;
   text-transform: uppercase;
@@ -570,8 +570,8 @@ footer {
 .productCbmNoPhoto {
   display: grid;
   place-items: center;
-  background: #263f57;
-  color: #9fb0c1;
+  background: #d9f4ff;
+  color: #3d4c5b;
   font-size: 8px;
   text-align: center;
 }

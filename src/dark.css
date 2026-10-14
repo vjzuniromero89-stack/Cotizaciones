@@ -1,15 +1,15 @@
 :root {
-  --ink: #f7f8fb;
-  --muted: #9da3b0;
-  --navy: #121319;
-  --blue: #22c979;
-  --cyan: #15251e;
-  --lime: #22c979;
-  --paper: #0e0f14;
-  --line: #292b35;
-  --surface: #16171d;
-  --surface-2: #1b1d24;
-  --field: #101116;
+  --ink: #17202b;
+  --muted: #5b6472;
+  --navy: #ffffff;
+  --blue: #12864f;
+  --cyan: #e7f6ee;
+  --lime: #12864f;
+  --paper: #f3f5f8;
+  --line: #dfe4ea;
+  --surface: #ffffff;
+  --surface-2: #f6f8fa;
+  --field: #ffffff;
 }
 html {
   background: var(--paper);
@@ -17,31 +17,31 @@ html {
 }
 body {
   background:
-    radial-gradient(circle at 82% 0, #17231e 0, transparent 27%), var(--paper);
+    radial-gradient(circle at 82% 0, #edfdf6 0, transparent 27%), var(--paper);
   color: var(--ink);
 }
 #root > header {
-  background: #121319;
+  background: #fbfdff;
   border-color: var(--line);
-  box-shadow: 0 8px 26px #0005;
+  box-shadow: 0 8px 26px rgba(0, 0, 0, 0.14);
 }
 .brand b,
 .pageHead h1,
 .sectionTitle h2,
 .resultHead h2 {
-  color: #fff;
+  color: #0f0f0f;
 }
 .logo {
-  background: #20222a;
+  background: #f4f7ff;
   color: var(--lime);
-  border: 1px solid #30333d;
+  border: 1px solid #ccd0dd;
 }
 .mainNav button {
-  color: #a8adb8;
+  color: #474b55;
 }
 .mainNav button:hover {
-  background: #1b1d24;
-  color: #fff;
+  background: #f6f9ff;
+  color: #0f0f0f;
 }
 .mainNav button.active {
   background: var(--lime);
@@ -64,7 +64,7 @@ body {
   background: var(--surface);
   border-color: var(--line);
   color: var(--ink);
-  box-shadow: 0 14px 36px #0003;
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.14);
 }
 .box,
 .productRow,
@@ -81,18 +81,18 @@ body {
 }
 .sectionTitle span,
 .resultHead > span {
-  background: #24262e;
+  background: #f2f5ff;
   color: var(--lime);
-  border: 1px solid #343741;
+  border: 1px solid #c7cbd7;
 }
 .settings,
 .add,
 .detailActions button,
 .editFooter > button:first-child,
 .iconBtn {
-  background: #1b1d24;
-  border-color: #343640;
-  color: #f5f6f8;
+  background: #f6f9ff;
+  border-color: #c9cbd8;
+  color: #121314;
 }
 .settings:hover,
 .add:hover,
@@ -123,15 +123,15 @@ select,
 .search input,
 .purchaseSummary input {
   background: var(--field);
-  border-color: #343640;
-  color: #fff;
+  border-color: #c9cbd8;
+  color: #0f0f0f;
 }
 .field input::placeholder,
 .field textarea::placeholder,
 .productRow input::placeholder,
 .profitControls input::placeholder,
 .search input::placeholder {
-  color: #747b89;
+  color: #737a88;
 }
 .field input:focus,
 .field select:focus,
@@ -140,33 +140,33 @@ select:focus,
 .detailSection input:focus,
 .detailSection textarea:focus {
   border-color: var(--lime);
-  box-shadow: 0 0 0 3px #22c97922;
+  box-shadow: 0 0 0 3px rgba(34, 201, 121, 0.133);
   outline: 0;
 }
 option {
-  background: #15161c;
-  color: #fff;
+  background: #fafcff;
+  color: #0f0f0f;
 }
 .results {
-  background: #13151b;
+  background: #f9fcff;
 }
 .route,
 .landedGrid > div,
 .capacity {
-  background: #1b1d24;
-  border-color: #32353e;
+  background: #f6f9ff;
+  border-color: #caced9;
 }
 .route.winner {
-  background: #1a201d;
-  color: #fff;
+  background: #f3fbf7;
+  color: #0f0f0f;
   border-color: var(--lime);
 }
 .routeIcon {
-  background: #222831;
+  background: #eef6ff;
   color: var(--lime);
 }
 .routeIcon.ship {
-  background: #17271f;
+  background: #e8fdf2;
   color: var(--lime);
 }
 .route mark {
@@ -180,31 +180,31 @@ option {
 .winner .legs dt b,
 .winner .weightLeg b,
 .route.winner h3 {
-  color: #fff;
+  color: #0f0f0f;
 }
 .winner .weightCompare,
 .winner .weightLeg {
-  background: #15171c;
-  border-color: #30333b;
+  background: #f9fcff;
+  border-color: #ccd0db;
 }
 .routeTotal,
 .winner .routeTotal {
-  border-color: #ffffff24;
+  border-color: rgba(255, 255, 255, 0.141);
 }
 .verdict {
   background: linear-gradient(100deg, #176d47, #22c979);
   color: #fff;
 }
 .verdict small {
-  color: #d6ffea;
+  color: #486d5b;
 }
 .bulb {
-  background: #101611;
-  color: #fff;
+  background: #f7fff8;
+  color: #0f0f0f;
 }
 .bar,
 .profitBar {
-  background: #292c34;
+  background: #eff3fe;
 }
 .bar i,
 .profitBar i {
@@ -219,7 +219,7 @@ option {
   border-color: var(--line);
 }
 .record.clickable:hover {
-  background: #1b1d24;
+  background: #f6f9ff;
 }
 .record h3,
 .recordSide strong,
@@ -230,43 +230,43 @@ option {
 .detailTop h2,
 .detailCard > b,
 .detailSection h3 {
-  color: #fff;
+  color: #0f0f0f;
 }
 .orderDelete,
 .detailActions .danger,
 .removeProduct {
-  background: #2a191b;
-  border-color: #5a2a30;
-  color: #ff858d;
+  background: #fff2f4;
+  border-color: #f8bcc0;
+  color: #a73543;
 }
 .badge.returned {
-  background: #292c34;
-  color: #c9cdd5;
+  background: #eff3fe;
+  color: #2e3137;
 }
 .profitMain {
-  background: linear-gradient(135deg, #143928, #176d47);
-  box-shadow: 0 18px 42px #0004;
+  background: linear-gradient(135deg, #d7fae6, #176d47);
+  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.14);
 }
 .profitMetric i {
-  background: #183326;
+  background: #dcfdeb;
   color: var(--lime);
 }
 .profitFilters button.active {
-  background: #292c34;
-  color: #fff;
+  background: #eff3fe;
+  color: #0f0f0f;
   box-shadow: none;
 }
 .profitControls > label {
   background: var(--field);
-  border-color: #343640;
+  border-color: #c9cbd8;
 }
 .profitRecord:hover {
   border-color: #31875e;
-  box-shadow: 0 10px 30px #0003;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.14);
 }
 .profitAmount strong,
 .profitAmount span {
-  color: #47dc91;
+  color: #007c3b;
 }
 .profitRecordTop,
 .profitAmount,
@@ -274,8 +274,8 @@ option {
   color: var(--ink);
 }
 .photoPicker {
-  background: #121419;
-  border-color: #3c434d;
+  background: #fafdff;
+  border-color: #b6beca;
   color: var(--lime);
 }
 .photoPicker span {
@@ -285,7 +285,7 @@ option {
   border-color: var(--lime);
 }
 .noPhoto {
-  background: #23252c;
+  background: #f3f6ff;
   color: var(--muted);
 }
 .productCosts .unitCost {
@@ -293,50 +293,50 @@ option {
   color: #fff;
 }
 .productCosts .unitCost span {
-  color: #d6ffea;
+  color: #486d5b;
 }
 .chosenRoute {
   color: var(--lime);
 }
 .costBreakdown .selectedCost {
-  background: #20232a;
-  color: #fff;
-  border: 1px solid #343741;
+  background: #f3f7ff;
+  color: #0f0f0f;
+  border: 1px solid #c7cbd7;
 }
 .productCosts .saleUnit {
   background: linear-gradient(135deg, #176d47, #1a8b58);
   border-color: #2ab878;
 }
 .productCosts .saleUnit span {
-  color: #d9ffea;
+  color: #4a6c5a;
 }
 .productCosts .saleUnit span small {
-  color: #8de8b8;
+  color: #08764c;
 }
 .boxRow.head {
-  color: #b4bac5;
+  color: #3c414a;
 }
 .dialogTotal {
-  background: #1b2a23;
+  background: #e8fbf2;
 }
 .overlay {
-  background: #07080bdb;
+  background: rgba(21, 22, 25, 0.301);
 }
 .unitPriceTable {
   border-color: var(--line);
 }
 .unitPriceHead {
-  background: #20232a;
-  color: #aeb5c0;
+  background: #f3f7ff;
+  color: #3f454e;
 }
 .unitPriceRow + .unitPriceRow {
   border-color: var(--line);
 }
 .unitPriceRow > strong {
-  color: #fff;
+  color: #0f0f0f;
 }
 .unitPriceRow > .salePriceValue {
-  color: #28d681;
+  color: #007c37;
 }
 .productCargoCard,
 .productBoxEditor {
@@ -344,7 +344,7 @@ option {
   border-color: var(--line);
 }
 .productCargoHead {
-  background: #20232a;
+  background: #f3f7ff;
   border-color: var(--line);
 }
 .productInfoRow {
@@ -353,8 +353,8 @@ option {
 .productBoxEditor input,
 .productBoxEditor select {
   background: var(--field);
-  border-color: #343640;
-  color: #fff;
+  border-color: #c9cbd8;
+  color: #0f0f0f;
 }
 .addCompleteProduct {
   background: linear-gradient(135deg, #148d58, #1fc978);
@@ -362,23 +362,23 @@ option {
 }
 .boxProductName,
 .linkedQuoteBoxes .boxRow > b {
-  color: #28d681;
+  color: #007c37;
 }
 .clientQuotePrint {
   color: #122236;
   color-scheme: light;
 }
 .clientQuotePrint .clientQuoteTools button {
-  background: #fff;
+  background: #ffffff;
   border-color: #d5dee8;
   color: #122236;
 }
 .clientQuotePrint .clientQuoteTools .printQuote {
-  background: #123454;
-  color: #fff;
+  background: #daf3ff;
+  color: #0f0f0f;
 }
 .clientQuotePrint footer {
-  background: #fff;
+  background: #ffffff;
 }
 .clientQuotePrint .clientProductRow,
 .clientQuotePrint .clientQuoteSummary > div {
@@ -400,7 +400,7 @@ option {
 .quoteUnifiedCard .savedProducts b,
 .quoteUnifiedCard .savedProducts strong,
 .quoteUnifiedCard .costBreakdown b {
-  color: #fff;
+  color: #0f0f0f;
 }
 .quoteUnifiedCard .savedProducts > div {
   background: var(--surface-2);
@@ -415,8 +415,8 @@ option {
   color: var(--ink);
 }
 .quoteUnifiedCard .detailGroupLabel > span {
-  background: #173629;
-  color: #3be090;
+  background: #d8fdeb;
+  color: #007c3a;
 }
 .quoteUnifiedCard .detailGrid,
 .quoteUnifiedCard .detailSection + .detailSection,
@@ -441,14 +441,14 @@ option {
 .internalTotalsSummary b,
 .internalTotalsSummary strong,
 .internalNotes h3 {
-  color: #fff;
+  color: #0f0f0f;
 }
 .internalTotalsSummary .internalUnitTotal {
   background: #176d47;
   color: #d9ffea;
 }
 .internalTotalsSummary .internalUnitTotal strong {
-  color: #fff;
+  color: #0f0f0f;
 }
 .productAllocationSection,
 .allocationTable,
@@ -460,14 +460,14 @@ option {
 }
 .allocationTitle b,
 .allocationRow b {
-  color: #fff;
+  color: #0f0f0f;
 }
 .allocationRow .salePriceValue {
-  color: #28d681;
+  color: #007c37;
 }
 @media (max-width: 700px) {
   #root > header {
-    background: #121319;
+    background: #fbfdff;
   }
   .mainNav {
     border-top: 1px solid var(--line);
@@ -477,15 +477,15 @@ option {
   background: var(--surface);
   border-color: var(--line);
   color: var(--ink);
-  box-shadow: 0 14px 36px #0003;
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.14);
 }
 .quoteClientGrid input,
 .quoteFull input,
 .quoteFull textarea,
 .saleRow input {
   background: var(--field);
-  border-color: #343640;
-  color: #fff;
+  border-color: #c9cbd8;
+  color: #0f0f0f;
 }
 .saleItems,
 .saleRow,
@@ -498,20 +498,20 @@ option {
   color: var(--ink);
 }
 .productCbmBreakdown {
-  background: #1b1d24;
-  border-color: #32353e;
+  background: #f6f9ff;
+  border-color: #caced9;
 }
 .productCbmTable,
 .productCbmRow,
 .productCbmNote {
-  border-color: #32353e;
+  border-color: #caced9;
 }
 .productCbmHead {
-  background: #15171c;
+  background: #f9fcff;
 }
 .productCbmRow strong,
 .productCbmTitle > strong {
-  color: #47dc91;
+  color: #007c3b;
 }
 .internalOverview,
 .internalOverview > div,
@@ -537,14 +537,14 @@ option {
 .quoteTotalStrip strong,
 .economicsList b,
 .economicsList strong {
-  color: #fff;
+  color: #0f0f0f;
 }
 .saleResult {
-  background: #173629;
+  background: #d8fdeb;
 }
 .internalBlock > header span {
-  background: #173629;
-  color: #3be090;
+  background: #d8fdeb;
+  color: #007c3a;
 }
 .calculatorProductPricing article {
   border-color: var(--line);
@@ -554,14 +554,14 @@ option {
   background: var(--surface-2);
 }
 .pricingSale {
-  background: #173629;
+  background: #d8fdeb;
 }
 .pricingSale > div {
   background: var(--field);
   border-color: #2d7c55;
 }
 .pricingSale input {
-  color: #fff;
+  color: #0f0f0f;
 }
 .combinedProductHead,
 .productLandedTotal,
@@ -572,16 +572,16 @@ option {
   border-color: var(--line);
 }
 .inlineSale {
-  background: #173629;
+  background: #d8fdeb;
 }
 .inlineSale b {
-  color: #3be090;
+  color: #007c3a;
 }
 .productLandedTotal {
-  color: #fff;
+  color: #0f0f0f;
 }
 .calculatorProductPricing em {
-  color: #3be090;
+  color: #007c3a;
 }
 /* Fotos de producto: siempre completas, sin recortar, sobre fondo blanco. */
 .photoPicker img,
@@ -600,7 +600,7 @@ img.clientProductPhoto,
 .catalogDetailHero > img,
 .productCbmRow img {
   object-fit: contain;
-  background: #fff;
+  background: #ffffff;
 }
 @media (min-width: 761px) {
   .recordProductThumb {
@@ -733,26 +733,26 @@ img.clientProductPhoto,
   color: var(--muted);
 }
 .inlineCost {
-  background: #3a2410;
+  background: #ffead2;
   border: 1px solid #b8641a;
 }
 .inlineCost small,
 .inlineCost b,
 .inlineCost em {
-  color: #ff9a3c;
+  color: #a14400;
 }
 .inlineSale {
   border: 1px solid #2d7c55;
 }
 .inlineSale small,
 .inlineSale em {
-  color: #3be090;
+  color: #007c3a;
 }
 .inlineProfit.positive em {
-  color: #3be090;
+  color: #007c3a;
 }
 .inlineProfit.negative em {
-  color: #ff6b5e;
+  color: #ac312a;
 }
 @media (max-width: 900px) {
   .combinedProductRow {
@@ -767,10 +767,10 @@ img.clientProductPhoto,
   }
 }
 .inlineProfit.positive b {
-  color: #3be090;
+  color: #007c3a;
 }
 .inlineProfit.negative b {
-  color: #ff6b5e;
+  color: #ac312a;
 }
 .combinedProductRow > .productStat .cellInput {
   min-width: 0;
@@ -849,9 +849,9 @@ body {
 }
 /* Botón eliminar igual en todas las listas. */
 .clientRowDelete {
-  border: 1px solid #6b2a26 !important;
-  background: #2a1513 !important;
-  color: #ff8a80 !important;
+  border: 1px solid #f9bdb6 !important;
+  background: #fff2ee !important;
+  color: #a53935 !important;
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -905,10 +905,10 @@ body {
   width: 100%;
   min-width: 0;
   height: 36px;
-  border: 1px solid #343640;
+  border: 1px solid #c9cbd8;
   border-radius: 7px;
   background: var(--field);
-  color: #fff;
+  color: #0f0f0f;
   font: inherit;
   font-size: 13px;
   padding: 0 6px;
@@ -965,17 +965,17 @@ body {
   font-size: 10.5px;
 }
 .qtCost b {
-  color: #ff9a3c;
+  color: #a14400;
 }
 .qtRemove {
   width: 30px;
   height: 30px;
   display: grid;
   place-items: center;
-  border: 1px solid #6b2a26;
+  border: 1px solid #f9bdb6;
   border-radius: 8px;
-  background: #2a1513;
-  color: #ff8a80;
+  background: #fff2ee;
+  color: #a53935;
   cursor: pointer;
   padding: 0;
 }
@@ -1079,7 +1079,7 @@ body {
   border: 0;
   background: none;
   padding: 0;
-  color: #ff9a3c;
+  color: #a14400;
   font-size: 10.5px;
   font-weight: 800;
   text-align: right;
@@ -1120,10 +1120,10 @@ body {
   width: 100%;
   min-width: 0;
   height: 40px;
-  border: 1px solid #343640;
+  border: 1px solid #c9cbd8;
   border-radius: 8px;
   background: var(--field);
-  color: #fff;
+  color: #0f0f0f;
   font: inherit;
   padding: 0 10px;
 }
@@ -1162,14 +1162,14 @@ body {
   margin-top: 10px;
 }
 .rpCalc div {
-  background: #173629;
+  background: #d8fdeb;
   border: 1px solid #2d7c55;
   border-radius: 10px;
   padding: 9px 11px;
 }
 .rpCalc span {
   display: block;
-  color: #3be090;
+  color: #007c3a;
   font-size: 10.5px;
   font-weight: 800;
   letter-spacing: 0.5px;
@@ -1224,7 +1224,7 @@ main:has(.qtTable) {
     align-items: end;
     padding-top: 12px;
     padding-bottom: 10px;
-    color: #c5ced8;
+    color: #2b3239;
     font-size: 12.5px;
     font-weight: 800;
     letter-spacing: 0;
@@ -1245,7 +1245,7 @@ main:has(.qtTable) {
     font-style: normal;
     padding-bottom: 4px;
     margin-bottom: 4px;
-    border-bottom: 1px solid #3a3e49;
+    border-bottom: 1px solid #bdc2d0;
   }
   .qtHeadGroup i {
     display: grid;
@@ -1259,7 +1259,7 @@ main:has(.qtTable) {
   .qtHeadGroup b {
     font-size: 11.5px;
     font-weight: 700;
-    color: #9aa5b1;
+    color: #4b545f;
   }
   .qtRow input,
   .qtRow select {
@@ -1341,7 +1341,7 @@ main:has(.qtTable) {
   border-color: #2d7c55;
 }
 .rpSale em {
-  color: #3be090;
+  color: #007c3a;
 }
 .catalogProductSummary {
   grid-template-columns: repeat(7, minmax(0, 1fr));
@@ -1354,7 +1354,7 @@ main:has(.qtTable) {
 }
 .catalogProductSummary .saleSummary strong,
 .catalogProductSummary .saleSummary small {
-  color: #3be090;
+  color: #007c3a;
 }
 @media (max-width: 900px) {
   .catalogProductSummary {
@@ -1365,7 +1365,7 @@ main:has(.qtTable) {
 .rpField > span i {
   font-style: normal;
   font-weight: 700;
-  color: #6f7a86;
+  color: #717c88;
   margin-left: 4px;
 }
 .rpDescription {
@@ -1375,10 +1375,10 @@ main:has(.qtTable) {
   width: 100%;
   min-height: 104px;
   resize: vertical;
-  border: 1px solid #343640;
+  border: 1px solid #c9cbd8;
   border-radius: 8px;
   background: var(--field);
-  color: #fff;
+  color: #0f0f0f;
   font: inherit;
   line-height: 1.5;
   padding: 10px;
@@ -1387,7 +1387,7 @@ main:has(.qtTable) {
   margin: 0;
   padding: 12px 14px;
   border-top: 1px solid var(--line);
-  color: #c5ced8;
+  color: #2b3239;
   font-size: 13.5px;
   line-height: 1.55;
   white-space: pre-line;
@@ -1412,7 +1412,7 @@ main:has(.qtTable) {
   font-style: normal;
   font-weight: 700;
   font-size: 12px;
-  color: #6f7a86;
+  color: #717c88;
   margin-left: 4px;
 }
 .rpSpecsGrid {
@@ -1452,12 +1452,12 @@ main:has(.qtTable) {
 }
 .catalogSpecs dd {
   margin: 0;
-  color: #fff;
+  color: #0f0f0f;
   font-weight: 700;
 }
 .catalogSpecs p {
   margin: 8px 0 0;
-  color: #c5ced8;
+  color: #2b3239;
   font-size: 14px;
   line-height: 1.5;
   white-space: pre-line;
@@ -1478,10 +1478,10 @@ main:has(.qtTable) {
   width: 100%;
   min-width: 0;
   margin-top: 4px;
-  border: 1px solid #343640;
+  border: 1px solid #c9cbd8;
   border-radius: 7px;
   background: var(--field);
-  color: #fff;
+  color: #0f0f0f;
   font: inherit;
   font-size: 13.5px;
   line-height: 1.35;
@@ -1492,10 +1492,10 @@ main:has(.qtTable) {
 .quoteDetailText {
   margin: 6px 0 0;
   padding: 7px 10px;
-  border-left: 3px solid #3be090;
+  border-left: 3px solid #00a458;
   background: var(--surface-2);
   border-radius: 0 8px 8px 0;
-  color: #eef2f5;
+  color: #141719;
   font-size: 14px;
   line-height: 1.45;
   white-space: pre-line;
@@ -1536,27 +1536,27 @@ textarea.quoteDetailInput {
   display: block;
   font-size: 13px;
   font-weight: 700;
-  color: #c5ced8;
+  color: #2b3239;
 }
 .lpCost {
-  background: #3a2410;
+  background: #ffead2;
   border-color: #b8641a !important;
 }
 .lpCost b,
 .lpCost small {
-  color: #ff9a3c;
+  color: #a14400;
 }
 .lpSale {
-  background: #173629;
+  background: #d8fdeb;
   border-color: #2d7c55 !important;
 }
 .lpSale b,
 .lpSale small,
 .lpGain b {
-  color: #3be090;
+  color: #007c3a;
 }
 .lpLoss b {
-  color: #ff6b5e;
+  color: #ac312a;
 }
 @media (min-width: 850px) {
   .productPanel > .liveProductPricing,
@@ -1607,9 +1607,9 @@ textarea.quoteDetailInput {
   cursor: pointer;
 }
 .productEditBar button {
-  border: 1px solid #6b2a26;
-  background: #2a1513;
-  color: #ff8a80;
+  border: 1px solid #f9bdb6;
+  background: #fff2ee;
+  color: #a53935;
 }
 .productEditBar button:disabled {
   opacity: 0.35;
@@ -1623,13 +1623,13 @@ textarea.quoteDetailInput {
 .addQuoteProduct {
   margin: 4px 16px 12px;
   border: 1px solid #2d7c55;
-  background: #173629;
-  color: #3be090;
+  background: #d8fdeb;
+  color: #007c3a;
 }
 .clientQuoteTools .clientEdit {
-  background: #1d2b4f;
-  border-color: #1d2b4f;
-  color: #fff;
+  background: #e2f0ff;
+  border-color: #b9cdfc;
+  color: #0f0f0f;
 }
 /* Barra para agregar productos al editar una cotización. */
 .addQuoteBar {
@@ -1641,7 +1641,7 @@ textarea.quoteDetailInput {
   padding: 14px 16px;
   border: 2px dashed #2d7c55;
   border-radius: 13px;
-  background: #121816;
+  background: #f6fefb;
 }
 .addQuoteBar b {
   font: 800 16px Manrope;
@@ -1652,13 +1652,13 @@ textarea.quoteDetailInput {
   font-size: 15px;
   padding: 12px 16px;
   background: #3be090;
-  border-color: #3be090;
+  border-color: #00a458;
   color: #07140e;
 }
 .addQuoteBar .addQuoteProduct.plain {
   background: transparent;
-  border-color: #343640;
-  color: #eef2f5;
+  border-color: #c9cbd8;
+  color: #141719;
 }
 .quoteEditPicker {
   margin: 0 16px 14px;
@@ -1674,7 +1674,7 @@ textarea.quoteDetailInput {
   border: 1px solid #2d7c55;
   border-radius: 9px;
   background: var(--field);
-  color: #fff;
+  color: #0f0f0f;
   font: inherit;
   font-size: 15px;
   padding: 0 12px;
@@ -1697,8 +1697,8 @@ textarea.quoteDetailInput {
   gap: 6px;
   border: 1px solid #2d7c55;
   border-radius: 10px;
-  background: #173629;
-  color: #3be090;
+  background: #d8fdeb;
+  color: #007c3a;
   font-weight: 900;
   padding: 11px 15px;
   cursor: pointer;
@@ -1713,7 +1713,7 @@ textarea.quoteDetailInput {
   align-items: end;
   border: 1px solid #2d7c55;
   border-radius: 13px;
-  background: #121816;
+  background: #f6fefb;
   padding: 14px;
   margin-bottom: 16px;
 }
@@ -1728,20 +1728,20 @@ textarea.quoteDetailInput {
 }
 .addClientForm input {
   height: 44px;
-  border: 1px solid #343640;
+  border: 1px solid #c9cbd8;
   border-radius: 9px;
   background: var(--field);
-  color: #fff;
+  color: #0f0f0f;
   font: inherit;
   font-size: 15px;
   padding: 0 12px;
 }
 .addClientForm > button[type="button"] {
   height: 44px;
-  border: 1px solid #343640;
+  border: 1px solid #c9cbd8;
   border-radius: 10px;
   background: transparent;
-  color: #eef2f5;
+  color: #141719;
   font-weight: 800;
   padding: 0 14px;
   cursor: pointer;
@@ -1749,13 +1749,13 @@ textarea.quoteDetailInput {
 .addClientForm p {
   grid-column: 1/-1;
   margin: 0;
-  color: #ff8a80;
+  color: #a53935;
 }
 .clientRemove {
-  border: 1px solid #6b2a26;
+  border: 1px solid #f9bdb6;
   border-radius: 8px;
-  background: #2a1513;
-  color: #ff8a80;
+  background: #fff2ee;
+  color: #a53935;
   font-size: 12.5px;
   font-weight: 800;
   padding: 6px 10px;
@@ -1777,7 +1777,7 @@ a.addClientButton {
   background: var(--surface);
   padding: 16px;
   margin: 14px 0;
-  color: #eef2f5;
+  color: #141719;
   text-align: left;
 }
 .payPanel > header {
@@ -1794,25 +1794,25 @@ a.addClientButton {
 .payPanel h3 {
   margin: 0;
   font: 800 18px Manrope;
-  color: #fff;
+  color: #0f0f0f;
 }
 .payBadge {
   border-radius: 99px;
   padding: 5px 12px;
   font-size: 13px;
   font-weight: 800;
-  background: #2b1f0d;
-  color: #ffb866;
+  background: #fff5de;
+  color: #915200;
   border: 1px solid #6b4a1a;
 }
 .payBadge.part {
-  background: #1a2238;
-  color: #b9c6ee;
-  border-color: #3b4a7a;
+  background: #eaf7ff;
+  color: #576285;
+  border-color: #bbccfd;
 }
 .payBadge.done {
-  background: #173629;
-  color: #3be090;
+  background: #d8fdeb;
+  color: #007c3a;
   border-color: #2d7c55;
 }
 .payFigures {
@@ -1836,35 +1836,35 @@ a.addClientButton {
 .payFigures b {
   display: block;
   font: 800 21px Manrope;
-  color: #fff;
+  color: #0f0f0f;
 }
 .payFigures span {
   display: block;
-  color: #c5ced8;
+  color: #2b3239;
   font-size: 13px;
 }
 .payFigures small input {
   width: 56px;
   height: 28px;
-  border: 1px solid #343640;
+  border: 1px solid #c9cbd8;
   border-radius: 7px;
   background: var(--field);
-  color: #fff;
+  color: #0f0f0f;
   font: inherit;
   text-align: center;
 }
 .payDeposit b {
-  color: #ffb866;
+  color: #915200;
 }
 .payPaid b {
-  color: #3be090;
+  color: #007c3a;
 }
 .payBalance {
   border-color: #b8641a !important;
-  background: #3a2410 !important;
+  background: #ffead2 !important;
 }
 .payBalance b {
-  color: #ff9a3c;
+  color: #a14400;
 }
 .payQuick {
   display: flex;
@@ -1909,10 +1909,10 @@ a.addClientButton {
 }
 .payAdd input {
   height: 44px;
-  border: 1px solid #343640;
+  border: 1px solid #c9cbd8;
   border-radius: 9px;
   background: var(--field);
-  color: #fff;
+  color: #0f0f0f;
   font: inherit;
   font-size: 15px;
   padding: 0 10px;
@@ -1922,12 +1922,12 @@ a.addClientButton {
 .payAdd > button {
   background: transparent;
   border: 1px solid #2d7c55;
-  color: #3be090;
+  color: #007c3a;
   height: 44px;
   padding: 0 14px;
 }
 .payError {
-  color: #ff8a80;
+  color: #a53935;
   margin: 10px 0 0;
 }
 .payList {
@@ -1946,11 +1946,11 @@ a.addClientButton {
   border-radius: 10px;
   padding: 8px 10px 8px 12px;
   font-size: 14px;
-  color: #c5ced8;
+  color: #2b3239;
   font-variant-numeric: tabular-nums;
 }
 .payList li b {
-  color: #3be090;
+  color: #007c3a;
   font: 800 15.5px Manrope;
 }
 .payList li button {
@@ -1958,10 +1958,10 @@ a.addClientButton {
   height: 32px;
   display: grid;
   place-items: center;
-  border: 1px solid #6b2a26;
+  border: 1px solid #f9bdb6;
   border-radius: 8px;
-  background: #2a1513;
-  color: #ff8a80;
+  background: #fff2ee;
+  color: #a53935;
   cursor: pointer;
   padding: 0;
 }
@@ -1974,18 +1974,18 @@ a.addClientButton {
 }
 .clientQuotePrint .clientQuoteTools.payHolder button {
   background: #3be090;
-  border-color: #3be090;
+  border-color: #00a458;
   color: #07140e;
 }
 .clientQuotePrint .clientQuoteTools.payHolder .payAdd > button {
   background: transparent;
   border-color: #2d7c55;
-  color: #3be090;
+  color: #007c3a;
 }
 .clientQuotePrint .clientQuoteTools.payHolder .payList li button {
-  background: #2a1513;
-  border-color: #6b2a26;
-  color: #ff8a80;
+  background: #fff2ee;
+  border-color: #f9bdb6;
+  color: #a53935;
 }
 .clientQuoteTools .clientPay {
   background: #1faa59;
@@ -2044,7 +2044,7 @@ a.addClientButton {
   justify-content: center;
   gap: 6px;
   padding: 8px max(16px, calc((100% - 1180px) / 2));
-  background: #15171d;
+  background: #f9fcff;
   border-bottom: 1px solid var(--line);
   overflow-x: auto;
 }
@@ -2055,7 +2055,7 @@ a.addClientButton {
   border: 1px solid transparent;
   border-radius: 99px;
   background: transparent;
-  color: #b8c2cc;
+  color: #343c44;
   font: inherit;
   font-size: 14.5px;
   font-weight: 700;
@@ -2064,12 +2064,12 @@ a.addClientButton {
   white-space: nowrap;
 }
 .subNav button:hover {
-  color: #fff;
+  color: #0f0f0f;
 }
 .subNav button.active {
-  background: #173629;
+  background: #d8fdeb;
   border-color: #2d7c55;
-  color: #3be090;
+  color: #007c3a;
 }
 .subNav svg {
   width: 16px;
