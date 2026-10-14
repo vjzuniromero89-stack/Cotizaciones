@@ -128,3 +128,32 @@ describe("costo estimado para comparar proveedores", () => {
     expect(estimateLandedUnit({ price: 1, box: { ...box, unitsPerBox: "" } })).toBe(null);
   });
 });
+import { nextPriceHistory } from "./specs.js";
+describe("historial de precios", () => {
+  const product = {
+    unit_price: 1.6,
+    updated_at: "2026-10-01T10:00:00Z",
+    boxes: [{ info: { salePrice: 6.5, supplier: "donna Sera" } }],
+  };
+  it("guarda el precio anterior y el nuevo al primer cambio", () => {
+    const h = nextPriceHistory(product, 1.95, 6.5, "donna Sera");
+    expect(h.length).toBe(2);
+    expect(h[0]).toMatchObject({ date: "2026-10-01", price: 1.6, salePrice: 6.5 });
+    expect(h[1]).toMatchObject({ price: 1.95, salePrice: 6.5 });
+  });
+  it("no agrega renglón si el precio no cambió", () => {
+    const h = nextPriceHistory(product, 1.6, 6.5, "donna Sera");
+    expect(h.length).toBe(1);
+  });
+  it("sigue sumando sobre un historial que ya existe", () => {
+    const withHistory = {
+      ...product,
+      boxes: [{ info: { history: [{ date: "2026-09-01", price: 1.5, salePrice: 6 }] } }],
+    };
+    expect(nextPriceHistory(withHistory, 1.7, 6, "").length).toBe(2);
+  });
+  it("un producto nuevo empieza con su primer precio", () => {
+    expect(nextPriceHistory(null, 2, 4, "X")).toHaveLength(1);
+    expect(nextPriceHistory(null, "", "", "X")).toHaveLength(0);
+  });
+});

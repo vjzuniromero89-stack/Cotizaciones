@@ -1469,3 +1469,165 @@
     font-size: 20px;
   }
 }
+
+/* Historial de precios del producto. */
+.priceHistory {
+  border-top: 1px solid var(--line);
+  padding: 12px 16px;
+}
+.priceHistoryTop {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 14px;
+  font-size: 14.5px;
+  color: #c5ced8;
+}
+.priceHistoryTop > b {
+  color: var(--lime);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+}
+.priceHistoryTop strong {
+  color: #fff;
+  font-size: 16px;
+}
+.priceHistoryTop s {
+  color: #8b96a3;
+}
+.priceHistory em {
+  font-style: normal;
+  font-weight: 800;
+  margin-left: 6px;
+}
+.priceHistory em.up {
+  color: #ff8a80;
+}
+.priceHistory em.down {
+  color: #3be090;
+}
+.priceHistoryTop button {
+  margin-left: auto;
+  border: 1px solid #343640;
+  border-radius: 8px;
+  background: transparent;
+  color: #eef2f5;
+  font: inherit;
+  font-weight: 800;
+  font-size: 13px;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+.priceHistoryTable {
+  margin-top: 10px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  overflow-x: auto;
+}
+.priceHistoryRow {
+  display: grid;
+  grid-template-columns: 150px 130px 100px 130px 100px minmax(110px, 1fr);
+  gap: 10px;
+  align-items: center;
+  min-width: 760px;
+  padding: 9px 12px;
+  border-top: 1px solid var(--line);
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
+.priceHistoryRow.head {
+  border-top: 0;
+  background: var(--surface-2);
+  color: #c5ced8;
+  font-size: 12px;
+  font-weight: 800;
+}
+.priceHistoryRow b {
+  font: 800 15px Manrope;
+}
+.priceHistoryRow em {
+  margin: 0;
+}
+.priceHistoryRow span i {
+  font-style: normal;
+  margin-left: 6px;
+  font-size: 11px;
+  font-weight: 800;
+  color: #07140e;
+  background: #3be090;
+  border-radius: 99px;
+  padding: 1px 7px;
+}
+
+/* Cambios de precio a la vista. */
+.priceHistoryChanges {
+  display: grid;
+  gap: 4px;
+}
+.priceHistoryTop strong.sale {
+  color: #3be090;
+}
+.priceHistory em.saleUp {
+  color: #3be090;
+}
+.priceHistory em.saleDown {
+  color: #ff8a80;
+}
+.priceRow {
+  grid-template-columns: 110px minmax(0, 1fr) 150px 170px 190px;
+}
+.priceBefore {
+  display: grid;
+  gap: 2px;
+  font-variant-numeric: tabular-nums;
+}
+.priceBefore s {
+  color: #8b96a3;
+  font: 800 18px Manrope;
+}
+.priceBefore i {
+  font-style: normal;
+  font-weight: 800;
+  font-size: 14px;
+}
+.priceBefore i.up {
+  color: #3be090;
+}
+.priceBefore i.down {
+  color: #ff8a80;
+}
+.priceBefore small {
+  color: var(--muted);
+  font-size: 12.5px;
+}
+@media (max-width: 1150px) {
+  .priceTable {
+    overflow-x: auto;
+  }
+  .priceRow {
+    grid-template-columns: 84px minmax(150px, 1fr) 120px 140px 160px;
+    gap: 12px;
+    min-width: 800px;
+    padding: 10px 14px;
+  }
+  .priceHead span:nth-child(4),
+  .priceRow em {
+    display: block;
+  }
+  .priceRow img,
+  .priceRow .compareNoPhoto {
+    width: 84px;
+    height: 84px;
+  }
+  .priceRow b {
+    font-size: 16.5px;
+  }
+  .priceRow strong {
+    font-size: 22px;
+  }
+  .priceRow em {
+    font-size: 17px;
+  }
+}

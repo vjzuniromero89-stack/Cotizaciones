@@ -3,6 +3,7 @@ import { Tag, Package, Search } from "lucide-react";
 import { authFetch } from "./auth.js";
 import { DEFAULT_EXCHANGE_RATE } from "./calculate.js";
 import { isRealProduct, infoOf } from "./suppliers.js";
+import { lastChange } from "./specs.js";
 import "./suppliers.css";
 
 const usd = (n) =>
@@ -69,9 +70,11 @@ export default function PriceListPage({ refreshKey }) {
             <span>Producto</span>
             <span>Precio (US$)</span>
             <span>Precio (C$)</span>
+            <span>Precio anterior</span>
           </div>
           {shown.map((p) => {
             const price = Number(infoOf(p).salePrice) || 0;
+            const change = lastChange(infoOf(p), "salePrice");
             return (
               <div className="priceRow" key={p.id}>
                 {p.image_url ? (
@@ -84,6 +87,28 @@ export default function PriceListPage({ refreshKey }) {
                 <b>{p.name}</b>
                 <strong>{price > 0 ? usd(price) : "Sin precio"}</strong>
                 <em>{price > 0 ? cs(price) : "—"}</em>
+                <div className="priceBefore">
+                  {change ? (
+                    <>
+                      <s>{usd(change.before)}</s>
+                      {change.percent != null && (
+                        <i className={change.percent > 0 ? "up" : "down"}>
+                          {change.percent > 0 ? "▲ subió " : "▼ bajó "}
+                          {Math.abs(change.percent).toFixed(1)} %
+                        </i>
+                      )}
+                      <small>
+                        desde el{" "}
+                        {new Date(change.date + "T12:00:00").toLocaleDateString(
+                          "es-NI",
+                          { day: "numeric", month: "short", year: "numeric" },
+                        )}
+                      </small>
+                    </>
+                  ) : (
+                    <small>Sin cambios</small>
+                  )}
+                </div>
               </div>
             );
           })}

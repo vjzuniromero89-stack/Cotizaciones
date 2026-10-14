@@ -23,7 +23,7 @@ import "./product-detail.css";
 import "./client-quote.css";
 import { calculate, exchangeRateOf, autoBoxes } from "./calculate.js";
 import { isRealProduct } from "./suppliers.js";
-import { publicSpecs } from "./specs.js";
+import { publicSpecs, localToday } from "./specs.js";
 import "./suppliers.css";
 import { authFetch } from "./auth.js";
 
@@ -249,7 +249,7 @@ export const paymentSummary = (record) => {
     balance: Math.max(0, total - paid),
   };
 };
-const today = () => new Date().toISOString().slice(0, 10);
+const today = localToday;
 const dateLabel = (text) =>
   text
     ? new Date(text + "T12:00:00").toLocaleDateString("es-NI", {

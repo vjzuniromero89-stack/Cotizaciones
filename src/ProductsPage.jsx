@@ -23,6 +23,8 @@ import {
   specsOfInfo,
   priceNoteOf,
   DEFAULT_PRICE_NOTE,
+  nextPriceHistory,
+  lastChange,
 } from "./specs.js";
 import {
   isRealProduct,
@@ -485,6 +487,108 @@ function ProductSpecs({ product }) {
     </div>
   );
 }
+const shortDate = (text) =>
+  text
+    ? new Date(text + "T12:00:00").toLocaleDateString("es-NI", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+      })
+    : "sin fecha";
+const changeOf = (now, before) =>
+  before > 0 && now !== before ? ((now - before) / before) * 100 : null;
+// Historial de precios: último cambio a la vista y la lista completa al abrir.
+function PriceHistory({ product }) {
+  const history = Array.isArray(infoOf(product).history)
+    ? infoOf(product).history
+    : [];
+  const [open, setOpen] = useState(false);
+  if (!history.length) return null;
+  const last = history[history.length - 1];
+  const buy = lastChange(infoOf(product), "price"),
+    sell = lastChange(infoOf(product), "salePrice");
+  return (
+    <div className="priceHistory">
+      <div className="priceHistoryTop">
+        <b>Historial de precios</b>
+        {buy || sell ? (
+          <div className="priceHistoryChanges">
+            {buy && (
+              <span>
+                Precio de compra: antes <s>{money(buy.before)}</s> → ahora{" "}
+                <strong>{money(buy.now)}</strong>
+                {buy.percent != null && (
+                  <em className={buy.percent > 0 ? "up" : "down"}>
+                    {buy.percent > 0 ? "▲ +" : "▼ "}
+                    {buy.percent.toFixed(1)} %
+                  </em>
+                )}{" "}
+                · desde el {shortDate(buy.date)}
+              </span>
+            )}
+            {sell && (
+              <span>
+                Precio de venta: antes <s>{money(sell.before)}</s> → ahora{" "}
+                <strong className="sale">{money(sell.now)}</strong>
+                {sell.percent != null && (
+                  <em className={sell.percent > 0 ? "saleUp" : "saleDown"}>
+                    {sell.percent > 0 ? "▲ +" : "▼ "}
+                    {sell.percent.toFixed(1)} %
+                  </em>
+                )}{" "}
+                · desde el {shortDate(sell.date)}
+              </span>
+            )}
+          </div>
+        ) : (
+          <span>
+            Sin cambios desde el {shortDate(last.date)}. Aquí quedará anotado
+            cada cambio de precio.
+          </span>
+        )}
+        {history.length > 1 && (
+          <button type="button" onClick={() => setOpen((x) => !x)}>
+            {open ? "Ocultar" : `Ver los ${history.length} precios`}
+          </button>
+        )}
+      </div>
+      {open && (
+        <div className="priceHistoryTable">
+          <div className="priceHistoryRow head">
+            <span>Fecha</span>
+            <span>Precio de compra</span>
+            <span>Cambio</span>
+            <span>Precio de venta</span>
+            <span>Cambio</span>
+            <span>Proveedor</span>
+          </div>
+          {[...history].reverse().map((h, i, list) => {
+            const before = list[i + 1];
+            const buy = before ? changeOf(h.price, before.price) : null,
+              sell = before ? changeOf(h.salePrice, before.salePrice) : null;
+            return (
+              <div className="priceHistoryRow" key={h.date + i}>
+                <span>
+                  {shortDate(h.date)}
+                  {i === 0 && <i>actual</i>}
+                </span>
+                <b>{h.price > 0 ? money(h.price) : "—"}</b>
+                <em className={buy == null ? "" : buy > 0 ? "up" : "down"}>
+                  {buy == null ? "—" : (buy > 0 ? "▲ +" : "▼ ") + buy.toFixed(1) + " %"}
+                </em>
+                <b>{h.salePrice > 0 ? money(h.salePrice) : "—"}</b>
+                <em className={sell == null ? "" : sell > 0 ? "up" : "down"}>
+                  {sell == null ? "—" : (sell > 0 ? "▲ +" : "▼ ") + sell.toFixed(1) + " %"}
+                </em>
+                <span>{h.supplier || "—"}</span>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
 const safeLink = (url) => {
   const text = String(url || "").trim();
   if (!text) return "";
@@ -682,6 +786,12 @@ export function RegisterProductDialog({
                 salePrice:
                   Number(form.salePrice) > 0 ? Number(form.salePrice) : "",
                 priceNote: form.priceNote.trim(),
+                history: nextPriceHistory(
+                  product,
+                  form.price,
+                  form.salePrice,
+                  form.supplier.trim(),
+                ),
                 photos: form.photos.filter((u) => u && u !== form.imageUrl),
                 model: form.model.trim(),
                 family,
@@ -1411,6 +1521,7 @@ function CatalogSection({ refreshKey, onCatalogChanged, onOptions }) {
                   <div className="cbmSummary"><span>CBM por unidad</span><strong>{perBox ? (oneBoxCbm(box) / perBox).toFixed(6) : "—"}</strong></div>
                   <div><span>Condición del precio</span><strong>{priceNoteOf(info.priceNote)}</strong></div>
                 </div>
+                <PriceHistory product={p} />
                 <ProductSpecs product={p} />
                 {(info.url || info.notes) && (
                   <div className="catalogInfoLine">
