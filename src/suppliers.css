@@ -1631,3 +1631,142 @@
     font-size: 17px;
   }
 }
+
+/* Precio anterior en dólares y córdobas. */
+.priceBefore s {
+  display: block;
+}
+.priceHistoryRow {
+  grid-template-columns: 140px 130px 95px 130px 95px 110px minmax(100px, 1fr);
+  min-width: 880px;
+}
+.priceHistoryRow b small {
+  display: block;
+  font: 600 12.5px Manrope;
+  color: #c5ced8;
+}
+/* Pestaña Cambios de precio. */
+.chgSummary {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.chgSummary > div {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+  padding: 12px 14px;
+}
+.chgSummary span {
+  display: block;
+  font-size: 13px;
+  color: #c5ced8;
+}
+.chgSummary strong {
+  font: 800 26px Manrope;
+}
+.chgSummary .good,
+.chgCell i.good {
+  color: #3be090;
+}
+.chgSummary .bad,
+.chgCell i.bad {
+  color: #ff8a80;
+}
+.chgFilters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.chgFilters button {
+  border: 1px solid #343640;
+  border-radius: 99px;
+  background: transparent;
+  color: #eef2f5;
+  font: 800 14px Manrope;
+  padding: 8px 16px;
+  cursor: pointer;
+}
+.chgFilters button.active {
+  background: #3be090;
+  border-color: #3be090;
+  color: #07140e;
+}
+.chgTable {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface);
+  overflow-x: auto;
+}
+.chgRow {
+  display: grid;
+  grid-template-columns: 84px minmax(170px, 1.3fr) repeat(3, minmax(165px, 1fr));
+  gap: 14px;
+  align-items: center;
+  min-width: 860px;
+  padding: 12px 16px;
+  border-top: 1px solid var(--line);
+  font-variant-numeric: tabular-nums;
+}
+.chgHead {
+  border-top: 0;
+  background: var(--surface-2);
+  color: #c5ced8;
+  font-size: 13px;
+  font-weight: 800;
+}
+.chgRow img,
+.chgRow .compareNoPhoto {
+  width: 84px;
+  height: 84px;
+  border-radius: 10px;
+  object-fit: contain;
+  background: #fff;
+  border: 1px solid var(--line);
+}
+.chgRow .compareNoPhoto {
+  background: var(--surface-2);
+}
+.chgName b {
+  display: block;
+  font: 800 17px Manrope;
+  overflow-wrap: anywhere;
+}
+.chgName small {
+  font-size: 13.5px;
+  color: #c5ced8;
+}
+.chgCell {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  font-size: 14px;
+}
+.chgCell s {
+  color: #8b96a3;
+  font-size: 13.5px;
+}
+.chgCell strong {
+  font: 800 20px Manrope;
+}
+.chgCell small {
+  font-size: 14px;
+  color: #eef2f5;
+}
+.chgCell i {
+  font-style: normal;
+  font-weight: 800;
+  font-size: 13.5px;
+  color: #8b96a3;
+}
+.chgCell.same strong {
+  font-size: 17px;
+  color: #c5ced8;
+}
+@media (max-width: 760px) {
+  .chgSummary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

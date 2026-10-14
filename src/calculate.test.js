@@ -157,3 +157,24 @@ describe("historial de precios", () => {
     expect(nextPriceHistory(null, "", "", "X")).toHaveLength(0);
   });
 });
+import { marginOf, priceChanges } from "./specs.js";
+describe("registro de cambios", () => {
+  it("guarda el costo y calcula el porcentaje de ganancia", () => {
+    const h = nextPriceHistory(null, 2, 3, "X", 2.5);
+    expect(h[0].cost).toBe(2.5);
+    expect(marginOf(h[0])).toBeCloseTo(20);
+    expect(marginOf({ price: 2, salePrice: 3 })).toBeNull();
+  });
+  it("anota el cambio de porcentaje aunque el precio de compra siga igual", () => {
+    const p = { boxes: [{ info: { history: [{ date: "2026-10-01", price: 2, salePrice: 3, cost: 2.5 }] } }] };
+    const h = nextPriceHistory(p, 2, 3.5, "X", 2.5);
+    expect(h).toHaveLength(2);
+    expect(marginOf(h[1])).toBeCloseTo(40);
+    expect(nextPriceHistory(p, 2, 3, "X", 2.5)).toHaveLength(1);
+  });
+  it("junta los cambios de todos los productos, el más nuevo primero", () => {
+    const mk = (name, dates) => ({ name, boxes: [{ info: { history: dates.map((date, i) => ({ date, price: i + 1, salePrice: 5 })) } }] });
+    const list = priceChanges([mk("a", ["2026-09-01", "2026-09-10"]), mk("b", ["2026-09-02", "2026-10-05", "2026-10-06"]), mk("c", ["2026-01-01"])]);
+    expect(list.map((c) => c.product.name + c.now.date)).toEqual(["b2026-10-06", "b2026-10-05", "a2026-09-10"]);
+  });
+});

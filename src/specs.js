@@ -1,3 +1,4 @@
+import { estimateLandedUnit } from "./calculate.js";
 // Ficha del producto: cada dato con su nombre, como en la cotización del
 // proveedor (Material, Capacity, Weight, Product dimensions, Quantity).
 export const SPEC_FIELDS = [
@@ -60,13 +61,46 @@ export const localToday = () => {
   const two = (n) => String(n).padStart(2, "0");
   return d.getFullYear() + "-" + two(d.getMonth() + 1) + "-" + two(d.getDate());
 };
+// Costo por unidad que tenía el producto guardado (compra + comisión + flete).
+function oldCostOf(product) {
+  const box = product?.boxes?.[0] || {},
+    buy = Number(product?.unit_price) || 0;
+  const hasBox =
+    (Number(box.l) > 0 && Number(box.w) > 0 && Number(box.h) > 0) ||
+    Number(box.weight) > 0;
+  const landed = hasBox ? estimateLandedUnit({ price: buy, box }) : null;
+  return Math.round((landed?.total || buy) * 1000) / 1000;
+}
+// Porcentaje de ganancia de un renglón del historial: (venta − costo) ÷ costo.
+// null si el renglón es viejo y no guardó el costo.
+export function marginOf(entry) {
+  const cost = Number(entry?.cost) || 0,
+    sale = Number(entry?.salePrice) || 0;
+  return cost > 0 && sale > 0 ? ((sale - cost) / cost) * 100 : null;
+}
+// Todos los cambios de todos los productos, del más nuevo al más viejo.
+export function priceChanges(products) {
+  const list = [];
+  for (const product of products || []) {
+    const history = product?.boxes?.[0]?.info?.history;
+    if (!Array.isArray(history)) continue;
+    for (let i = 1; i < history.length; i++)
+      list.push({ product, before: history[i - 1], now: history[i], order: i });
+  }
+  return list.sort(
+    (a, b) =>
+      String(b.now.date).localeCompare(String(a.now.date)) || b.order - a.order,
+  );
+}
 // Historial de precios de un producto. Cada vez que cambia el precio de compra
 // o el de venta se agrega un renglón; nunca se borra lo anterior.
-export function nextPriceHistory(product, price, salePrice, supplier) {
+export function nextPriceHistory(product, price, salePrice, supplier, cost) {
   const info = product?.boxes?.[0]?.info || {};
   const history = Array.isArray(info.history) ? [...info.history] : [];
   const buy = Number(price) || 0,
     sell = Number(salePrice) || 0;
+  // Costo por unidad puesto en Nicaragua; sin caja se usa el precio de compra.
+  const landed = Math.round((Number(cost) || buy) * 1000) / 1000;
   // Producto que ya existía sin historial: se guarda primero lo que tenía.
   if (product && !history.length) {
     const oldBuy = Number(product.unit_price) || 0,
@@ -76,16 +110,20 @@ export function nextPriceHistory(product, price, salePrice, supplier) {
         date: String(product.updated_at || product.created_at || "").slice(0, 10),
         price: oldBuy,
         salePrice: oldSell,
+        cost: oldCostOf(product),
         supplier: String(info.supplier || ""),
       });
   }
   const last = history[history.length - 1];
-  if (!last || last.price !== buy || last.salePrice !== sell) {
+  const costChanged =
+    last && Number(last.cost) > 0 && Math.abs(last.cost - landed) > 0.005;
+  if (!last || last.price !== buy || last.salePrice !== sell || costChanged) {
     if (buy > 0 || sell > 0)
       history.push({
         date: localToday(),
         price: buy,
         salePrice: sell,
+        cost: landed,
         supplier: String(supplier || ""),
       });
   }

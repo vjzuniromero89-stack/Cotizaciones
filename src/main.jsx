@@ -23,6 +23,7 @@ import {
   Images,
   Percent,
   Tag,
+  History,
 } from "lucide-react";
 import "./style.css";
 import "./route-breakdown.css";
@@ -38,6 +39,7 @@ import SuppliersPage from "./SuppliersPage.jsx";
 import PhotosPage from "./PhotosPage.jsx";
 import MarginsPage from "./MarginsPage.jsx";
 import PriceListPage from "./PriceListPage.jsx";
+import ChangesPage from "./ChangesPage.jsx";
 import { isRealProduct } from "./suppliers.js";
 import UsersPage from "./UsersPage.jsx";
 import AuthPage from "./AuthPage.jsx";
@@ -123,6 +125,7 @@ const navGroups = (currentUser) => [
       ["suppliers", Factory, "Proveedores"],
       ["photos", Images, "Fotos"],
       ["prices", Tag, "Lista de precios"],
+      ["changes", History, "Cambios de precio"],
     ],
   },
   {
@@ -1098,6 +1101,8 @@ function App() {
           />
         ) : page === "prices" ? (
           <PriceListPage refreshKey={refresh} />
+        ) : page === "changes" ? (
+          <ChangesPage refreshKey={refresh} />
         ) : page === "margins" ? (
           <MarginsPage refreshKey={refresh} />
         ) : page === "photos" ? (

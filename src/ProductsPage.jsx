@@ -24,6 +24,7 @@ import {
   priceNoteOf,
   DEFAULT_PRICE_NOTE,
   nextPriceHistory,
+  marginOf,
   lastChange,
 } from "./specs.js";
 import {
@@ -507,16 +508,33 @@ function PriceHistory({ product }) {
   const last = history[history.length - 1];
   const buy = lastChange(infoOf(product), "price"),
     sell = lastChange(infoOf(product), "salePrice");
+  // Último cambio del porcentaje de ganancia.
+  const marginNow = marginOf(last);
+  let margin = null;
+  for (let i = history.length - 2; i >= 0 && marginNow != null; i--) {
+    const before = marginOf(history[i]);
+    if (before == null) break;
+    if (Math.abs(before - marginNow) >= 0.05) {
+      margin = { before, now: marginNow, date: history[i + 1].date };
+      break;
+    }
+  }
   return (
     <div className="priceHistory">
       <div className="priceHistoryTop">
         <b>Historial de precios</b>
-        {buy || sell ? (
+        {buy || sell || margin ? (
           <div className="priceHistoryChanges">
             {buy && (
               <span>
-                Precio de compra: antes <s>{money(buy.before)}</s> → ahora{" "}
-                <strong>{money(buy.now)}</strong>
+                Precio de compra: antes{" "}
+                <s>
+                  {money(buy.before)} · {cordobas(buy.before)}
+                </s>{" "}
+                → ahora{" "}
+                <strong>
+                  {money(buy.now)} · {cordobas(buy.now)}
+                </strong>
                 {buy.percent != null && (
                   <em className={buy.percent > 0 ? "up" : "down"}>
                     {buy.percent > 0 ? "▲ +" : "▼ "}
@@ -528,8 +546,14 @@ function PriceHistory({ product }) {
             )}
             {sell && (
               <span>
-                Precio de venta: antes <s>{money(sell.before)}</s> → ahora{" "}
-                <strong className="sale">{money(sell.now)}</strong>
+                Precio de venta: antes{" "}
+                <s>
+                  {money(sell.before)} · {cordobas(sell.before)}
+                </s>{" "}
+                → ahora{" "}
+                <strong className="sale">
+                  {money(sell.now)} · {cordobas(sell.now)}
+                </strong>
                 {sell.percent != null && (
                   <em className={sell.percent > 0 ? "saleUp" : "saleDown"}>
                     {sell.percent > 0 ? "▲ +" : "▼ "}
@@ -537,6 +561,17 @@ function PriceHistory({ product }) {
                   </em>
                 )}{" "}
                 · desde el {shortDate(sell.date)}
+              </span>
+            )}
+            {margin && (
+              <span>
+                Porcentaje de ganancia: antes <s>{margin.before.toFixed(1)} %</s>{" "}
+                → ahora <strong>{margin.now.toFixed(1)} %</strong>
+                <em className={margin.now > margin.before ? "saleUp" : "saleDown"}>
+                  {margin.now > margin.before ? "▲ subió " : "▼ bajó "}
+                  {Math.abs(margin.now - margin.before).toFixed(1)} puntos
+                </em>{" "}
+                · desde el {shortDate(margin.date)}
               </span>
             )}
           </div>
@@ -560,6 +595,7 @@ function PriceHistory({ product }) {
             <span>Cambio</span>
             <span>Precio de venta</span>
             <span>Cambio</span>
+            <span>% de ganancia</span>
             <span>Proveedor</span>
           </div>
           {[...history].reverse().map((h, i, list) => {
@@ -572,14 +608,21 @@ function PriceHistory({ product }) {
                   {shortDate(h.date)}
                   {i === 0 && <i>actual</i>}
                 </span>
-                <b>{h.price > 0 ? money(h.price) : "—"}</b>
+                <b>
+                  {h.price > 0 ? money(h.price) : "—"}
+                  {h.price > 0 && <small>{cordobas(h.price)}</small>}
+                </b>
                 <em className={buy == null ? "" : buy > 0 ? "up" : "down"}>
                   {buy == null ? "—" : (buy > 0 ? "▲ +" : "▼ ") + buy.toFixed(1) + " %"}
                 </em>
-                <b>{h.salePrice > 0 ? money(h.salePrice) : "—"}</b>
+                <b>
+                  {h.salePrice > 0 ? money(h.salePrice) : "—"}
+                  {h.salePrice > 0 && <small>{cordobas(h.salePrice)}</small>}
+                </b>
                 <em className={sell == null ? "" : sell > 0 ? "up" : "down"}>
                   {sell == null ? "—" : (sell > 0 ? "▲ +" : "▼ ") + sell.toFixed(1) + " %"}
                 </em>
+                <b>{marginOf(h) == null ? "—" : marginOf(h).toFixed(1) + " %"}</b>
                 <span>{h.supplier || "—"}</span>
               </div>
             );
@@ -791,6 +834,7 @@ export function RegisterProductDialog({
                   form.price,
                   form.salePrice,
                   form.supplier.trim(),
+                  landed ? landed.total : 0,
                 ),
                 photos: form.photos.filter((u) => u && u !== form.imageUrl),
                 model: form.model.trim(),

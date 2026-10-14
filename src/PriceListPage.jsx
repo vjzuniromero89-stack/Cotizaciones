@@ -91,6 +91,7 @@ export default function PriceListPage({ refreshKey }) {
                   {change ? (
                     <>
                       <s>{usd(change.before)}</s>
+                      <s>{cs(change.before)}</s>
                       {change.percent != null && (
                         <i className={change.percent > 0 ? "up" : "down"}>
                           {change.percent > 0 ? "▲ subió " : "▼ bajó "}
